@@ -1,17 +1,20 @@
-#include <iostream>
-#include <actor_monitor/include/actor_monitor.h>
-#include "logger/include/logger.h"
-#include "caf/io/all.hpp"
+/*
+ * Copyright (c) 2020 ThoughtWorks Inc.
+ */
 
-caf::behavior calculator_with_error(caf::event_based_actor* self) {
+#include "caf/io/all.hpp"
+#include "logger/include/logger.h"
+#include <actor_monitor/include/actor_monitor.h>
+#include <iostream>
+
+caf::behavior calculator_with_error(caf::event_based_actor *self) {
   self->set_default_handler(caf::reflect_and_quit);
   return {[=](caf::add_atom, int a, int b) {
-            CDCF_LOGGER_INFO(
-            "received add_atom task from remote node. input a:{} b:{}", a,
-            b);
-            self->quit();
-            return 0;
-          }};
+    CDCF_LOGGER_INFO("received add_atom task from remote node. input a:{} b:{}",
+                     a, b);
+    self->quit();
+    return 0;
+  }};
 }
 
 int main() {
@@ -24,7 +27,7 @@ int main() {
   std::string error_message_ = "";
 
   caf::actor supervisor_ = system_.spawn<ActorMonitor>(
-      [&](const caf::down_msg& downMsg, const std::string& actor_description) {
+      [&](const caf::down_msg &downMsg, const std::string &actor_description) {
         promise_.set_value(caf::to_string(downMsg.reason));
       });
   caf::actor calculator_ = system_.spawn(calculator_with_error);
@@ -32,5 +35,5 @@ int main() {
 
   scoped_sender->send(calculator_, caf::add_atom::value, 3, 1);
   error_message_ = promise_.get_future().get();
-  std::cout << "actor monitor error message: " << error_message_  << std::endl;
+  std::cout << "actor monitor error message: " << error_message_ << std::endl;
 }
