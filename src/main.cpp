@@ -12,7 +12,7 @@
 caf::behavior calculator_with_error(caf::event_based_actor *self) {
   self->set_default_handler(caf::reflect_and_quit);
   return {[=](caf::add_atom, int a, int b) {
-    CDCF_LOGGER_INFO("received add_atom task from remote node. input a:{} b:{}",
+    CDCF_LOGGER_INFO("received new add_atom task from remote node. input a:{} b:{}",
                      a, b);
     self->quit();
     return 0;
