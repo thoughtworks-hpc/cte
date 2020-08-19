@@ -32,6 +32,7 @@ DartConfiguration.tcl
 **/*.pb.h
 
 */.DS_Store
+.DS_Store
 
 tags
 __pycache__

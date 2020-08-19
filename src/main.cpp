@@ -2,10 +2,12 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
+#include <actor_monitor/include/actor_monitor.h>
+
+#include <iostream>
+
 #include "caf/io/all.hpp"
 #include "logger/include/logger.h"
-#include <actor_monitor/include/actor_monitor.h>
-#include <iostream>
 
 caf::behavior calculator_with_error(caf::event_based_actor *self) {
   self->set_default_handler(caf::reflect_and_quit);
