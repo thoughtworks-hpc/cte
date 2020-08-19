@@ -1,0 +1,7 @@
+[requires]
+cdcf/1.0@x3/stable
+
+[generators]
+cmake_find_package
+cmake_paths
+cmake
