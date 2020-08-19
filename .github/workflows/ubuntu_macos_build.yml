@@ -28,6 +28,7 @@ jobs:
       - name: conan
         run: |
           conan remote add inexorgame "https://api.bintray.com/conan/inexorgame/inexor-conan"
+          conan remote add test_lib "https://api.bintray.com/conan/grandmango/cdcf"
           conan install . -s compiler.libcxx=${{ matrix.libcxx }} --build missing
       - name: cmake
         run: |
