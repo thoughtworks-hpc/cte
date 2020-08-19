@@ -4,7 +4,8 @@ cmake_minimum_required(VERSION 3.10)
 # Name of the project
 project(Project)
 set(CMAKE_CXX_STANDARD 17)
-SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/build)
+
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/build)
 if ("${CONAN_COMPILER}" STREQUAL "gcc")
     set(CMAKE_C_FLAGS ${CONAN_C_FLAGS})
     set(CMAKE_CXX_FLAGS ${CONAN_CXX_FLAGS})
