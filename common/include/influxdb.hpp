@@ -324,17 +324,31 @@ inline int inner::http_request(const char* method, const char* uri,
         _('t')
         _('e')
         _('n')
-        _('t') _('-') _('L') _('e') _('n') _('g') _('t') _('h') _(':') _(' ')
-            _GET_NUMBER(content_length) break;
+        _('t')
+        _('-')
+        _('L')
+        _('e')
+        _('n')
+        _('g') _('t') _('h') _(':') _(' ') _GET_NUMBER(content_length) break;
       case 'T':
         _('r')
         _('a')
         _('n')
         _('s')
         _('f')
-        _('e') _('r') _('-') _('E') _('n') _('c') _('o') _('d') _('i') _('n')
-            _('g') _(':') _(' ') _('c') _('h') _('u') _('n') _('k') _('e')
-                _('d') chunked = 1;
+        _('e')
+        _('r')
+        _('-')
+        _('E')
+        _('n')
+        _('c')
+        _('o')
+        _('d')
+        _('i')
+        _('n')
+        _('g')
+        _(':')
+        _(' ') _('c') _('h') _('u') _('n') _('k') _('e') _('d') chunked = 1;
         break;
       case '\r':
         __('\n')
