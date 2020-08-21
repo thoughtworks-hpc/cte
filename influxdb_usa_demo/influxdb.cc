@@ -2,7 +2,7 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
-#include "influxdb.hpp"
+#include "../common/include/influxdb.hpp"
 
 #include <iostream>
 
