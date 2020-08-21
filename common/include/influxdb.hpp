@@ -8,9 +8,11 @@
 #include <sys/uio.h>
 #include <unistd.h>
 
+#include <algorithm>
 #include <cstdio>
 #include <cstring>
 #include <sstream>
+#include <string>
 
 namespace influxdb_cpp {
 struct server_info {
@@ -86,7 +88,7 @@ struct builder {
     lines_ << '\"';
     return (detail::field_caller&)*this;
   }
-  detail::field_caller& _f_i(char delim, const std::string& k, long long v) {
+  detail::field_caller& _f_i(char delim, const std::string& k, int64_t v) {
     lines_ << delim;
     _escape(k, ",= ");
     lines_ << '=';
@@ -108,7 +110,7 @@ struct builder {
     lines_ << '=' << (v ? 't' : 'f');
     return (detail::field_caller&)*this;
   }
-  detail::ts_caller& _ts(long long ts) {
+  detail::ts_caller& _ts(int64_t ts) {
     lines_ << ' ' << ts;
     return (detail::ts_caller&)*this;
   }
@@ -130,7 +132,7 @@ struct builder {
     lines_ << '\n';
     if (sendto(sock, &lines_.str()[0], lines_.str().length(), 0,
                (struct sockaddr*)&addr,
-               sizeof(addr)) < (int)lines_.str().length())
+               sizeof(addr)) < static_cast<int>(lines_.str().length()))
       ret = -3;
 
     close(sock);
@@ -160,16 +162,13 @@ struct tag_caller : public builder {
   detail::field_caller& field(const std::string& k, bool v) {
     return _f_b(' ', k, v);
   }
-  detail::field_caller& field(const std::string& k, short v) {
+  detail::field_caller& field(const std::string& k, int16_t v) {
     return _f_i(' ', k, v);
   }
   detail::field_caller& field(const std::string& k, int v) {
     return _f_i(' ', k, v);
   }
-  detail::field_caller& field(const std::string& k, long v) {
-    return _f_i(' ', k, v);
-  }
-  detail::field_caller& field(const std::string& k, long long v) {
+  detail::field_caller& field(const std::string& k, int64_t v) {
     return _f_i(' ', k, v);
   }
   detail::field_caller& field(const std::string& k, double v, int prec = 2) {
@@ -198,22 +197,19 @@ struct field_caller : public ts_caller {
   detail::field_caller& field(const std::string& k, bool v) {
     return _f_b(',', k, v);
   }
-  detail::field_caller& field(const std::string& k, short v) {
+  detail::field_caller& field(const std::string& k, int16_t v) {
     return _f_i(',', k, v);
   }
   detail::field_caller& field(const std::string& k, int v) {
     return _f_i(',', k, v);
   }
-  detail::field_caller& field(const std::string& k, long v) {
-    return _f_i(',', k, v);
-  }
-  detail::field_caller& field(const std::string& k, long long v) {
+  detail::field_caller& field(const std::string& k, int64_t v) {
     return _f_i(',', k, v);
   }
   detail::field_caller& field(const std::string& k, double v, int prec = 2) {
     return _f_f(',', k, v, prec);
   }
-  detail::ts_caller& timestamp(unsigned long long ts) { return _ts(ts); }
+  detail::ts_caller& timestamp(uint64_t ts) { return _ts(ts); }
 };
 inline void inner::url_encode(std::string& out, const std::string& src) {
   size_t pos = 0, start = 0;
@@ -222,9 +218,9 @@ inline void inner::url_encode(std::string& out, const std::string& src) {
            "abcdefghijklmnopqrstuvwxyqABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.~",
            start)) != std::string::npos) {
     out.append(src.c_str() + start, pos - start);
-    if (src[pos] == ' ')
+    if (src[pos] == ' ') {
       out += "+";
-    else {
+    } else {
       out += '%';
       out += to_hex((unsigned char)src[pos] >> 4);
       out += to_hex((unsigned char)src[pos] & 0xF);
@@ -265,8 +261,8 @@ inline int inner::http_request(const char* method, const char* uri,
                  "%s\r\nContent-Length: %d\r\n\r\n",
                  method, uri, si.db_.c_str(), si.usr_.c_str(), si.pwd_.c_str(),
                  si.precision_.c_str(), querystring.c_str(), si.host_.c_str(),
-                 (int)body.length());
-    if ((int)iv[0].iov_len >= len)
+                 static_cast<int>(body.length()));
+    if (static_cast<int>(iv[0].iov_len) >= len)
       header.resize(len *= 2);
     else
       break;
@@ -275,7 +271,7 @@ inline int inner::http_request(const char* method, const char* uri,
   iv[1].iov_base = (void*)&body[0];
   iv[1].iov_len = body.length();
 
-  if (writev(sock, iv, 2) < (int)(iv[0].iov_len + iv[1].iov_len)) {
+  if (writev(sock, iv, 2) < static_cast<int>(iv[0].iov_len + iv[1].iov_len)) {
     ret_code = -6;
     goto END;
   }
@@ -283,7 +279,7 @@ inline int inner::http_request(const char* method, const char* uri,
   iv[0].iov_len = len;
 
 #define _NO_MORE()                                                       \
-  (len >= (int)iv[0].iov_len &&                                          \
+  (len >= static_cast<int>(iv[0].iov_len) &&                             \
    (iv[0].iov_len = recv(sock, &header[0], header.length(), len = 0)) == \
        size_t(-1))
 #define _GET_NEXT_CHAR() (ch = _NO_MORE() ? 0 : header[len++])
@@ -324,28 +320,36 @@ inline int inner::http_request(const char* method, const char* uri,
     switch (_GET_NEXT_CHAR()) {
       case 'C':
         _('o')
-        _('n') _('t') _('e') _('n') _('t') _('-') _('L') _('e') _('n') _('g')
-            _('t') _('h') _(':') _(' ') _GET_NUMBER(content_length) break;
+        _('n')
+        _('t')
+        _('e')
+        _('n')
+        _('t') _('-') _('L') _('e') _('n') _('g') _('t') _('h') _(':') _(' ')
+            _GET_NUMBER(content_length) break;
       case 'T':
         _('r')
-        _('a') _('n') _('s') _('f') _('e') _('r') _('-') _('E') _('n') _('c')
-            _('o') _('d') _('i') _('n') _('g') _(':') _(' ') _('c') _('h')
-                _('u') _('n') _('k') _('e') _('d') chunked = 1;
+        _('a')
+        _('n')
+        _('s')
+        _('f')
+        _('e') _('r') _('-') _('E') _('n') _('c') _('o') _('d') _('i') _('n')
+            _('g') _(':') _(' ') _('c') _('h') _('u') _('n') _('k') _('e')
+                _('d') chunked = 1;
         break;
       case '\r':
         __('\n')
         switch (chunked) {
           do {
             __('\r')
-            __('\n') case 1 : _GET_CHUNKED_LEN(content_length, '\r')
-                                  __('\n') if (!content_length) {
-              __('\r') __('\n') goto END;
-            }
+            __('\n')
+            case 1:
+              _GET_CHUNKED_LEN(content_length, '\r')
+              __('\n') if (!content_length) { __('\r') __('\n') goto END; }
             case 0:
               while (content_length > 0 && !_NO_MORE()) {
-                content_length -=
-                    (iv[1].iov_len =
-                         std::min(content_length, (int)iv[0].iov_len - len));
+                content_length -= (iv[1].iov_len = std::min(
+                                       content_length,
+                                       static_cast<int>(iv[0].iov_len) - len));
                 if (resp) resp->append(&header[len], iv[1].iov_len);
                 len += iv[1].iov_len;
               }
