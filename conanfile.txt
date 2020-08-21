@@ -1,5 +1,5 @@
 [requires]
-cdcf/1.0@x3/linux
+cdcf/1.0@x4/stable
 
 [generators]
 cmake_find_package
