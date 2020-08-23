@@ -1,13 +1,12 @@
 /*
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
-
-#include <actor_monitor/include/actor_monitor.h>
+#include <cdcf/actor_monitor.h>
+#include <cdcf/logger.h>
 
 #include <iostream>
 
-#include "caf/io/all.hpp"
-#include "logger/include/logger.h"
+#include <caf/io/all.hpp>
 
 caf::behavior calculator_with_error(caf::event_based_actor *self) {
   self->set_default_handler(caf::reflect_and_quit);
@@ -28,12 +27,12 @@ int main() {
   caf::scoped_actor scoped_sender(system_);
   std::string error_message_ = "";
 
-  caf::actor supervisor_ = system_.spawn<ActorMonitor>(
+  caf::actor supervisor_ = system_.spawn<cdcf::ActorMonitor>(
       [&](const caf::down_msg &downMsg, const std::string &actor_description) {
         promise_.set_value(caf::to_string(downMsg.reason));
       });
   caf::actor calculator_ = system_.spawn(calculator_with_error);
-  SetMonitor(supervisor_, calculator_, "worker actor for testing");
+  cdcf::SetMonitor(supervisor_, calculator_, "worker actor for testing");
 
   scoped_sender->send(calculator_, caf::add_atom::value, 3, 1);
   error_message_ = promise_.get_future().get();
