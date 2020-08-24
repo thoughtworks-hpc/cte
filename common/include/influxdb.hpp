@@ -4,7 +4,8 @@
   Copyright (c) 2010-2018 <http://ez8.co> <orca.zhang@yahoo.com>
   This library is released under the MIT License.
 
-  Please see LICENSE file or visit https://github.com/orca-zhang/influxdb-cpp for details.
+  Please see LICENSE file or visit https://github.com/orca-zhang/influxdb-cpp
+  for details.
  */
 #include <arpa/inet.h>
 #include <netinet/in.h>
