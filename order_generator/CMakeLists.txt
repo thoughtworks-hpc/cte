@@ -1,0 +1,8 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 3.5.2 FATAL_ERROR)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_LIBCPP_ENABLE_CXX17_REMOVED_AUTO_PTR" )
+
+
+add_executable(order_generator order_generator.cc)
+
+
+
