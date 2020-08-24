@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+option java_package = "com.thoughtworks.hpc.te.controller";
+option java_outer_classname = "MatchEngineProto";
+option objc_class_prefix = "MEP";
+
+package prototype;
+
+service TradingEngine {
+  rpc Match (Order) returns (Reply) {}
+  rpc SubscribeMatchResult(google.protobuf.Empty) returns (stream Trade) {}
+}
+
+enum TradingSide {
+  UNKNOWN = 0;
+  BUY = 1;
+  SELL = 2;
+}
+
+message Order {
+  int64 orderId = 1;
+  int32 symbol = 2;
+  int32 user_id = 3;
+  TradingSide trading_side = 4;
+  int32 amount = 5;
+  int32 price = 6; //  考虑到浮点误差的风险，使用int（比如价格为12.34，那传输的时候应该传递1234）
+  google.protobuf.Timestamp submit_time = 7; // 订单提交时间
+}
+
+enum Status {
+  UNKNOWN = 0;
+  SUCCESS = 1;
+  FAILURE = 2;
+}
+
+message Reply {
+  Status status = 1;
+  string message = 2;
+}
+
+message Trade {
+  string makerId = 1;
+  string takerId = 2; //taker 吃掉 maker
+  TradingSide trading_side = 3; // 吃单的买卖方向
+  int32 amount = 4;
+  int32 price = 5;
+  uint64 seller_user_id = 6;
+  uint64 buyer_user_id =7;
+  uint64 symbol_id = 8;
+  google.protobuf.Timestamp deal_time = 9; // 成交时间
+}
