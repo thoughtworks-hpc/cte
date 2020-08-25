@@ -2,7 +2,7 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
-#ifndef CTE_MATCH_ACTOR_H
+#ifndef MATCH_ENGINE_INCLUDE_MATCH_ACTOR_H_
 
 #include <caf/io/all.hpp>
 
@@ -10,6 +10,6 @@ struct Order {};
 
 struct OrderBook {};
 
-#define CTE_MATCH_ACTOR_H
+#define MATCH_ENGINE_INCLUDE_MATCH_ACTOR_H_
 
-#endif  // CTE_MATCH_ACTOR_H
+#endif  // MATCH_ENGINE_INCLUDE_MATCH_ACTOR_H_
