@@ -16,9 +16,9 @@ service TradingEngine {
 }
 
 enum TradingSide {
-  UNKNOWN = 0;
-  BUY = 1;
-  SELL = 2;
+  TRADING_UNKNOWN = 0;
+  TRADING_BUY = 1;
+  TRADING_SELL = 2;
 }
 
 message Order {
@@ -32,9 +32,9 @@ message Order {
 }
 
 enum Status {
-  UNKNOWN = 0;
-  SUCCESS = 1;
-  FAILURE = 2;
+  STATUS_UNKNOWN = 0;
+  STATUS_SUCCESS = 1;
+  STATUS_FAILURE = 2;
 }
 
 message Reply {
