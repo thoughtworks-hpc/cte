@@ -3,6 +3,7 @@
  */
 
 #include "../include/order_manager.h"
+
 #include "../../common/include/influxdb.hpp"
 
 ::grpc::Status OrderManagerImpl::PlaceOrder(
@@ -32,14 +33,20 @@
                 .timestamp(current_time_stamp.time_since_epoch().count())
                 .post_http(si, &resp);
 
+  std::string message;
   if (0 == ret && resp.empty()) {
-    std::cout << "write db success" << std::endl;
+    message = "write db success";
+    response->set_error_code(order_manager_proto::SUCCESS);
+    //    std::cout << "write db success" << std::endl;
   } else {
-    std::cout << "write db failed, ret:" << ret << " resp:" << resp
-              << std::endl;
+    message = message + "write db failed, ret:" + std::to_string(ret) +
+              " resp:" + resp;
+    response->set_error_code(order_manager_proto::FAILURE);
+    //    std::cout << "write db failed, ret:" << ret << " resp:" << resp
+    //              << std::endl;
   }
 
-  response->set_error(27);
+  response->set_message(message);
 
   //  stub_->Match(&client_context, order, reply);
   return grpc::Status::OK;

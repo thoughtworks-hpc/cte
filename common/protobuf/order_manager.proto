@@ -3,7 +3,8 @@ syntax = "proto3";
 package order_manager_proto;
 
 service OrderManager {
-    rpc PlaceOrder(Order) returns (Reply) {}
+    rpc PlaceOrder (Order) returns (Reply) {
+    }
 }
 
 enum TradingSide {
@@ -20,6 +21,12 @@ message Order {
     int32 price = 5; //  考虑到浮点误差的风险，使用int（比如价格为12.34，那传输的时候应该传递1234）
 }
 
+enum ErrorCode {
+    SUCCESS = 0;
+    FAILURE = 1;
+}
+
 message Reply {
-    int32 error = 1;
+    ErrorCode error_code = 1;
+    string message = 2;
 }
