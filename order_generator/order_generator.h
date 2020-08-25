@@ -15,7 +15,6 @@ int GnenerateRandomNumber(int range_min, int range_max);
 std::map<int, int> GenerateInitialPrice(int object_id_min, int object_id_max,
                                         int price_min, int price_max);
 std::map<int, int> GetAllInitialPrice();
-void CreateDatabaseOrder();
 
 class Order {
  public:

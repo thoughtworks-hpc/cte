@@ -7,21 +7,9 @@ int GnenerateRandomNumber(int range_min, int range_max) {
   return rand() % (range_max - range_min + 1) + range_min;
 }
 
-void CreateDatabaseOrder() {
-  std::string resp;
-  int ret;
-  influxdb_cpp::server_info si("127.0.0.1", 8086, "orders", "", "");
-  ret = influxdb_cpp::create_db(resp, "orders", si);
-  if (0 == ret) {
-    std::cout << "creat db success, resp:" << resp << std::endl;
-  } else {
-    std::cout << "creat db failed ret:" << ret << std::endl;
-  }
-}
-
 std::map<int, int> GenerateInitialPrice(int object_id_min, int object_id_max,
                                         int price_min, int price_max) {
-  srand((unsigned)time(nullptr));
+  //  srand((unsigned)time(nullptr));
   std::map<int, int> all_initial_prices;
 
   std::string resp;
@@ -48,10 +36,6 @@ std::map<int, int> GenerateInitialPrice(int object_id_min, int object_id_max,
     }
   }
 
-  for (auto &item : all_initial_prices) {
-    std::cout << item.first << " " << item.second << std::endl;
-  }
-
   return all_initial_prices;
 }
 
@@ -63,8 +47,6 @@ std::map<int, int> GetAllInitialPrice() {
   int ret;
   influxdb_cpp::server_info si("127.0.0.1", 8086, "orders", "", "");
 
-  //  ret = influxdb_cpp::query(resp, "select * from initial_price where
-  //  ""key_symbol"" = '0'", si);
   ret = influxdb_cpp::query(resp, "select * from initial_price", si);
   if (0 == ret) {
     std::cout << "query db success, resp:" << resp << std::endl;
@@ -77,61 +59,53 @@ std::map<int, int> GetAllInitialPrice() {
     all_initial_prices[item[3]] = item[2];
   }
 
-  for (auto &item : all_initial_prices) {
-    std::cout << item.first << " " << item.second << std::endl;
-  }
-
   return all_initial_prices;
 }
 
-//Order::Order(int user_id_min, int user_id_max, int symbol_min, int symbol_max,
-//             std::map<int, int> &all_initial_prices) {
-//  this->user_id_ = GnenerateRandomNumber(user_id_min, user_id_max);
-//  this->symbol_ = GnenerateRandomNumber(symbol_min, symbol_max);
-//  //  if (!all_initial_prices.empty()){
-//  //    all_initial_prices = GetAllInitialPrice();
-//  //  }
-//  int initial_price = all_initial_prices[this->symbol_];
-//  this->price_ =
-//      GnenerateRandomNumber(initial_price - (int)0.1 * initial_price,
-//                            initial_price + (int)0.1 * initial_price);
-//  this->amount_ = GnenerateRandomNumber(1, 10000);
-//  this->trading_side_ = GnenerateRandomNumber(0, 1);
-//}
-
 Order::Order(std::map<int, int> &all_initial_prices, int user_id_min,
-             int user_id_max, int symbol_min, int symbol_max,
-             int amount_max) {
+             int user_id_max, int symbol_min, int symbol_max, int amount_max) {
   this->user_id_ = GnenerateRandomNumber(user_id_min, user_id_max);
   this->symbol_ = GnenerateRandomNumber(symbol_min, symbol_max);
-  //  if (!all_initial_prices.empty()){
-  //    all_initial_prices = GetAllInitialPrice();
-  //  }
   int initial_price = all_initial_prices[this->symbol_];
   this->price_ =
-      GnenerateRandomNumber(0.9 * initial_price,
-                            1.1 * initial_price);
+      GnenerateRandomNumber(0.9 * initial_price, 1.1 * initial_price);
   this->amount_ = GnenerateRandomNumber(1, amount_max);
   this->trading_side_ = GnenerateRandomNumber(0, 1);
 }
 
-void Order::CreateOrderInDatabase(){
-  std::cout << this->price_ << " " << this->symbol_ << std::endl;
+void Order::CreateOrderInDatabase() {
+  std::string resp;
+  int ret;
+  influxdb_cpp::server_info si("127.0.0.1", 8086, "orders", "", "");
+
+  ret = influxdb_cpp::builder()
+            .meas("orders")
+            .field("user_id", (int32_t)this->user_id_)
+            .field("symbol", (int32_t)this->symbol_)
+            .field("price", (int32_t)this->price_)
+            .field("amount", (int32_t)this->amount_)
+            .field("trading_side", (int32_t)this->trading_side_)
+            .post_http(si, &resp);
+
+  if (0 == ret && "" == resp) {
+    std::cout << "write db success" << std::endl;
+  } else {
+    std::cout << "write db failed, ret:" << ret << " resp:" << resp
+              << std::endl;
+  }
 }
 
 int main() {
   srand((unsigned)time(nullptr));
-//  for (int i = 0; i < 10; i++) {
-//    std::cout << GnenerateRandomNumber(0, 1) << std::endl;
-//  }
+//  GenerateInitialPrice(0,10,1,20);
+
   auto all_initial_prices = GetAllInitialPrice();
-  Order order1(all_initial_prices, 1, 10, 1, 10);
-  Order order2(all_initial_prices, 1, 10, 1, 10, 100);
 
-  order1.CreateOrderInDatabase();
-  order2.CreateOrderInDatabase();
+  for (int i = 0; i < 20; i++) {
+      Order order(all_initial_prices, 1, 10, 1, 10);
+      order.CreateOrderInDatabase();
+    }
 
-  //  CreateDatabaseOrder();
   //  GenerateInitialPrice(0,10,1,20);
   //  GetAllInitialPrice();
   return 0;
