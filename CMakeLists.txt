@@ -42,6 +42,7 @@ message("${CONAN_LIBS}")
 target_link_libraries(project ${CONAN_LIBS} caf::caf cdcf::cdcf)
 
 add_subdirectory(influxdb_usa_demo)
+add_subdirectory(match_engine)
 
 
 
