@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
-#include "./order_generator.h"
+#include "../include/order_generator.h"
 
 int GnenerateRandomNumber(int range_min, int range_max) {
   return rand() % (range_max - range_min + 1) + range_min;
@@ -97,16 +97,15 @@ void Order::CreateOrderInDatabase() {
 
 int main() {
   srand((unsigned)time(nullptr));
+  std::cout << "lueluelue" <<std::endl;
 //  GenerateInitialPrice(0,10,1,20);
 
-  auto all_initial_prices = GetAllInitialPrice();
+//  auto all_initial_prices = GetAllInitialPrice();
+//
+//  for (int i = 0; i < 20; i++) {
+//      Order order(all_initial_prices, 1, 10, 1, 10);
+//      order.CreateOrderInDatabase();
+//    }
 
-  for (int i = 0; i < 20; i++) {
-      Order order(all_initial_prices, 1, 10, 1, 10);
-      order.CreateOrderInDatabase();
-    }
-
-  //  GenerateInitialPrice(0,10,1,20);
-  //  GetAllInitialPrice();
   return 0;
 }

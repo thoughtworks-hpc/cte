@@ -8,8 +8,8 @@
 #include <iostream>
 #include <map>
 
-#include "../common/include/influxdb.hpp"
-#include "../common/include/json.hpp"
+#include "../../common/include/influxdb.hpp"
+#include "../../common/include/json.hpp"
 
 int GnenerateRandomNumber(int range_min, int range_max);
 std::map<int, int> GenerateInitialPrice(int object_id_min, int object_id_max,
@@ -21,7 +21,6 @@ class Order {
   Order(std::map<int, int> &all_initial_prices, int user_id_min,
         int user_id_max, int symbol_min, int symbol_max,
         int amount_max = 10000);
-
   void CreateOrderInDatabase();
  private:
   int user_id_;
