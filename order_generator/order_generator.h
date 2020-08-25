@@ -21,8 +21,7 @@ class Order {
   Order(std::map<int, int> &all_initial_prices, int user_id_min,
         int user_id_max, int symbol_min, int symbol_max,
         int amount_max = 10000);
-  //  Order( int user_id_min,
-  //        int user_id_max, int symbol_min, int symbol_max);
+
   void CreateOrderInDatabase();
  private:
   int user_id_;
