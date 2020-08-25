@@ -86,7 +86,9 @@ target_link_libraries(project ${CONAN_LIBS} caf::caf cdcf::cdcf protobuf::protob
 target_link_libraries(order_manager ${CONAN_LIBS} caf::caf cdcf::cdcf protobuf::protobuf grpc::grpc common)
 #protobuf_generate(LANGUAGE cpp TARGET project)
 
+add_subdirectory(common)
 add_subdirectory(influxdb_usa_demo)
+add_subdirectory(match_engine)
 
 
 

@@ -25,7 +25,7 @@ int main() {
   std::promise<std::string> promise_;
 
   caf::scoped_actor scoped_sender(system_);
-  std::string error_message_ = "";
+  std::string error_message_;
 
   caf::actor supervisor_ = system_.spawn<cdcf::ActorMonitor>(
       [&](const caf::down_msg &downMsg, const std::string &actor_description) {

@@ -8,7 +8,7 @@ option java_package = "com.thoughtworks.hpc.te.controller";
 option java_outer_classname = "MatchEngineProto";
 option objc_class_prefix = "MEP";
 
-package match_engine;
+package match_engine_proto;
 
 service TradingEngine {
   rpc Match (Order) returns (Reply) {}
@@ -16,13 +16,13 @@ service TradingEngine {
 }
 
 enum TradingSide {
-  UNKNOWN = 0;
-  BUY = 1;
-  SELL = 2;
+  TRADING_UNKNOWN = 0;
+  TRADING_BUY = 1;
+  TRADING_SELL = 2;
 }
 
 message Order {
-  int64 orderId = 1;
+  int64 order_id = 1;
   int32 symbol = 2;
   int32 user_id = 3;
   TradingSide trading_side = 4;
@@ -32,8 +32,9 @@ message Order {
 }
 
 enum Status {
-  SUCCESS = 0;
-  FAILURE = 1;
+  STATUS_UNKNOWN = 0;
+  STATUS_SUCCESS = 1;
+  STATUS_FAILURE = 2;
 }
 
 message Reply {
@@ -42,8 +43,8 @@ message Reply {
 }
 
 message Trade {
-  string makerId = 1;
-  string takerId = 2; //taker 吃掉 maker
+  string maker_id = 1;
+  string taker_id = 2; //taker 吃掉 maker
   TradingSide trading_side = 3; // 吃单的买卖方向
   int32 amount = 4;
   int32 price = 5;
