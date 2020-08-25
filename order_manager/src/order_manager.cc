@@ -3,20 +3,14 @@
  */
 
 #include "../include/order_manager.h"
-
-#include <uuid.h>
-
 #include "../../common/include/influxdb.hpp"
 
 ::grpc::Status OrderManagerImpl::PlaceOrder(
     ::grpc::ServerContext *context, const ::order_manager_proto::Order *request,
     ::order_manager_proto::Reply *response) {
-
   ClientContext client_context;
   match_engine_proto::Order order;
   match_engine_proto::Reply *reply = nullptr;
-
-  uuids::uuid const order_id = uuids::uuid_system_generator{}();
 
   using time_stamp = std::chrono::time_point<std::chrono::system_clock,
                                              std::chrono::nanoseconds>;
@@ -29,7 +23,7 @@
 
   int ret = influxdb_cpp::builder()
                 .meas("order")
-                .tag("order_id", uuids::to_string(order_id))
+                .tag("order_id", std::to_string(++order_id_))
                 .field("user_id", request->user_id())
                 .field("price", request->price())
                 .field("amount", request->amount())
