@@ -1,3 +1,3 @@
-//
-// Created by Mingfei Deng on 2020/8/24.
-//
+/*
+ * Copyright (c) 2020 ThoughtWorks Inc.
+ */
