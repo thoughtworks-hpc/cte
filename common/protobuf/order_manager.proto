@@ -7,18 +7,17 @@ service OrderManager {
 }
 
 enum TradingSide {
-    UNKNOWN = 0;
-    BUY = 1;
-    SELL = 2;
+    TRADING_UNKNOWN = 0;
+    TRADING_BUY = 1;
+    TRADING_SELL = 2;
 }
 
 message Order {
-    int64 order_id = 1;
-    int32 symbol = 2;
-    int32 user_id = 3;
-    TradingSide trading_side = 4;
-    int32 amount = 5;
-    int32 price = 6; //  考虑到浮点误差的风险，使用int（比如价格为12.34，那传输的时候应该传递1234）
+    int32 symbol = 1;
+    int32 user_id = 2;
+    TradingSide trading_side = 3;
+    int32 amount = 4;
+    int32 price = 5; //  考虑到浮点误差的风险，使用int（比如价格为12.34，那传输的时候应该传递1234）
 }
 
 message Reply {

@@ -1,6 +1,6 @@
 [requires]
 cdcf/1.0@hpc/stable
-
+stduuid/1.0
 
 [generators]
 cmake_find_package
