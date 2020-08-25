@@ -22,7 +22,7 @@ enum TradingSide {
 }
 
 message Order {
-  int64 orderId = 1;
+  int64 order_id = 1;
   int32 symbol = 2;
   int32 user_id = 3;
   TradingSide trading_side = 4;
@@ -43,8 +43,8 @@ message Reply {
 }
 
 message Trade {
-  string makerId = 1;
-  string takerId = 2; //taker 吃掉 maker
+  string maker_id = 1;
+  string taker_id = 2; //taker 吃掉 maker
   TradingSide trading_side = 3; // 吃单的买卖方向
   int32 amount = 4;
   int32 price = 5;
