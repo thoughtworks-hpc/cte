@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package order_manager;
+package order_manager_proto;
 
 service OrderManager {
     rpc PlaceOrder(Order) returns (Reply) {}

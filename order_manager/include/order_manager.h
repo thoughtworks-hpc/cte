@@ -5,8 +5,8 @@
 #ifndef CTE_ORDER_MANAGER_H
 #define CTE_ORDER_MANAGER_H
 
-#include "./order_manager.grpc.pb.h"
-#include "./match_engine.grpc.pb.h"
+#include "../../common/protobuf_gen/order_manager.grpc.pb.h"
+#include "../../common/protobuf_gen/match_engine.grpc.pb.h"
 #include <grpc/grpc.h>
 #include <grpcpp/channel.h>
 #include <grpcpp/client_context.h>
@@ -20,17 +20,17 @@ using grpc::ClientReaderWriter;
 using grpc::ClientWriter;
 using grpc::Status;
 
-class OrderManagerImpl final : public order_manager::OrderManager::Service {
+class OrderManagerImpl final : public order_manager_proto::OrderManager::Service {
  public:
-  explicit OrderManagerImpl(const std::shared_ptr<Channel>& channel) : stub_(::match_engine::TradingEngine::NewStub(channel)) {
+  explicit OrderManagerImpl(const std::shared_ptr<Channel>& channel) : stub_(::match_engine_proto::TradingEngine::NewStub(channel)) {
 
   }
 
   ::grpc::Status PlaceOrder(::grpc::ServerContext* context,
-                            const ::order_manager::Order* request, ::order_manager::Reply* response) override;
+                            const ::order_manager_proto::Order* request, ::order_manager_proto::Reply* response) override;
 
  private:
-    std::unique_ptr<::match_engine::TradingEngine::Stub> stub_;
+    std::unique_ptr<::match_engine_proto::TradingEngine::Stub> stub_;
 };
 
 #endif  // CTE_ORDER_MANAGER_H

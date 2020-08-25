@@ -6,9 +6,8 @@
 #include <grpcpp/server_builder.h>
 #include <grpcpp/server_context.h>
 
-//#include "./order_manager.grpc.pb.h"
-#include "./match_engine.grpc.pb.h"
-#include "./order_manager.h"
+#include "../include/order_manager.h"
+#include "../../common/protobuf_gen/match_engine.grpc.pb.h"
 
 using grpc::Server;
 using grpc::ServerBuilder;
