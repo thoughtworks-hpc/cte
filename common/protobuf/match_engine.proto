@@ -8,7 +8,7 @@ option java_package = "com.thoughtworks.hpc.te.controller";
 option java_outer_classname = "MatchEngineProto";
 option objc_class_prefix = "MEP";
 
-package prototype;
+package match_engine;
 
 service TradingEngine {
   rpc Match (Order) returns (Reply) {}
@@ -32,9 +32,8 @@ message Order {
 }
 
 enum Status {
-  UNKNOWN = 0;
-  SUCCESS = 1;
-  FAILURE = 2;
+  SUCCESS = 0;
+  FAILURE = 1;
 }
 
 message Reply {
