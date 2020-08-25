@@ -6,17 +6,9 @@
 
 #include <caf/io/all.hpp>
 
-struct Order{
+struct Order {};
 
-};
-
-struct OrderBook{
-
-
-};
-
-
-
+struct OrderBook {};
 
 #define CTE_MATCH_ACTOR_H
 
