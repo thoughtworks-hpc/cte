@@ -7,57 +7,91 @@ int GnenerateRandomNumber(int range_min, int range_max) {
   return rand() % (range_max - range_min + 1) + range_min;
 }
 
-std::map<int, int> GenerateInitialPrice(int object_id_min, int object_id_max,
+std::map<int, int> GenerateInitialPrice(int symbol_id_min, int symbol_id_max,
                                         int price_min, int price_max) {
   //  srand((unsigned)time(nullptr));
   std::map<int, int> all_initial_prices;
 
-  std::string resp;
-  int ret;
-  influxdb_cpp::server_info si("127.0.0.1", 8086, "orders", "", "");
+//  std::string resp;
+//  int ret;
+//  influxdb_cpp::server_info si("127.0.0.1", 8086, "orders", "", "");
 
-  for (int i = object_id_min; i < object_id_max + 1; i++) {
+  for (int i = symbol_id_min; i < symbol_id_max + 1; i++) {
     int price = GnenerateRandomNumber(price_min * 100, price_max * 100);
     all_initial_prices[i] = price;
 
-    ret = influxdb_cpp::builder()
-              .meas("initial_price")
-              .tag("key_symbol", std::to_string(i))
-              .field("price", price)
-              .field("symbol", i)
-              .timestamp(0)
-              .post_http(si, &resp);
-
-    if (0 == ret && "" == resp) {
-      std::cout << "write db success" << std::endl;
-    } else {
-      std::cout << "write db failed, ret:" << ret << " resp:" << resp
-                << std::endl;
-    }
+//    ret = influxdb_cpp::builder()
+//              .meas("initial_price")
+//              .tag("key_symbol", std::to_string(i))
+//              .field("price", price)
+//              .field("symbol_id", i)
+//              .timestamp(0)
+//              .post_http(si, &resp);
+//
+//    if (0 == ret && "" == resp) {
+//      std::cout << "write db success" << std::endl;
+//    } else {
+//      std::cout << "write db failed, ret:" << ret << " resp:" << resp
+//                << std::endl;
+//    }
   }
 
   return all_initial_prices;
 }
 
+int ImportInitialPriceToJsonFile(std::map<int, int> initial_prices){
+  nlohmann::json j;
+  for(auto& initial_price: initial_prices){
+    j[initial_price.first] = initial_price.second;
+  }
+  std::ofstream o("../files/initial_prices.json");
+  o << j << std::endl;
+  return 0;
+}
+
+//std::map<int, int> GetAllInitialPrice() {
+//  using json = nlohmann::json;
+//
+//  std::map<int, int> all_initial_prices;
+//  std::string resp;
+//  int ret;
+//  influxdb_cpp::server_info si("127.0.0.1", 8086, "orders", "", "");
+//
+//  ret = influxdb_cpp::query(resp, "select * from initial_price", si);
+//  if (0 == ret) {
+//    std::cout << "query db success, resp:" << resp << std::endl;
+//  } else {
+//    std::cout << "query db failed ret:" << ret << std::endl;
+//  }
+//
+//  json j = json::parse(resp);
+//  for (auto &item : j["results"][0]["series"][0]["values"]) {
+//    all_initial_prices[item[3]] = item[2];
+//  }
+//
+//  return all_initial_prices;
+//}
+
 std::map<int, int> GetAllInitialPrice() {
-  using json = nlohmann::json;
-
   std::map<int, int> all_initial_prices;
-  std::string resp;
-  int ret;
-  influxdb_cpp::server_info si("127.0.0.1", 8086, "orders", "", "");
 
-  ret = influxdb_cpp::query(resp, "select * from initial_price", si);
-  if (0 == ret) {
-    std::cout << "query db success, resp:" << resp << std::endl;
-  } else {
-    std::cout << "query db failed ret:" << ret << std::endl;
+  std::ifstream in("../files/initial_prices.json");
+  nlohmann::json initial_prices;
+  in >> initial_prices;
+
+  for (int i = 0; i < initial_prices.size(); i++){
+    if (!initial_prices[i].empty()){
+      all_initial_prices[i] = initial_prices[i];
+    }
   }
 
-  json j = json::parse(resp);
-  for (auto &item : j["results"][0]["series"][0]["values"]) {
-    all_initial_prices[item[3]] = item[2];
+  for(auto& item:all_initial_prices){
+    std::cout<<item.first<<" "<<item.second<<std::endl;
   }
+//  nlohmann::json j = nlohmann::json::parse(resp);
+//  for (auto &item : j["results"][0]["series"][0]["values"]) {
+//    all_initial_prices[item[3]] = item[2];
+//  }
 
   return all_initial_prices;
 }
@@ -95,17 +129,3 @@ void Order::CreateOrderInDatabase() {
   }
 }
 
-int main() {
-  srand((unsigned)time(nullptr));
-  std::cout << "lueluelue" <<std::endl;
-//  GenerateInitialPrice(0,10,1,20);
-
-//  auto all_initial_prices = GetAllInitialPrice();
-//
-//  for (int i = 0; i < 20; i++) {
-//      Order order(all_initial_prices, 1, 10, 1, 10);
-//      order.CreateOrderInDatabase();
-//    }
-
-  return 0;
-}

@@ -7,13 +7,15 @@
 
 #include <iostream>
 #include <map>
+#include <fstream>
 
 #include "../../common/include/influxdb.hpp"
 #include "../../common/include/json.hpp"
 
 int GnenerateRandomNumber(int range_min, int range_max);
-std::map<int, int> GenerateInitialPrice(int object_id_min, int object_id_max,
+std::map<int, int> GenerateInitialPrice(int symbol_id_min, int symbol_id_max,
                                         int price_min, int price_max);
+int ImportInitialPriceToJsonFile(std::map<int, int> initial_prices);
 std::map<int, int> GetAllInitialPrice();
 
 class Order {
