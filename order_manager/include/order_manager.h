@@ -2,14 +2,16 @@
  * Copyright (c) 2019-2020 ThoughtWorks Inc.
  */
 
-#ifndef CTE_ORDER_MANAGER_H
-#define CTE_ORDER_MANAGER_H
+#ifndef ORDER_MANAGER_INCLUDE_ORDER_MANAGER_H_
+#define ORDER_MANAGER_INCLUDE_ORDER_MANAGER_H_
 
 #include <grpc/grpc.h>
 #include <grpcpp/channel.h>
 #include <grpcpp/client_context.h>
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
+
+#include <memory>
 
 #include "../../common/protobuf_gen/match_engine.grpc.pb.h"
 #include "../../common/protobuf_gen/order_manager.grpc.pb.h"
@@ -35,6 +37,8 @@ class OrderManagerImpl final
  private:
   std::atomic<std::int64_t> order_id_;
   std::unique_ptr<::match_engine_proto::TradingEngine::Stub> stub_;
+
+  void SubscribeMatchResult() {}
 };
 
-#endif  // CTE_ORDER_MANAGER_H
+#endif  // ORDER_MANAGER_INCLUDE_ORDER_MANAGER_H_

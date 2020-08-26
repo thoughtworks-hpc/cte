@@ -19,7 +19,7 @@ using grpc::Status;
 void RunServer() {
   std::string server_address("0.0.0.0:50051");
   OrderManagerImpl service(grpc::CreateChannel(
-      "localhost:50052", grpc::InsecureChannelCredentials()));
+      "localhost:4770", grpc::InsecureChannelCredentials()));
 
   ServerBuilder builder;
   builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
