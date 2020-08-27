@@ -21,7 +21,7 @@ std::map<int, int> GetAllInitialPrice();
 class Order {
  public:
   Order(std::map<int, int> &all_initial_prices, int user_id_min,
-        int user_id_max, int symbol_min, int symbol_max,
+        int user_id_max, int symbol_min, int symbol_max, int amount_min = 100,
         int amount_max = 10000);
   void CreateOrderInDatabase();
  private:

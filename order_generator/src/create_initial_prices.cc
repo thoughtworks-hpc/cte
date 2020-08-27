@@ -8,9 +8,9 @@
 int main(int argc, char* argv[]) {
   srand((unsigned)time(nullptr));
 
-  std::ifstream i("../files/create_initial_prices_config.json");
+  std::ifstream in("../files/create_initial_prices_config.json");
   nlohmann::json initial_prices_config;
-  i >> initial_prices_config;
+  in >> initial_prices_config;
 
   std::map<int, int> initial_prices = GenerateInitialPrice(
       initial_prices_config["symbol_id_min"],
