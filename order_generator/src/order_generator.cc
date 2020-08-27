@@ -29,29 +29,6 @@ int ImportInitialPriceToJsonFile(std::map<int, int> initial_prices) {
   return 0;
 }
 
-// std::map<int, int> GetAllInitialPrice() {
-//  using json = nlohmann::json;
-//
-//  std::map<int, int> all_initial_prices;
-//  std::string resp;
-//  int ret;
-//  influxdb_cpp::server_info si("127.0.0.1", 8086, "orders", "", "");
-//
-//  ret = influxdb_cpp::query(resp, "select * from initial_price", si);
-//  if (0 == ret) {
-//    std::cout << "query db success, resp:" << resp << std::endl;
-//  } else {
-//    std::cout << "query db failed ret:" << ret << std::endl;
-//  }
-//
-//  json j = json::parse(resp);
-//  for (auto &item : j["results"][0]["series"][0]["values"]) {
-//    all_initial_prices[item[3]] = item[2];
-//  }
-//
-//  return all_initial_prices;
-//}
-
 std::map<int, int> GetAllInitialPrice() {
   std::map<int, int> all_initial_prices;
 
@@ -68,10 +45,6 @@ std::map<int, int> GetAllInitialPrice() {
   for (auto& item : all_initial_prices) {
     std::cout << item.first << " " << item.second << std::endl;
   }
-  //  nlohmann::json j = nlohmann::json::parse(resp);
-  //  for (auto &item : j["results"][0]["series"][0]["values"]) {
-  //    all_initial_prices[item[3]] = item[2];
-  //  }
 
   return all_initial_prices;
 }
