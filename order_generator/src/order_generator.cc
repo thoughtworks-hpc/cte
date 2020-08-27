@@ -22,9 +22,9 @@ std::map<int, int> GenerateInitialPrice(int symbol_id_min, int symbol_id_max,
 int ImportInitialPriceToJsonFile(std::map<int, int> initial_prices) {
   nlohmann::json j;
   for (auto& initial_price : initial_prices) {
-    j[initial_price.first] = initial_price.second;
+    j[std::to_string(initial_price.first)] = initial_price.second;
   }
-  std::ofstream o("../files/initial_prices.json");
+  std::ofstream o("initial_prices.json");
   o << j << std::endl;
   return 0;
 }
@@ -32,19 +32,17 @@ int ImportInitialPriceToJsonFile(std::map<int, int> initial_prices) {
 std::map<int, int> GetAllInitialPrice() {
   std::map<int, int> all_initial_prices;
 
-  std::ifstream in("../files/initial_prices.json");
+  std::ifstream in("initial_prices.json");
   nlohmann::json initial_prices;
   in >> initial_prices;
 
-  for (int i = 0; i < initial_prices.size(); i++) {
-    if (!initial_prices[i].empty()) {
-      all_initial_prices[i] = initial_prices[i];
-    }
+  for (const auto& initial_price:initial_prices.items()){
+    all_initial_prices[stoi(initial_price.key())] = initial_price.value();
   }
 
-  for (auto& item : all_initial_prices) {
-    std::cout << item.first << " " << item.second << std::endl;
-  }
+//  for (auto& item : all_initial_prices) {
+//    std::cout << item.first << " " << item.second << std::endl;
+//  }
 
   return all_initial_prices;
 }

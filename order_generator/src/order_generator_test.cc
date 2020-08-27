@@ -11,7 +11,6 @@ TEST(GenerateRandomNumber, should_generate_random_number_in_range) {
 
   EXPECT_GE(result, 5);
   EXPECT_LE(result, 10);
-  //  EXPECT_EQ(true, 1);
 }
 
 TEST(GenerateInitialPrice, should_generate_initial_prices_in_range) {
