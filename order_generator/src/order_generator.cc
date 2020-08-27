@@ -3,7 +3,7 @@
  */
 #include "../include/order_generator.h"
 
-int GnenerateRandomNumber(int range_min, int range_max) {
+int GenerateRandomNumber(int range_min, int range_max) {
   return rand() % (range_max - range_min + 1) + range_min;
 }
 
@@ -12,7 +12,7 @@ std::map<int, int> GenerateInitialPrice(int symbol_id_min, int symbol_id_max,
   std::map<int, int> all_initial_prices;
 
   for (int i = symbol_id_min; i < symbol_id_max + 1; i++) {
-    int price = GnenerateRandomNumber(price_min * 100, price_max * 100);
+    int price = GenerateRandomNumber(price_min * 100, price_max * 100);
     all_initial_prices[i] = price;
   }
 
@@ -52,16 +52,15 @@ std::map<int, int> GetAllInitialPrice() {
 Order::Order(std::map<int, int>& all_initial_prices, int user_id_min,
              int user_id_max, int symbol_min, int symbol_max, int amount_min,
              int amount_max) {
-  this->user_id_ = GnenerateRandomNumber(user_id_min, user_id_max);
-  this->symbol_ = GnenerateRandomNumber(symbol_min, symbol_max);
+  this->user_id_ = GenerateRandomNumber(user_id_min, user_id_max);
+  this->symbol_ = GenerateRandomNumber(symbol_min, symbol_max);
   int initial_price = all_initial_prices[this->symbol_];
-  this->price_ =
-      GnenerateRandomNumber(0.9 * initial_price, 1.1 * initial_price);
-  this->amount_ = GnenerateRandomNumber(amount_min, amount_max);
-  this->trading_side_ = GnenerateRandomNumber(0, 1);
+  this->price_ = GenerateRandomNumber(0.9 * initial_price, 1.1 * initial_price);
+  this->amount_ = GenerateRandomNumber(amount_min, amount_max);
+  this->trading_side_ = GenerateRandomNumber(0, 1);
 }
 
-void Order::CreateOrderInDatabase() {
+int Order::CreateOrderInDatabase() {
   std::string resp;
   int ret;
   influxdb_cpp::server_info si("127.0.0.1", 8086, "orders", "", "");
@@ -81,4 +80,10 @@ void Order::CreateOrderInDatabase() {
     std::cout << "write db failed, ret:" << ret << " resp:" << resp
               << std::endl;
   }
+
+  return ret;
 }
+int Order::GetUserId() const { return user_id_; }
+int Order::GetSymbol() const { return symbol_; }
+int Order::GetPrice() const { return price_; }
+int Order::GetAmount() const { return amount_; }

@@ -5,7 +5,6 @@
 
 int main() {
   srand((unsigned)time(nullptr));
-  std::cout << GnenerateRandomNumber(1, 20) << std::endl;
   auto initial_prices = GetAllInitialPrice();
 
   std::ifstream in("../files/create_orders_config.json");
