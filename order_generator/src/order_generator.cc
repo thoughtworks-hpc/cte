@@ -37,8 +37,8 @@ int ImportInitialPriceToJsonFile(const std::map<int, int>& initial_prices) {
   for (auto& initial_price : initial_prices) {
     initial_price_json[std::to_string(initial_price.first)] = initial_price.second;
   }
-  std::ofstream out("initial_prices.json");
-  out << initial_price_json << std::endl;
+  std::ofstream output("initial_prices.json");
+  output << initial_price_json << std::endl;
   return 0;
 }
 
