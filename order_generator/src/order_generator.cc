@@ -42,10 +42,10 @@ int ImportInitialPriceToJsonFile(std::map<int, int> initial_prices) {
   return 0;
 }
 
-std::map<int, int> GetAllInitialPrice() {
+std::map<int, int> GetAllInitialPrice(std::string file_path) {
   std::map<int, int> all_initial_prices;
 
-  std::ifstream in("initial_prices.json");
+  std::ifstream in(file_path);
   nlohmann::json initial_prices;
   in >> initial_prices;
 
@@ -57,11 +57,19 @@ std::map<int, int> GetAllInitialPrice() {
 }
 
 Order::Order(std::map<int, int>& all_initial_prices, int user_id_min,
-             int user_id_max, int symbol_min, int symbol_max, int amount_min,
-             int amount_max) {
+             int user_id_max, int amount_min, int amount_max) {
   this->user_id_ = GenerateRandomNumber(user_id_min, user_id_max);
-  this->symbol_ = GenerateRandomNumber(symbol_min, symbol_max);
-  int initial_price = all_initial_prices[this->symbol_];
+  int temp = GenerateRandomNumber(0, (int)all_initial_prices.size() - 1);
+  int initial_price;
+  int i = 0;
+  for (auto& item : all_initial_prices) {
+    if (i == temp) {
+      this->symbol_ = item.first;
+      initial_price = item.second;
+      break;
+    }
+    i++;
+  }
   this->price_ = GenerateRandomNumber(0.9 * initial_price, 1.1 * initial_price);
   this->amount_ = GenerateRandomNumber(amount_min, amount_max);
   this->trading_side_ = GenerateRandomNumber(0, 1);
