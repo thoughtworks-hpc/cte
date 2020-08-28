@@ -13,6 +13,7 @@
 #include "../../common/include/json.hpp"
 
 int GenerateRandomNumber(int range_min, int range_max);
+int CreateDatabaseOrder();
 std::map<int, int> GenerateInitialPrice(int symbol_id_min, int symbol_id_max,
                                         int price_min, int price_max);
 int ImportInitialPriceToJsonFile(std::map<int, int> initial_prices);

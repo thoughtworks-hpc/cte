@@ -19,6 +19,19 @@ std::map<int, int> GenerateInitialPrice(int symbol_id_min, int symbol_id_max,
   return all_initial_prices;
 }
 
+int CreateDatabaseOrder() {
+  std::string resp;
+  int ret = 1;
+  influxdb_cpp::server_info si("127.0.0.1", 8086, "orders", "", "");
+  ret = influxdb_cpp::create_db(resp, "orders", si);
+  if (0 == ret) {
+    std::cout << "creat db success, resp:" << resp << std::endl;
+  } else {
+    std::cout << "creat db failed ret:" << ret << std::endl;
+  }
+  return ret;
+}
+
 int ImportInitialPriceToJsonFile(std::map<int, int> initial_prices) {
   nlohmann::json j;
   for (auto& initial_price : initial_prices) {

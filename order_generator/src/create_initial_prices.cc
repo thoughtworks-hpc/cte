@@ -7,8 +7,14 @@
 int main(int argc, char* argv[]) {
   srand((unsigned)time(nullptr));
 
-  nlohmann::json initial_prices_config;
   int ret;
+  nlohmann::json initial_prices_config;
+
+  ret = CreateDatabaseOrder();
+  if (ret == 1) {
+    std::cout << "Error: create db failed" << std::endl;
+    return ret;
+  }
 
   if (argc == 1) {
     std::ifstream in("create_initial_prices_config.json");
@@ -19,6 +25,7 @@ int main(int argc, char* argv[]) {
   } else {
     ret = 1;
     std::cout << "Error: you must enter one file path or not." << std::endl;
+    return ret;
   }
 
   std::map<int, int> initial_prices = GenerateInitialPrice(
