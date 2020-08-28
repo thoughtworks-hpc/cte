@@ -5,9 +5,9 @@
 #ifndef ORDER_GENERATOR_INCLUDE_ORDER_GENERATOR_H_
 #define ORDER_GENERATOR_INCLUDE_ORDER_GENERATOR_H_
 
+#include <fstream>
 #include <iostream>
 #include <map>
-#include <fstream>
 
 #include "../../common/include/influxdb.hpp"
 #include "../../common/include/json.hpp"
@@ -24,6 +24,7 @@ class Order {
         int user_id_max, int symbol_min, int symbol_max, int amount_min = 100,
         int amount_max = 10000);
   int CreateOrderInDatabase();
+
  private:
   int user_id_;
   int symbol_;
