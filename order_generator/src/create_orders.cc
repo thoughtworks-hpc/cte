@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
-#include "order_generator.h"
+#include "../include/order_generator.h"
 
 int main(int argc, char* argv[]) {
   srand((unsigned)time(nullptr));

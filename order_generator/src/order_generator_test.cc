@@ -2,7 +2,7 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
-#include "order_generator.h"
+#include "../include/order_generator.h"
 
 #include <gtest/gtest.h>
 

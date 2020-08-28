@@ -36,13 +36,9 @@ std::map<int, int> GetAllInitialPrice() {
   nlohmann::json initial_prices;
   in >> initial_prices;
 
-  for (const auto& initial_price:initial_prices.items()){
+  for (const auto& initial_price : initial_prices.items()) {
     all_initial_prices[stoi(initial_price.key())] = initial_price.value();
   }
-
-//  for (auto& item : all_initial_prices) {
-//    std::cout << item.first << " " << item.second << std::endl;
-//  }
 
   return all_initial_prices;
 }

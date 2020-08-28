@@ -2,8 +2,8 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
-#ifndef CTE_ORDER_GENERATOR_H
-#define CTE_ORDER_GENERATOR_H
+#ifndef ORDER_GENERATOR_INCLUDE_ORDER_GENERATOR_H_
+#define ORDER_GENERATOR_INCLUDE_ORDER_GENERATOR_H_
 
 #include <iostream>
 #include <map>
@@ -38,4 +38,4 @@ class Order {
   int GetAmount() const;
 };
 
-#endif  // CTE_ORDER_GENERATOR_H
+#endif  // ORDER_GENERATOR_INCLUDE_ORDER_GENERATOR_H_

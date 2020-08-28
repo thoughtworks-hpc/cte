@@ -1,9 +1,8 @@
 /*
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
-#include <fstream>
 
-#include "order_generator.h"
+#include "../include/order_generator.h"
 
 int main(int argc, char* argv[]) {
   srand((unsigned)time(nullptr));
@@ -11,17 +10,15 @@ int main(int argc, char* argv[]) {
   nlohmann::json initial_prices_config;
   int ret;
 
-  if (argc == 1){
+  if (argc == 1) {
     std::ifstream in("create_initial_prices_config.json");
     in >> initial_prices_config;
-  }
-  else if (argc == 2){
+  } else if (argc == 2) {
     std::ifstream in(argv[1]);
     in >> initial_prices_config;
-  }
-  else{
+  } else {
     ret = 1;
-    std::cout << "Error: you must enter one file path or not."<<std::endl;
+    std::cout << "Error: you must enter one file path or not." << std::endl;
   }
 
   std::map<int, int> initial_prices = GenerateInitialPrice(
