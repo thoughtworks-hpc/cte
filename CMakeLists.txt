@@ -32,18 +32,13 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 # would fail
 conan_basic_setup()
 
-# Compile main.cpp
-add_executable(project src/main.cpp)
-
 # Link the dependencies with our binary
 message("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 message("${CONAN_LIBS}")
 
-target_link_libraries(project ${CONAN_LIBS} caf::caf cdcf::cdcf)
-
 add_subdirectory(common)
 add_subdirectory(influxdb_usa_demo)
 add_subdirectory(match_engine)
-
+add_subdirectory(request_generator)
 
 

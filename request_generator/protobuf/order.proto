@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package order_manager_proto;
+
+service OrderManager {
+  rpc PlaceOrder (Order) returns (Reply) {
+  }
+}
+
+enum TradingSide {
+  TRADING_UNKNOWN = 0;
+  TRADING_BUY = 1;
+  TRADING_SELL = 2;
+}
+
+message Order {
+  int32 symbol = 1;
+  int32 user_id = 2;
+  TradingSide trading_side = 3;
+  int32 amount = 4;
+  int32 price = 5; //  考虑到浮点误差的风险，使用int（比如价格为12.34，那传输的时候应该传递1234）
+}
+
+enum ErrorCode {
+  SUCCESS = 0;
+  FAILURE = 1;
+}
+
+message Reply {
+  ErrorCode error_code = 1;
+  string message = 2;
+}
