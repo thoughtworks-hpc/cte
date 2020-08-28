@@ -44,7 +44,8 @@ TEST(GenerateOrder, should_generate_order_in_range) {
   auto initial_prices =
       GenerateInitialPrice(symbol_id_min, symbol_id_max, price_min, price_max);
   for (int i = 0; i < order_amount; i++) {
-    Order order(initial_prices, user_id_min, user_id_max, amount_min, amount_max);
+    Order order(initial_prices, user_id_min, user_id_max, amount_min,
+                amount_max);
     int initial_price_now = initial_prices[order.GetSymbol()];
     EXPECT_GE(order.GetUserId(), user_id_min);
     EXPECT_LE(order.GetUserId(), user_id_max);
