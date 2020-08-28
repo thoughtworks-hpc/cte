@@ -1,5 +1,5 @@
 {
-  "symbol_id_min": 3,
+  "symbol_id_min": 1,
   "symbol_id_max": 10,
   "price_min": 1,
   "price_max": 100
