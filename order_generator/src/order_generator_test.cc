@@ -44,16 +44,16 @@ TEST(GenerateOrder, should_generate_order_in_range) {
   auto initial_prices =
       GenerateInitialPrice(symbol_id_min, symbol_id_max, price_min, price_max);
   for (int i = 0; i < order_amount; i++) {
-      Order order(initial_prices, user_id_min, user_id_max, symbol_id_min,
-                  symbol_id_max, amount_min, amount_max);
-      int initial_price_now = initial_prices[order.GetSymbol()];
-      EXPECT_GE(order.GetUserId(), user_id_min);
-      EXPECT_LE(order.GetUserId(), user_id_max);
-      EXPECT_GE(order.GetSymbol(), symbol_id_min);
-      EXPECT_LE(order.GetSymbol(), symbol_id_max);
-      EXPECT_GE(order.GetPrice(), initial_price_now * 0.9);
-      EXPECT_LE(order.GetPrice(), initial_price_now * 1.1);
-      EXPECT_GE(order.GetAmount(), amount_min);
-      EXPECT_LE(order.GetAmount(), amount_max);
+    Order order(initial_prices, user_id_min, user_id_max, symbol_id_min,
+                symbol_id_max, amount_min, amount_max);
+    int initial_price_now = initial_prices[order.GetSymbol()];
+    EXPECT_GE(order.GetUserId(), user_id_min);
+    EXPECT_LE(order.GetUserId(), user_id_max);
+    EXPECT_GE(order.GetSymbol(), symbol_id_min);
+    EXPECT_LE(order.GetSymbol(), symbol_id_max);
+    EXPECT_GE(order.GetPrice(), initial_price_now * 0.9);
+    EXPECT_LE(order.GetPrice(), initial_price_now * 1.1);
+    EXPECT_GE(order.GetAmount(), amount_min);
+    EXPECT_LE(order.GetAmount(), amount_max);
   }
 }
