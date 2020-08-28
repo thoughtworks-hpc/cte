@@ -16,7 +16,7 @@ jobs:
 
   check-style:
     needs: check-format
-s
+
     runs-on: ubuntu-latest
 
     steps:
