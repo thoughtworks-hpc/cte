@@ -36,57 +36,14 @@ OrderManagerImpl::OrderManagerImpl(const std::shared_ptr<Channel> &channel)
   BuildMatchEngineOrder(*request, order_id, nanoseconds_since_epoch, order);
 
   SaveOrderStatus(order);
-  //  int ret = influxdb_cpp::builder()
-  //                .meas("order")
-  //                .tag("order_id", std::to_string(order_id))
-  //                .field("user_id", request->user_id())
-  //                .field("price", request->price())
-  //                .field("amount", request->amount())
-  //                .field("trading_side", request->trading_side())
-  //                .field("status", std::string("unsubmitted"))
-  //                .timestamp(nanoseconds_since_epoch)
-  //                .post_http(si, &resp);
   PersistOrder(order, "unsubmitted");
 
   ClientContext client_context;
-
-  //  order.set_order_id(order_id);
-  //  order.set_symbol(request->symbol());
-  //  order.set_user_id(request->user_id());
-  //  order.set_price(request->price());
-  //  order.set_amount(request->amount());
-  //  order.set_trading_side(static_cast<match_engine_proto::TradingSide>(
-  //      static_cast<int>(request->trading_side())));
-  //  auto submit_time = new google::protobuf::Timestamp{};
-  //  submit_time->set_seconds(nanoseconds_since_epoch / 1000000000);
-  //  submit_time->set_nanos(nanoseconds_since_epoch % 1000000000);
-  //  order.set_allocated_submit_time(submit_time);
-
   Status status = stub_->Match(&client_context, order, &reply);
   int ret;
   if (reply.status() == match_engine_proto::STATUS_SUCCESS) {
-    //    influxdb_cpp::builder()
-    //        .meas("order")
-    //        .tag("order_id", std::to_string(order_id))
-    //        .field("user_id", request->user_id())
-    //        .field("price", request->price())
-    //        .field("amount", request->amount())
-    //        .field("trading_side", request->trading_side())
-    //        .field("status", std::string("submitted"))
-    //        .timestamp(nanoseconds_since_epoch)
-    //        .post_http(si, &resp);
     ret = PersistOrder(order, "submitted");
   } else {
-    //    influxdb_cpp::builder()
-    //        .meas("order")
-    //        .tag("order_id", std::to_string(order_id))
-    //        .field("user_id", request->user_id())
-    //        .field("price", request->price())
-    //        .field("amount", request->amount())
-    //        .field("trading_side", request->trading_side())
-    //        .field("status", std::string("submission error"))
-    //        .timestamp(nanoseconds_since_epoch)
-    //        .post_http(si, &resp);
     ret = PersistOrder(order, "submission error");
   }
 
