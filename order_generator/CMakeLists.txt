@@ -16,6 +16,3 @@ find_package(GTest REQUIRED)
 target_link_libraries(${PROJECT_NAME}_test GTest::GTest order_generator)
 enable_testing()
 add_test(NAME ${PROJECT_NAME}_test COMMAND ${PROJECT_NAME}_test)
-
-
-

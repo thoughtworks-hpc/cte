@@ -12,8 +12,8 @@ int main(int argc, char* argv[]) {
   nlohmann::json orders_config;
   if (argc == 1) {
     initial_price_file_path = "initial_prices.json";
-    std::ifstream in2("create_orders_config.json");
-    in2 >> orders_config;
+    std::ifstream input("create_orders_config.json");
+    input >> orders_config;
   } else if (argc == 3) {
     initial_price_file_path = argv[1];
     std::ifstream in2(argv[2]);

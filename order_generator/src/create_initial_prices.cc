@@ -17,8 +17,8 @@ int main(int argc, char* argv[]) {
   }
 
   if (argc == 1) {
-    std::ifstream in("create_initial_prices_config.json");
-    in >> initial_prices_config;
+    std::ifstream input("create_initial_prices_config.json");
+    input >> initial_prices_config;
   } else if (argc == 2) {
     std::ifstream in(argv[1]);
     in >> initial_prices_config;

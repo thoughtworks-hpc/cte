@@ -21,7 +21,7 @@ std::map<int, int> GenerateInitialPrice(int symbol_id_min, int symbol_id_max,
 
 int CreateDatabaseOrder() {
   std::string resp;
-  int ret = 1;
+  int ret;
   influxdb_cpp::server_info si("127.0.0.1", 8086, "orders", "", "");
   ret = influxdb_cpp::create_db(resp, "orders", si);
   if (0 == ret) {
@@ -32,17 +32,17 @@ int CreateDatabaseOrder() {
   return ret;
 }
 
-int ImportInitialPriceToJsonFile(std::map<int, int> initial_prices) {
-  nlohmann::json j;
+int ImportInitialPriceToJsonFile(const std::map<int, int>& initial_prices) {
+  nlohmann::json initial_price_json;
   for (auto& initial_price : initial_prices) {
-    j[std::to_string(initial_price.first)] = initial_price.second;
+    initial_price_json[std::to_string(initial_price.first)] = initial_price.second;
   }
-  std::ofstream o("initial_prices.json");
-  o << j << std::endl;
+  std::ofstream out("initial_prices.json");
+  out << initial_price_json << std::endl;
   return 0;
 }
 
-std::map<int, int> GetAllInitialPrice(std::string file_path) {
+std::map<int, int> GetAllInitialPrice(const std::string& file_path) {
   std::map<int, int> all_initial_prices;
 
   std::ifstream in(file_path);
@@ -71,12 +71,12 @@ Order::Order(std::map<int, int>& all_initial_prices, int user_id_min,
     }
     i++;
   }
-  this->price_ = GenerateRandomNumber(0.9 * initial_price, 1.1 * initial_price);
+  this->price_ = GenerateRandomNumber((int)(0.9 * initial_price), (int)(1.1 * initial_price));
   this->amount_ = GenerateRandomNumber(amount_min, amount_max);
   this->trading_side_ = GenerateRandomNumber(0, 1);
 }
 
-int Order::CreateOrderInDatabase() {
+int Order::CreateOrderInDatabase() const{
   std::string resp;
   int ret;
   influxdb_cpp::server_info si("127.0.0.1", 8086, "orders", "", "");
@@ -90,7 +90,7 @@ int Order::CreateOrderInDatabase() {
             .field("trading_side", (int32_t)this->trading_side_)
             .post_http(si, &resp);
 
-  if (0 == ret && "" == resp) {
+  if (0 == ret && resp.empty()) {
     std::cout << "write db success" << std::endl;
   } else {
     std::cout << "write db failed, ret:" << ret << " resp:" << resp
