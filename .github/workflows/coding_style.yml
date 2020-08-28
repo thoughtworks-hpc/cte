@@ -12,11 +12,11 @@ jobs:
       - name: clang-format lint
         uses: DoozyX/clang-format-lint-action@v0.5
         with:
-          exclude: './node_keeper/protobuf common/include/json.hpp'
+          exclude: './node_keeper/protobuf ./common/include/json'
 
   check-style:
     needs: check-format
-
+s
     runs-on: ubuntu-latest
 
     steps:
