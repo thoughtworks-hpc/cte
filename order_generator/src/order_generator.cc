@@ -59,7 +59,8 @@ std::map<int, int> GetAllInitialPrice(std::string file_path) {
 Order::Order(std::map<int, int>& all_initial_prices, int user_id_min,
              int user_id_max, int amount_min, int amount_max) {
   this->user_id_ = GenerateRandomNumber(user_id_min, user_id_max);
-  int temp = GenerateRandomNumber(0, (int)all_initial_prices.size() - 1);
+  auto temp =
+      GenerateRandomNumber(0, static_cast<int>(all_initial_prices.size()) - 1);
   int initial_price;
   int i = 0;
   for (auto& item : all_initial_prices) {

@@ -8,6 +8,7 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <string>
 
 #include "../../common/include/influxdb.hpp"
 #include "../../common/include/json.hpp"
