@@ -8,11 +8,30 @@
 
 #include "../../common/include/influxdb.hpp"
 
-OrderManagerImpl::OrderManagerImpl(const std::shared_ptr<Channel> &channel)
+OrderManagerImpl::OrderManagerImpl(
+    const std::shared_ptr<Channel> &main_channel,
+    const std::vector<const std::shared_ptr<Channel>> &request_channel)
     : order_id_(0),
-      stub_(::match_engine_proto::TradingEngine::NewStub(channel)) {
+      request_stub_index_(0),
+      main_stub_(::match_engine_proto::TradingEngine::NewStub(main_channel)) {
+  for (const auto &channel : request_channel) {
+    request_stubs_.emplace_back(
+        ::match_engine_proto::TradingEngine::NewStub(channel));
+  }
+  request_stubs_.push_back(main_stub_);
+
   std::thread t(&OrderManagerImpl::SubscribeMatchResult, this);
   t.detach();
+}
+
+std::shared_ptr<TradingEngine::Stub> OrderManagerImpl::GetNextRequestStub() {
+  assert(!request_stubs_.empty());
+
+  if (request_stub_index_ == request_stubs_.size()) {
+    request_stub_index_ = 0;
+  }
+
+  return request_stubs_[request_stub_index_];
 }
 
 ::grpc::Status OrderManagerImpl::PlaceOrder(
@@ -27,7 +46,7 @@ OrderManagerImpl::OrderManagerImpl(const std::shared_ptr<Channel> &channel)
   PersistOrder(order, "unsubmitted");
 
   ClientContext client_context;
-  Status status = stub_->Match(&client_context, order, &reply);
+  Status status = GetNextRequestStub()->Match(&client_context, order, &reply);
   int ret;
   if (reply.status() == match_engine_proto::STATUS_SUCCESS) {
     ret = PersistOrder(order, "submitted");
@@ -67,11 +86,11 @@ void OrderManagerImpl::SubscribeMatchResult() {
   bool if_order_exists = false;
   std::this_thread::sleep_for(std::chrono::seconds(10));
 
-  std::unique_ptr<ClientReader<match_engine_proto::Trade> > reader(
-      stub_->SubscribeMatchResult(&context, google::protobuf::Empty()));
+  std::unique_ptr<ClientReader<match_engine_proto::Trade>> reader(
+      main_stub_->SubscribeMatchResult(&context, google::protobuf::Empty()));
   while (reader->Read(&trade)) {
-    trade.PrintDebugString();
-    std::cout << "trade: " << trade.SerializeAsString() << std::endl;
+    //    trade.PrintDebugString();
+    //    std::cout << "trade: " << trade.SerializeAsString() << std::endl;
     std::this_thread::sleep_for(std::chrono::seconds(2));
     {
       std::lock_guard<std::mutex> lock(mutex_);
