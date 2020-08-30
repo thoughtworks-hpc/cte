@@ -22,10 +22,10 @@ using grpc::ServerWriter;
 using grpc::Status;
 
 template <typename Out>
-void split(const std::string& s, char delim, Out result) {
+void split(const std::string& s, char delimiter, Out result) {
   std::istringstream iss(s);
   std::string item;
-  while (std::getline(iss, item, delim)) {
+  while (std::getline(iss, item, delimiter)) {
     *result++ = item;
   }
 }
@@ -36,7 +36,6 @@ void RunServer(const std::string& order_manager_port,
   assert(!order_manager_port.empty());
   assert(!match_engine_main_port.empty());
 
-  std::string server_address(order_manager_port);
   std::shared_ptr<Channel> main_channel;
   std::vector<const std::shared_ptr<Channel>> request_channels;
 
@@ -53,10 +52,11 @@ void RunServer(const std::string& order_manager_port,
   OrderManagerImpl service(main_channel, request_channels);
 
   ServerBuilder builder;
-  builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
+  builder.AddListeningPort(order_manager_port,
+                           grpc::InsecureServerCredentials());
   builder.RegisterService(&service);
   std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
-  std::cout << "Server listening on " << server_address << std::endl;
+  std::cout << "Server listening on " << order_manager_port << std::endl;
   server->Wait();
 }
 
@@ -65,6 +65,7 @@ int main(int argc, char* argv[]) {
     std::cout << "usage: order_manager localhost:50051 localhost:4770 "
                  "localhost:4771,localhost:4772,localhost:4773"
               << std::endl;
+    return 0;
   }
 
   std::string order_manager_port = argv[1];
@@ -77,4 +78,6 @@ int main(int argc, char* argv[]) {
 
   RunServer(order_manager_port, match_engine_main_port,
             match_engine_request_port);
+
+  return 0;
 }
