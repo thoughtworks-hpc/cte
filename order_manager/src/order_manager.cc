@@ -18,22 +18,10 @@ OrderManagerImpl::OrderManagerImpl(const std::shared_ptr<Channel> &channel)
 ::grpc::Status OrderManagerImpl::PlaceOrder(
     ::grpc::ServerContext *context, const ::order_manager_proto::Order *request,
     ::order_manager_proto::Reply *response) {
-  using time_stamp = std::chrono::time_point<std::chrono::system_clock,
-                                             std::chrono::nanoseconds>;
-  time_stamp current_time_stamp =
-      std::chrono::time_point_cast<std::chrono::nanoseconds>(
-          std::chrono::system_clock::now());
-  int64_t nanoseconds_since_epoch =
-      current_time_stamp.time_since_epoch().count();
-
-  influxdb_cpp::server_info si("127.0.0.1", 8086, "order_manager", "", "");
-  std::string resp;
-
-  int64_t order_id = ++order_id_;
   match_engine_proto::Order order;
   match_engine_proto::Reply reply;
 
-  BuildMatchEngineOrder(*request, order_id, nanoseconds_since_epoch, order);
+  BuildMatchEngineOrder(*request, order);
 
   SaveOrderStatus(order);
   PersistOrder(order, "unsubmitted");
@@ -126,9 +114,17 @@ void OrderManagerImpl::SubscribeMatchResult() {
 }
 
 void OrderManagerImpl::BuildMatchEngineOrder(
-    const order_manager_proto::Order &request, int64_t order_id,
-    int64_t nanoseconds_since_epoch, match_engine_proto::Order &order) {
-  order.set_order_id(order_id);
+    const order_manager_proto::Order &request,
+    match_engine_proto::Order &order) {
+  using time_stamp = std::chrono::time_point<std::chrono::system_clock,
+                                             std::chrono::nanoseconds>;
+  time_stamp current_time_stamp =
+      std::chrono::time_point_cast<std::chrono::nanoseconds>(
+          std::chrono::system_clock::now());
+  int64_t nanoseconds_since_epoch =
+      current_time_stamp.time_since_epoch().count();
+
+  order.set_order_id(++order_id_);
   order.set_symbol(request.symbol());
   order.set_user_id(request.user_id());
   order.set_price(request.price());

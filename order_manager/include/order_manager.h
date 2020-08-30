@@ -45,9 +45,8 @@ class OrderManagerImpl final
   mutable std::mutex mutex_;
   std::unordered_map<int64_t, OrderStatus> order_id_to_order_status_;
 
-  static void BuildMatchEngineOrder(
-      const order_manager_proto::Order& order_in_request, int64_t order_id,
-      int64_t nanoseconds_since_epoch, match_engine_proto::Order& order);
+  void BuildMatchEngineOrder(const order_manager_proto::Order& order_in_request,
+                             match_engine_proto::Order& order);
   void SaveOrderStatus(const match_engine_proto::Order& order);
   static int PersistOrder(const match_engine_proto::Order& order,
                           std::string status);
