@@ -13,6 +13,9 @@
 
 #include <memory>
 #include <mutex>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 #include "../../common/protobuf_gen/match_engine.grpc.pb.h"
 #include "../../common/protobuf_gen/order_manager.grpc.pb.h"
@@ -48,8 +51,7 @@ class OrderManagerService final
   void BuildMatchEngineOrder(const order_manager_proto::Order& order_in_request,
                              match_engine_proto::Order& order);
   void SaveOrderStatus(const match_engine_proto::Order& order);
-  int PersistOrder(const match_engine_proto::Order& order,
-                          std::string status);
+  int PersistOrder(const match_engine_proto::Order& order, std::string status);
   void SubscribeMatchResult();
   std::shared_ptr<::match_engine_proto::TradingEngine::Stub>
   GetNextRequestStub();

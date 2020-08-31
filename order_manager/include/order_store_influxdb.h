@@ -2,8 +2,10 @@
  * Copyright (c) 2019-2020 ThoughtWorks Inc.
  */
 
-#ifndef CTE_ORDER_STORE_IMPL_H
-#define CTE_ORDER_STORE_IMPL_H
+#ifndef ORDER_MANAGER_INCLUDE_ORDER_STORE_INFLUXDB_H_
+#define ORDER_MANAGER_INCLUDE_ORDER_STORE_INFLUXDB_H_
+
+#include <string>
 
 #include "./order_store.h"
 
@@ -19,4 +21,4 @@ class OrderStoreInfluxDB : public OrderStore {
   int port_;
 };
 
-#endif  // CTE_ORDER_STORE_IMPL_H
+#endif  // ORDER_MANAGER_INCLUDE_ORDER_STORE_INFLUXDB_H_

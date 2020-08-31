@@ -2,8 +2,8 @@
  * Copyright (c) 2019-2020 ThoughtWorks Inc.
  */
 
-#ifndef CTE_FAKE_MATCH_ENGINE_H
-#define CTE_FAKE_MATCH_ENGINE_H
+#ifndef ORDER_MANAGER_INCLUDE_FAKE_MATCH_ENGINE_H_
+#define ORDER_MANAGER_INCLUDE_FAKE_MATCH_ENGINE_H_
 
 #include "../../common/protobuf_gen/match_engine.grpc.pb.h"
 
@@ -18,4 +18,4 @@ class FakeMatchEngineService
       ::grpc::ServerWriter< ::match_engine_proto::Trade>* writer) override;
 };
 
-#endif  // CTE_FAKE_MATCH_ENGINE_H
+#endif  // ORDER_MANAGER_INCLUDE_FAKE_MATCH_ENGINE_H_

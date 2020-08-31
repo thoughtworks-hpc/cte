@@ -2,10 +2,14 @@
  * Copyright (c) 2019-2020 ThoughtWorks Inc.
  */
 
-#include "./order_store.h"
+#ifndef ORDER_MANAGER_INCLUDE_ORDER_STORE_MOCK_H_
+#define ORDER_MANAGER_INCLUDE_ORDER_STORE_MOCK_H_
 
-#ifndef CTE_ORDER_STORE_MOCK_H
-#define CTE_ORDER_STORE_MOCK_H
+#include <string>
+#include <utility>
+#include <vector>
+
+#include "./order_store.h"
 
 class OrderStoreMock : public OrderStore {
  public:
@@ -18,4 +22,4 @@ class OrderStoreMock : public OrderStore {
       order_and_status;
 };
 
-#endif  // CTE_ORDER_STORE_MOCK_H
+#endif  // ORDER_MANAGER_INCLUDE_ORDER_STORE_MOCK_H_

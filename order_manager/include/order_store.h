@@ -2,8 +2,10 @@
  * Copyright (c) 2019-2020 ThoughtWorks Inc.
  */
 
-#ifndef CTE_ORDER_STORE_H
-#define CTE_ORDER_STORE_H
+#ifndef ORDER_MANAGER_INCLUDE_ORDER_STORE_H_
+#define ORDER_MANAGER_INCLUDE_ORDER_STORE_H_
+
+#include <string>
 
 #include "../../common/protobuf_gen/match_engine.grpc.pb.h"
 
@@ -13,4 +15,4 @@ class OrderStore {
                            std::string status) = 0;
 };
 
-#endif  // CTE_ORDER_STORE_H
+#endif  // ORDER_MANAGER_INCLUDE_ORDER_STORE_H_

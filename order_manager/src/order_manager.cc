@@ -79,7 +79,8 @@ std::shared_ptr<TradingEngine::Stub> OrderManagerService::GetNextRequestStub() {
   return grpc::Status::OK;
 }
 
-void OrderManagerService::SaveOrderStatus(const match_engine_proto::Order &order) {
+void OrderManagerService::SaveOrderStatus(
+    const match_engine_proto::Order &order) {
   OrderStatus order_status;
   order_status.order = order;
   order_status.transaction_amount = 0;
@@ -173,7 +174,7 @@ void OrderManagerService::BuildMatchEngineOrder(
 }
 
 int OrderManagerService::PersistOrder(const match_engine_proto::Order &order,
-                                   std::string status) {
+                                      std::string status) {
   return order_store_->PersistOrder(order, status);
 
   //  influxdb_cpp::server_info si("127.0.0.1", 8086, "order_manager", "", "");
