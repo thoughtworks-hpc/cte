@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
         orders_config["database_host"], orders_config["database_port"],
         orders_config["database_name"], orders_config["database_user"],
         orders_config["database_password"]);
-    if (i % 1000 == 0){
+    if (i % 1000 == 0) {
       std::cout << "write db success, the round is: " << i << std::endl;
     }
   }

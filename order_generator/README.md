@@ -3,7 +3,7 @@ This data generator contains two part: **create initial prices** and **create or
 
 ## Create initial prices
 
-In this part, a database named "orders" will be created and initial prices can be created by **create_initial_price.cc** with a default config file (**create_initial_prices_config.json**) in the same src directory. Or you can choose your own json file by adding a parameter which should be your json file path as the program arguments.
+In this part, initial prices can be created by **create_initial_price.cc** with a default config file (**create_initial_prices_config.json**) in the same src directory. Or you can choose your own json file by adding a parameter which should be your json file path as the program arguments.
 
 The config file should in this form, with four arguments:
 
@@ -22,7 +22,7 @@ Initial prices will be created in a json file in your current working directory 
 
 ## Create orders
 
-In this part, orders can be created by **create_orders.cc** with two default files(**initial_prices.json** and **create_orders_config.json**) in the same src directory. Or you can choose your own json files by adding two parameters which should be your json file pathes as the program arguments, in which the first one is like **initial_prices.json** and the second one is like **create_orders_config.json**.
+In this part, a database named "orders" will be created and orders can be created by **create_orders.cc** with two default files(**initial_prices.json** and **create_orders_config.json**) in the same src directory. Or you can choose your own json files by adding two parameters which should be your json file pathes as the program arguments, in which the first one is like **initial_prices.json** and the second one is like **create_orders_config.json**.
 
 The forms of  **initial_prices.json** and **create_orders_config.json** are shown:
 
