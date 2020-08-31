@@ -9,7 +9,7 @@
 
 #include "../../common/include/influxdb.hpp"
 
-OrderManagerImpl::OrderManagerImpl(
+OrderManagerService::OrderManagerService(
     std::shared_ptr<OrderStore> order_store,
     const std::shared_ptr<Channel> &main_channel,
     const std::vector<const std::shared_ptr<Channel>> &request_channel)
@@ -26,11 +26,11 @@ OrderManagerImpl::OrderManagerImpl(
         ::match_engine_proto::TradingEngine::NewStub(channel));
   }
 
-  std::thread t(&OrderManagerImpl::SubscribeMatchResult, this);
+  std::thread t(&OrderManagerService::SubscribeMatchResult, this);
   t.detach();
 }
 
-std::shared_ptr<TradingEngine::Stub> OrderManagerImpl::GetNextRequestStub() {
+std::shared_ptr<TradingEngine::Stub> OrderManagerService::GetNextRequestStub() {
   assert(!request_stubs_.empty());
 
   if (request_stub_index_ != 0 &&
@@ -41,7 +41,7 @@ std::shared_ptr<TradingEngine::Stub> OrderManagerImpl::GetNextRequestStub() {
   return request_stubs_[request_stub_index_++];
 }
 
-::grpc::Status OrderManagerImpl::PlaceOrder(
+::grpc::Status OrderManagerService::PlaceOrder(
     ::grpc::ServerContext *context, const ::order_manager_proto::Order *request,
     ::order_manager_proto::Reply *response) {
   match_engine_proto::Order order;
@@ -79,7 +79,7 @@ std::shared_ptr<TradingEngine::Stub> OrderManagerImpl::GetNextRequestStub() {
   return grpc::Status::OK;
 }
 
-void OrderManagerImpl::SaveOrderStatus(const match_engine_proto::Order &order) {
+void OrderManagerService::SaveOrderStatus(const match_engine_proto::Order &order) {
   OrderStatus order_status;
   order_status.order = order;
   order_status.transaction_amount = 0;
@@ -87,7 +87,7 @@ void OrderManagerImpl::SaveOrderStatus(const match_engine_proto::Order &order) {
   order_id_to_order_status_[order.order_id()] = order_status;
 }
 
-void OrderManagerImpl::SubscribeMatchResult() {
+void OrderManagerService::SubscribeMatchResult() {
   ClientContext context;
   match_engine_proto::Trade trade;
   int32_t maker_transaction_amount = 0;
@@ -148,7 +148,7 @@ void OrderManagerImpl::SubscribeMatchResult() {
   }
 }
 
-void OrderManagerImpl::BuildMatchEngineOrder(
+void OrderManagerService::BuildMatchEngineOrder(
     const order_manager_proto::Order &request,
     match_engine_proto::Order &order) {
   using time_stamp = std::chrono::time_point<std::chrono::system_clock,
@@ -172,7 +172,7 @@ void OrderManagerImpl::BuildMatchEngineOrder(
   order.set_allocated_submit_time(submit_time);
 }
 
-int OrderManagerImpl::PersistOrder(const match_engine_proto::Order &order,
+int OrderManagerService::PersistOrder(const match_engine_proto::Order &order,
                                    std::string status) {
   return order_store_->PersistOrder(order, status);
 

@@ -26,10 +26,10 @@ using grpc::ClientWriter;
 using grpc::Status;
 using ::match_engine_proto::TradingEngine;
 
-class OrderManagerImpl final
+class OrderManagerService final
     : public order_manager_proto::OrderManager::Service {
  public:
-  explicit OrderManagerImpl(
+  explicit OrderManagerService(
       std::shared_ptr<OrderStore> order_store,
       const std::shared_ptr<Channel>& main_channel,
       const std::vector<const std::shared_ptr<Channel>>& request_channel);

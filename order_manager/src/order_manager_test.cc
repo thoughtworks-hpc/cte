@@ -11,7 +11,7 @@
 TEST(OrderManager, should_store_order_correctly_when_place_an_order) {
   auto order_store = std::make_shared<OrderStoreMock>();
   std::vector<const std::shared_ptr<Channel>> empty_channels;
-  OrderManagerImpl order_manager(order_store, nullptr, empty_channels);
+  OrderManagerService order_manager(order_store, nullptr, empty_channels);
 
   ::order_manager_proto::Order order;
   ::order_manager_proto::Reply reply;
@@ -41,7 +41,7 @@ TEST(OrderManager, should_store_order_correctly_when_place_an_order) {
 TEST(OrderManager, should_auto_increment_order_id_when_place_orders) {
   auto order_store = std::make_shared<OrderStoreMock>();
   std::vector<const std::shared_ptr<Channel>> empty_channels;
-  OrderManagerImpl order_manager(order_store, nullptr, empty_channels);
+  OrderManagerService order_manager(order_store, nullptr, empty_channels);
 
   ::order_manager_proto::Order order1;
   ::order_manager_proto::Order order2;

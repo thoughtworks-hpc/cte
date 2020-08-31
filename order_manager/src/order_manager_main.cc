@@ -54,7 +54,7 @@ void RunServer(const std::string& order_manager_address,
   auto order_store = std::make_shared<OrderStoreInfluxDB>(store_address.first,
                                                           store_address.second);
 
-  OrderManagerImpl service(order_store, main_channel, request_channels);
+  OrderManagerService service(order_store, main_channel, request_channels);
 
   ServerBuilder builder;
   builder.AddListeningPort(order_manager_address,
