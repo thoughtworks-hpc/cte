@@ -15,11 +15,11 @@ OrderManagerImpl::OrderManagerImpl(
     : order_id_(0),
       request_stub_index_(0),
       main_stub_(::match_engine_proto::TradingEngine::NewStub(main_channel)) {
+  request_stubs_.push_back(main_stub_);
   for (const auto &channel : request_channel) {
     request_stubs_.emplace_back(
         ::match_engine_proto::TradingEngine::NewStub(channel));
   }
-  request_stubs_.push_back(main_stub_);
 
   std::thread t(&OrderManagerImpl::SubscribeMatchResult, this);
   t.detach();
@@ -28,11 +28,12 @@ OrderManagerImpl::OrderManagerImpl(
 std::shared_ptr<TradingEngine::Stub> OrderManagerImpl::GetNextRequestStub() {
   assert(!request_stubs_.empty());
 
-  if (request_stub_index_ == request_stubs_.size()) {
+  if (request_stub_index_ != 0 &&
+      request_stub_index_ == request_stubs_.size()) {
     request_stub_index_ = 0;
   }
 
-  return request_stubs_[request_stub_index_];
+  return request_stubs_[request_stub_index_++];
 }
 
 ::grpc::Status OrderManagerImpl::PlaceOrder(

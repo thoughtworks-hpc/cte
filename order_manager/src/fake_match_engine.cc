@@ -9,6 +9,8 @@
 ::grpc::Status FakeMatchEngineService::Match(
     ::grpc::ServerContext *context, const ::match_engine_proto::Order *request,
     ::match_engine_proto::Reply *response) {
+  std::cout << "receive order " << request->order_id() << std::endl;
+
   response->set_status(match_engine_proto::STATUS_SUCCESS);
   response->set_message("all good");
 

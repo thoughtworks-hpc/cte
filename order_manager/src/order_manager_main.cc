@@ -30,33 +30,33 @@ void split(const std::string& s, char delimiter, Out result) {
   }
 }
 
-void RunServer(const std::string& order_manager_port,
-               const std::string& match_engine_main_port,
-               std::vector<const std::string>& match_engine_request_port) {
-  assert(!order_manager_port.empty());
-  assert(!match_engine_main_port.empty());
+void RunServer(const std::string& order_manager_address,
+               const std::string& match_engine_main_address,
+               std::vector<const std::string>& match_engine_request_addresses) {
+  assert(!order_manager_address.empty());
+  assert(!match_engine_main_address.empty());
 
   std::shared_ptr<Channel> main_channel;
   std::vector<const std::shared_ptr<Channel>> request_channels;
 
-  main_channel = grpc::CreateChannel(match_engine_main_port,
+  main_channel = grpc::CreateChannel(match_engine_main_address,
                                      grpc::InsecureChannelCredentials());
 
-  if (!match_engine_request_port.empty()) {
-    for (const auto& port : match_engine_request_port) {
+  if (!match_engine_request_addresses.empty()) {
+    for (const auto& address : match_engine_request_addresses) {
       request_channels.push_back(
-          grpc::CreateChannel(port, grpc::InsecureChannelCredentials()));
+          grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
     }
   }
 
   OrderManagerImpl service(main_channel, request_channels);
 
   ServerBuilder builder;
-  builder.AddListeningPort(order_manager_port,
+  builder.AddListeningPort(order_manager_address,
                            grpc::InsecureServerCredentials());
   builder.RegisterService(&service);
   std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
-  std::cout << "Server listening on " << order_manager_port << std::endl;
+  std::cout << "Server listening on " << order_manager_address << std::endl;
   server->Wait();
 }
 
@@ -68,16 +68,16 @@ int main(int argc, char* argv[]) {
     return 0;
   }
 
-  std::string order_manager_port = argv[1];
-  std::string match_engine_main_port = argv[2];
-  std::vector<const std::string> match_engine_request_port;
+  std::string order_manager_address = argv[1];
+  std::string match_engine_main_address = argv[2];
+  std::vector<const std::string> match_engine_request_addresses;
 
   if (argc == 4) {
-    split(argv[3], ',', std::back_inserter(match_engine_request_port));
+    split(argv[3], ',', std::back_inserter(match_engine_request_addresses));
   }
 
-  RunServer(order_manager_port, match_engine_main_port,
-            match_engine_request_port);
+  RunServer(order_manager_address, match_engine_main_address,
+            match_engine_request_addresses);
 
   return 0;
 }
