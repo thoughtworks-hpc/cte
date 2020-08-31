@@ -28,4 +28,4 @@ jobs:
       - uses: actions/checkout@v1
       - name: Run cpplint
         run: |
-          cpplint --recursive --exclude=common/include/influxdb.hpp  --exclude=common/protobuf .
+          cpplint --recursive --exclude=common/include/influxdb.hpp --exclude=common/include/json.hpp --exclude=common/protobuf .

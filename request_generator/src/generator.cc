@@ -36,14 +36,6 @@ bool Generator::PrepareOrders() {
     orders_.push(order);
     count++;
     if (count == num_of_orders_) break;
-    //
-    //    grpc::ClientContext query_context;
-    //
-    //    order_manager_proto::Reply reply;
-    //    grpc::Status status = client.PlaceOrder(&query_context, order,
-    //    &reply); std::cout << "#" << count << " reply message: " <<
-    //    reply.message() << std::endl; std::cout << "#" << count << "reply
-    //    error_code: " << reply.error_code() << std::endl;
   }
   if (count != num_of_orders_) {
     std::cout << "[WARNING] DB only has " << count << " orders" << std::endl;
