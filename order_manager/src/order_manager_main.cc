@@ -32,6 +32,7 @@ void split(const std::string& s, char delimiter, Out result) {
 }
 
 void RunServer(const std::string& order_manager_address,
+               std::pair<std::string, int> store_address,
                const std::string& match_engine_main_address,
                std::vector<const std::string>& match_engine_request_addresses) {
   assert(!order_manager_address.empty());
@@ -50,7 +51,8 @@ void RunServer(const std::string& order_manager_address,
     }
   }
 
-  auto order_store = std::make_shared<OrderStoreInfluxDB>();
+  auto order_store = std::make_shared<OrderStoreInfluxDB>(store_address.first,
+                                                          store_address.second);
 
   OrderManagerImpl service(order_store, main_channel, request_channels);
 
@@ -64,22 +66,29 @@ void RunServer(const std::string& order_manager_address,
 }
 
 int main(int argc, char* argv[]) {
-  if (argc < 3) {
-    std::cout << "usage: order_manager localhost:50051 localhost:4770 "
-                 "localhost:4771,localhost:4772,localhost:4773"
-              << std::endl;
+  if (argc < 4) {
+    std::cout
+        << "usage: order_manager localhost:50051 localhost:8086 localhost:4770 "
+           "localhost:4771,localhost:4772,localhost:4773"
+        << std::endl;
     return 0;
   }
 
   std::string order_manager_address = argv[1];
-  std::string match_engine_main_address = argv[2];
+  std::vector<const std::string> influxdb_address_in_string;
+  std::pair<std::string, int> influxdb_address;
+  std::string match_engine_main_address = argv[3];
   std::vector<const std::string> match_engine_request_addresses;
 
-  if (argc == 4) {
-    split(argv[3], ',', std::back_inserter(match_engine_request_addresses));
+  split(argv[2], ':', std::back_inserter(influxdb_address_in_string));
+  influxdb_address.first = influxdb_address_in_string[0];
+  influxdb_address.second = std::stoi(influxdb_address_in_string[1]);
+
+  if (argc == 5) {
+    split(argv[4], ',', std::back_inserter(match_engine_request_addresses));
   }
 
-  RunServer(order_manager_address, match_engine_main_address,
+  RunServer(order_manager_address, influxdb_address, match_engine_main_address,
             match_engine_request_addresses);
 
   return 0;
