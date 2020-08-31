@@ -3,12 +3,18 @@
  */
 #include "../include/order_generator.h"
 
-int GenerateRandomNumber(int range_min, int range_max) {
-  return rand() % (range_max - range_min + 1) + range_min;
+int GenerateRandomNumber(const int& range_min, const int& range_max) {
+  std::random_device rd;
+  std::mt19937 mt(rd());
+  std::uniform_int_distribution<int> dist(range_min, range_max);
+  auto random_number = dist(mt);
+  return random_number;
 }
 
-std::map<int, int> GenerateInitialPrice(int symbol_id_min, int symbol_id_max,
-                                        int price_min, int price_max) {
+std::map<int, int> GenerateInitialPrice(const int& symbol_id_min,
+                                        const int& symbol_id_max,
+                                        const int& price_min,
+                                        const int& price_max) {
   std::map<int, int> all_initial_prices;
 
   for (int i = symbol_id_min; i < symbol_id_max + 1; i++) {
@@ -19,14 +25,16 @@ std::map<int, int> GenerateInitialPrice(int symbol_id_min, int symbol_id_max,
   return all_initial_prices;
 }
 
-int CreateDatabaseOrder() {
+int CreateDatabase(const std::string& database_host, const int& database_port,
+                   const std::string& database_name,
+                   const std::string& database_user,
+                   const std::string& database_password) {
   std::string resp;
   int ret;
-  influxdb_cpp::server_info si("127.0.0.1", 8086, "orders", "", "");
-  ret = influxdb_cpp::create_db(resp, "orders", si);
-  if (0 == ret) {
-    std::cout << "creat db success, resp:" << resp << std::endl;
-  } else {
+  influxdb_cpp::server_info si(database_host, database_port, database_name,
+                               database_user, database_password);
+  ret = influxdb_cpp::create_db(resp, database_name, si);
+  if (0 != ret) {
     std::cout << "creat db failed ret:" << ret << std::endl;
   }
   return ret;
@@ -35,7 +43,8 @@ int CreateDatabaseOrder() {
 int ImportInitialPriceToJsonFile(const std::map<int, int>& initial_prices) {
   nlohmann::json initial_price_json;
   for (auto& initial_price : initial_prices) {
-    initial_price_json[std::to_string(initial_price.first)] = initial_price.second;
+    initial_price_json[std::to_string(initial_price.first)] =
+        initial_price.second;
   }
   std::ofstream output("initial_prices.json");
   output << initial_price_json << std::endl;
@@ -56,8 +65,9 @@ std::map<int, int> GetAllInitialPrice(const std::string& file_path) {
   return all_initial_prices;
 }
 
-Order::Order(std::map<int, int>& all_initial_prices, int user_id_min,
-             int user_id_max, int amount_min, int amount_max) {
+Order::Order(const std::map<int, int>& all_initial_prices,
+             const int& user_id_min, const int& user_id_max,
+             const int& amount_min, const int& amount_max) {
   this->user_id_ = GenerateRandomNumber(user_id_min, user_id_max);
   auto temp =
       GenerateRandomNumber(0, static_cast<int>(all_initial_prices.size()) - 1);
@@ -71,15 +81,21 @@ Order::Order(std::map<int, int>& all_initial_prices, int user_id_min,
     }
     i++;
   }
-  this->price_ = GenerateRandomNumber((int)(0.9 * initial_price), (int)(1.1 * initial_price));
+  this->price_ = GenerateRandomNumber((int)(0.9 * initial_price),
+                                      (int)(1.1 * initial_price));
   this->amount_ = GenerateRandomNumber(amount_min, amount_max);
   this->trading_side_ = GenerateRandomNumber(0, 1);
 }
 
-int Order::CreateOrderInDatabase() const{
+int Order::CreateOrderInDatabase(const std::string& database_host,
+                                 const int& database_port,
+                                 const std::string& database_name,
+                                 const std::string& database_user,
+                                 const std::string& database_password) const {
   std::string resp;
   int ret;
-  influxdb_cpp::server_info si("127.0.0.1", 8086, "orders", "", "");
+  influxdb_cpp::server_info si(database_host, database_port, database_name,
+                               database_user, database_password);
 
   ret = influxdb_cpp::builder()
             .meas("orders")
@@ -90,9 +106,7 @@ int Order::CreateOrderInDatabase() const{
             .field("trading_side", (int32_t)this->trading_side_)
             .post_http(si, &resp);
 
-  if (0 == ret && resp.empty()) {
-    std::cout << "write db success" << std::endl;
-  } else {
+  if (0 != ret || !resp.empty()) {
     std::cout << "write db failed, ret:" << ret << " resp:" << resp
               << std::endl;
   }

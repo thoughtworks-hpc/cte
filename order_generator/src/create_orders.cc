@@ -4,8 +4,6 @@
 #include "../include/order_generator.h"
 
 int main(int argc, char* argv[]) {
-  srand((unsigned)time(nullptr));
-
   int ret = 0;
   std::string initial_price_file_path;
 
@@ -22,6 +20,16 @@ int main(int argc, char* argv[]) {
     ret = 1;
     std::cout << "Error: you must enter two file paths or not." << std::endl;
   }
+
+  ret = CreateDatabase(
+      orders_config["database_host"], orders_config["database_port"],
+      orders_config["database_name"], orders_config["database_user"],
+      orders_config["database_password"]);
+  if (ret == 1) {
+    std::cout << "Error: create db failed" << std::endl;
+    return ret;
+  }
+
   auto initial_prices = GetAllInitialPrice(initial_price_file_path);
 
   for (int i = 0; i < orders_config["order_amount"]; i++) {
@@ -29,7 +37,13 @@ int main(int argc, char* argv[]) {
                 orders_config["user_id_max"],
                 orders_config["trading_amount_min"],
                 orders_config["trading_amount_max"]);
-    order.CreateOrderInDatabase();
+    order.CreateOrderInDatabase(
+        orders_config["database_host"], orders_config["database_port"],
+        orders_config["database_name"], orders_config["database_user"],
+        orders_config["database_password"]);
+    if (i % 1000 == 0){
+      std::cout << "write db success, the round is: " << i << std::endl;
+    }
   }
 
   return ret;

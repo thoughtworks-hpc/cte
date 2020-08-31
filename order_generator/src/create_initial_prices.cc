@@ -5,16 +5,8 @@
 #include "../include/order_generator.h"
 
 int main(int argc, char* argv[]) {
-  srand((unsigned)time(nullptr));
-
   int ret;
   nlohmann::json initial_prices_config;
-
-  ret = CreateDatabaseOrder();
-  if (ret == 1) {
-    std::cout << "Error: create db failed" << std::endl;
-    return ret;
-  }
 
   if (argc == 1) {
     std::ifstream input("create_initial_prices_config.json");
