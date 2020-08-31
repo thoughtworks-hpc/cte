@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(request_generator)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 find_package(protobuf REQUIRED)
 find_package(protoc REQUIRED)
@@ -39,3 +40,6 @@ target_link_libraries(${PROJECT_NAME}_server ${PROJECT_NAME}_grpc grpc::grpc)
 
 add_executable(${PROJECT_NAME}_client src/client.cc)
 target_link_libraries(${PROJECT_NAME}_client ${PROJECT_NAME}_grpc grpc::grpc)
+
+add_executable(${PROJECT_NAME}_db src/main.cc src/generator.cc)
+target_link_libraries(${PROJECT_NAME}_db ${PROJECT_NAME}_grpc grpc::grpc)
