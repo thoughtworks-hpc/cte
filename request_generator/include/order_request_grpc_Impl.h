@@ -1,9 +1,9 @@
-//
-// Created by Yuecheng Pei on 2020/8/27.
-//
+/*
+ * Copyright (c) 2020 ThoughtWorks Inc.
+ */
 
-#ifndef CTE_ORDERREQUESTGRPCIMPL_H
-#define CTE_ORDERREQUESTGRPCIMPL_H
+#ifndef REQUEST_GENERATOR_INCLUDE_ORDER_REQUEST_GRPC_IMPL_H_
+#define REQUEST_GENERATOR_INCLUDE_ORDER_REQUEST_GRPC_IMPL_H_
 
 namespace cte {
 class OrderRequestGrpcImpl final : public ::OrderManager::Service {
@@ -14,4 +14,4 @@ class OrderRequestGrpcImpl final : public ::OrderManager::Service {
 };
 }  // namespace cte
 
-#endif  // CTE_ORDERREQUESTGRPCIMPL_H
+#endif  // REQUEST_GENERATOR_INCLUDE_ORDER_REQUEST_GRPC_IMPL_H_
