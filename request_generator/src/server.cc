@@ -1,12 +1,13 @@
-//
-// Created by Yuecheng Pei on 2020/8/27.
-//
+/*
+ * Copyright (c) 2020 ThoughtWorks Inc.
+ */
+
+#include <grpcpp/server_builder.h>
 
 #include <iostream>
 
 #include "../protobuf_gen/order.grpc.pb.h"
 #include "../protobuf_gen/order.pb.h"
-#include <grpcpp/server_builder.h>
 
 class OrderManagerImpl final
     : public order_manager_proto::OrderManager::Service {
@@ -24,8 +25,10 @@ class OrderManagerImpl final
     std::cout << "amount: " << request->amount() << std::endl;
     std::cout << "price: " << request->price() << std::endl;
 
-    response->set_error_code( order_manager_proto::ErrorCode::SUCCESS );
-    response->set_message("Response form server");
+    response->set_error_code(order_manager_proto::ErrorCode::SUCCESS);
+    std::string response_message =
+        "#" + std::to_string(count) + " Response form server";
+    response->set_message(response_message);
 
     return grpc::Status::OK;
   }
@@ -54,6 +57,4 @@ int main() {
   order_manager_impl.RunWithWait();
 }
 
-void writeData(order_manager_proto::Order* order) {
-  order->set_amount(10);
-}
+void writeData(order_manager_proto::Order* order) { order->set_amount(10); }
