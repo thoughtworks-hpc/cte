@@ -54,7 +54,6 @@ class OrderManagerImpl final
   std::shared_ptr<::match_engine_proto::TradingEngine::Stub>
   GetNextRequestStub();
   std::atomic<int64_t> order_id_;
-  std::unique_ptr<::match_engine_proto::TradingEngine::Stub> stub_;
   mutable std::mutex mutex_;
   std::unordered_map<int64_t, OrderStatus> order_id_to_order_status_;
 

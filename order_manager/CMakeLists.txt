@@ -3,6 +3,8 @@ project(order_manager)
 
 conan_basic_setup()
 
-add_executable(order_manager src/order_manager.cc src/main.cc)
+add_executable(order_manager src/order_manager.cc src/order_manager_main.cc)
+add_executable(fake_match_engine src/fake_match_engine.cc src/fake_match_engine_main.cc)
 
-target_link_libraries(order_manager common caf::caf cdcf::cdcf common_grpc ${CONAN_LIBS})
+target_link_libraries(order_manager common common_grpc ${CONAN_LIBS})
+target_link_libraries(fake_match_engine common common_grpc ${CONAN_LIBS})
