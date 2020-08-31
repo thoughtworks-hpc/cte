@@ -16,6 +16,7 @@
 
 #include "../../common/protobuf_gen/match_engine.grpc.pb.h"
 #include "../../common/protobuf_gen/order_manager.grpc.pb.h"
+#include "./order_store.h"
 
 using grpc::Channel;
 using grpc::ClientContext;
@@ -29,6 +30,7 @@ class OrderManagerImpl final
     : public order_manager_proto::OrderManager::Service {
  public:
   explicit OrderManagerImpl(
+      std::shared_ptr<OrderStore> order_store,
       const std::shared_ptr<Channel>& main_channel,
       const std::vector<const std::shared_ptr<Channel>>& request_channel);
 
@@ -46,13 +48,12 @@ class OrderManagerImpl final
   void BuildMatchEngineOrder(const order_manager_proto::Order& order_in_request,
                              match_engine_proto::Order& order);
   void SaveOrderStatus(const match_engine_proto::Order& order);
-  static int PersistOrder(const match_engine_proto::Order& order,
+  int PersistOrder(const match_engine_proto::Order& order,
                           std::string status);
-
   void SubscribeMatchResult();
-
   std::shared_ptr<::match_engine_proto::TradingEngine::Stub>
   GetNextRequestStub();
+
   std::atomic<int64_t> order_id_;
   mutable std::mutex mutex_;
   std::unordered_map<int64_t, OrderStatus> order_id_to_order_status_;
@@ -61,6 +62,8 @@ class OrderManagerImpl final
   std::vector<std::shared_ptr<::match_engine_proto::TradingEngine::Stub>>
       request_stubs_;
   std::atomic<unsigned int> request_stub_index_;
+
+  std::shared_ptr<OrderStore> order_store_;
 };
 
 #endif  // ORDER_MANAGER_INCLUDE_ORDER_MANAGER_H_

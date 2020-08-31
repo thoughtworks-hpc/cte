@@ -10,12 +10,17 @@
 #include "../../common/include/influxdb.hpp"
 
 OrderManagerImpl::OrderManagerImpl(
+    std::shared_ptr<OrderStore> order_store,
     const std::shared_ptr<Channel> &main_channel,
     const std::vector<const std::shared_ptr<Channel>> &request_channel)
     : order_id_(0),
       request_stub_index_(0),
-      main_stub_(::match_engine_proto::TradingEngine::NewStub(main_channel)) {
-  request_stubs_.push_back(main_stub_);
+      order_store_(std::move(order_store)) {
+  if (main_channel != nullptr) {
+    main_stub_ = ::match_engine_proto::TradingEngine::NewStub(main_channel);
+    request_stubs_.push_back(main_stub_);
+  }
+
   for (const auto &channel : request_channel) {
     request_stubs_.emplace_back(
         ::match_engine_proto::TradingEngine::NewStub(channel));
@@ -48,12 +53,15 @@ std::shared_ptr<TradingEngine::Stub> OrderManagerImpl::GetNextRequestStub() {
   PersistOrder(order, "unsubmitted");
 
   ClientContext client_context;
-  Status status = GetNextRequestStub()->Match(&client_context, order, &reply);
-  int ret;
-  if (reply.status() == match_engine_proto::STATUS_SUCCESS) {
-    ret = PersistOrder(order, "order submitted");
-  } else {
-    ret = PersistOrder(order, "order submission error");
+  int ret = 0;
+  if (!request_stubs_.empty()) {
+    GetNextRequestStub()->Match(&client_context, order, &reply);
+
+    if (reply.status() == match_engine_proto::STATUS_SUCCESS) {
+      ret = PersistOrder(order, "order submitted");
+    } else {
+      ret = PersistOrder(order, "order submission error");
+    }
   }
 
   std::string message;
@@ -87,50 +95,57 @@ void OrderManagerImpl::SubscribeMatchResult() {
   match_engine_proto::Order maker_order;
   match_engine_proto::Order taker_order;
   bool if_order_exists = false;
-  std::this_thread::sleep_for(std::chrono::seconds(10));
 
-  std::unique_ptr<ClientReader<match_engine_proto::Trade>> reader(
-      main_stub_->SubscribeMatchResult(&context, google::protobuf::Empty()));
-  while (reader->Read(&trade)) {
-    //    trade.PrintDebugString();
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-    {
-      std::lock_guard<std::mutex> lock(mutex_);
+  if (main_stub_ != nullptr) {
+    std::this_thread::sleep_for(std::chrono::seconds(10));
 
-      if (order_id_to_order_status_.find(trade.maker_id()) !=
-              order_id_to_order_status_.end() &&
-          order_id_to_order_status_.find(trade.taker_id()) !=
-              order_id_to_order_status_.end()) {
-        if_order_exists = true;
-        auto &maker_order_status = order_id_to_order_status_[trade.maker_id()];
-        auto &taker_order_status = order_id_to_order_status_[trade.taker_id()];
-        maker_order_status.transaction_amount =
-            maker_order_status.transaction_amount + trade.amount();
-        taker_order_status.transaction_amount =
-            taker_order_status.transaction_amount + trade.amount();
-        maker_order = maker_order_status.order;
-        taker_order = taker_order_status.order;
-        maker_transaction_amount = maker_order_status.transaction_amount;
-        taker_transaction_amount = taker_order_status.transaction_amount;
+    std::unique_ptr<ClientReader<match_engine_proto::Trade>> reader(
+        main_stub_->SubscribeMatchResult(&context, google::protobuf::Empty()));
+    while (reader->Read(&trade)) {
+      // trade.PrintDebugString();
+      std::this_thread::sleep_for(std::chrono::seconds(2));
+      {
+        std::lock_guard<std::mutex> lock(mutex_);
+
+        if (order_id_to_order_status_.find(trade.maker_id()) !=
+                order_id_to_order_status_.end() &&
+            order_id_to_order_status_.find(trade.taker_id()) !=
+                order_id_to_order_status_.end()) {
+          if_order_exists = true;
+          auto &maker_order_status =
+              order_id_to_order_status_[trade.maker_id()];
+          auto &taker_order_status =
+              order_id_to_order_status_[trade.taker_id()];
+          maker_order_status.transaction_amount =
+              maker_order_status.transaction_amount + trade.amount();
+          taker_order_status.transaction_amount =
+              taker_order_status.transaction_amount + trade.amount();
+          maker_order = maker_order_status.order;
+          taker_order = taker_order_status.order;
+          maker_transaction_amount = maker_order_status.transaction_amount;
+          taker_transaction_amount = taker_order_status.transaction_amount;
+        } else {
+          if_order_exists = false;
+        }
+      }
+
+      if (if_order_exists) {
+        std::cout << "receive trade for order " << trade.maker_id()
+                  << " as maker"
+                  << " and order " << trade.taker_id() << " as taker"
+                  << std::endl;
+        PersistOrder(maker_order, "transaction amount " +
+                                      std::to_string(maker_transaction_amount));
+        PersistOrder(taker_order, "transaction amount " +
+                                      std::to_string(taker_transaction_amount));
       } else {
-        if_order_exists = false;
+        std::cout << "order in trade doesn't exist for either "
+                  << trade.maker_id() << " or " << trade.taker_id()
+                  << std::endl;
       }
     }
-
-    if (if_order_exists) {
-      std::cout << "receive trade for order " << trade.maker_id() << " as maker"
-                << " and order " << trade.taker_id() << " as taker"
-                << std::endl;
-      PersistOrder(maker_order, "transaction amount " +
-                                    std::to_string(maker_transaction_amount));
-      PersistOrder(taker_order, "transaction amount " +
-                                    std::to_string(taker_transaction_amount));
-    } else {
-      std::cout << "order in trade doesn't exist for either "
-                << trade.maker_id() << " or " << trade.taker_id() << std::endl;
-    }
+    Status status = reader->Finish();
   }
-  Status status = reader->Finish();
 }
 
 void OrderManagerImpl::BuildMatchEngineOrder(
@@ -159,30 +174,33 @@ void OrderManagerImpl::BuildMatchEngineOrder(
 
 int OrderManagerImpl::PersistOrder(const match_engine_proto::Order &order,
                                    std::string status) {
-  influxdb_cpp::server_info si("127.0.0.1", 8086, "order_manager", "", "");
-  std::string resp;
-  std::string trading_side =
-      order.trading_side() == match_engine_proto::TRADING_BUY ? "buy" : "sell";
+  return order_store_->PersistOrder(order, status);
 
-  int ret = influxdb_cpp::builder()
-                .meas("order")
-                .tag("order_id", std::to_string(order.order_id()))
-                .tag("symbol_id", std::to_string(order.symbol()))
-                .field("user_id", order.user_id())
-                .field("price", order.price())
-                .field("amount", order.amount())
-                .field("trading_side", trading_side)
-                .field("status", std::string(status))
-                .timestamp(order.submit_time().seconds() * 1000000000 +
-                           order.submit_time().nanos())
-                .post_http(si, &resp);
-
-  if (0 == ret && resp.empty()) {
-    std::cout << "write db success" << std::endl;
-  } else {
-    std::cout << "write db failed, ret:" << ret << " resp:" << resp
-              << std::endl;
-  }
-
-  return ret;
+  //  influxdb_cpp::server_info si("127.0.0.1", 8086, "order_manager", "", "");
+  //  std::string resp;
+  //  std::string trading_side =
+  //      order.trading_side() == match_engine_proto::TRADING_BUY ? "buy" :
+  //      "sell";
+  //
+  //  int ret = influxdb_cpp::builder()
+  //                .meas("order")
+  //                .tag("order_id", std::to_string(order.order_id()))
+  //                .tag("symbol_id", std::to_string(order.symbol()))
+  //                .field("user_id", order.user_id())
+  //                .field("price", order.price())
+  //                .field("amount", order.amount())
+  //                .field("trading_side", trading_side)
+  //                .field("status", std::string(status))
+  //                .timestamp(order.submit_time().seconds() * 1000000000 +
+  //                           order.submit_time().nanos())
+  //                .post_http(si, &resp);
+  //
+  //  if (0 == ret && resp.empty()) {
+  //    std::cout << "write db success" << std::endl;
+  //  } else {
+  //    std::cout << "write db failed, ret:" << ret << " resp:" << resp
+  //              << std::endl;
+  //  }
+  //
+  //  return ret;
 }

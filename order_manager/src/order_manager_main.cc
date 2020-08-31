@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "../include/order_manager.h"
+#include "../include/order_store_influxdb.h"
 
 using grpc::Server;
 using grpc::ServerBuilder;
@@ -49,7 +50,9 @@ void RunServer(const std::string& order_manager_address,
     }
   }
 
-  OrderManagerImpl service(main_channel, request_channels);
+  auto order_store = std::make_shared<OrderStoreInfluxDB>();
+
+  OrderManagerImpl service(order_store, main_channel, request_channels);
 
   ServerBuilder builder;
   builder.AddListeningPort(order_manager_address,
