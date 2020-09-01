@@ -22,8 +22,9 @@ OrderManagerService::OrderManagerService(
   }
 
   for (const auto &channel : request_channel) {
-    request_stubs_.emplace_back(
-        ::match_engine_proto::TradingEngine::NewStub(channel));
+    std::shared_ptr<TradingEngine::Stub> stub =
+        ::match_engine_proto::TradingEngine::NewStub(channel);
+    request_stubs_.push_back(stub);
   }
 
   std::thread t(&OrderManagerService::SubscribeMatchResult, this);
