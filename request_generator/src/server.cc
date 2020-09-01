@@ -16,7 +16,7 @@ class OrderManagerImpl final
  public:
   std::string port;
   std::atomic_int32_t count = 0;
-  OrderManagerImpl(std::string port) : port(std::move(port)) {}
+  explicit OrderManagerImpl(std::string port) : port(std::move(port)) {}
 
   ::grpc::Status PlaceOrder(::grpc::ServerContext* context,
                             const ::order_manager_proto::Order* request,

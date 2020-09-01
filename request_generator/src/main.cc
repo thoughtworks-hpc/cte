@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
   nlohmann::json initial_prices_config;
   std::ifstream input("request_generator_config.json");
   input >> initial_prices_config;
-  std::cout << initial_prices_config << std::endl;
+  // std::cout << initial_prices_config << std::endl;
   int default_num_of_threads = initial_prices_config["default_num_of_threads"];
   int default_num_of_requests =
       initial_prices_config["default_num_of_requests"];
@@ -51,10 +51,12 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
   }
+
   Generator generator(default_num_of_threads, default_num_of_requests,
                       grcp_ip_address, default_db_host_address,
                       default_db_port);
   generator.Start();
+
   const std::vector<int> count_each_server = Generator::getCountEachServer();
   for (int i = 0; i < count_each_server.size(); i++) {
     std::cout << "Send " << count_each_server[i] << " requests to "
