@@ -13,8 +13,8 @@ class OrderStoreInfluxDB : public OrderStore {
  public:
   OrderStoreInfluxDB(const std::string& host, int port)
       : host_(host), port_(port) {}
-  int PersistOrder(const match_engine_proto::Order& order,
-                   std::string status, int concluded_amount) override;
+  int PersistOrder(const match_engine_proto::Order& order, std::string status,
+                   int concluded_amount) override;
 
  private:
   std::string host_;

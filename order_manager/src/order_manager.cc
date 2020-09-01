@@ -159,4 +159,3 @@ void OrderManagerService::BuildMatchEngineOrder(
   submit_time->set_nanos(nanoseconds_since_epoch % 1000000000);
   order.set_allocated_submit_time(submit_time);
 }
-
