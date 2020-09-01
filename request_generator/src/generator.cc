@@ -18,17 +18,12 @@ std::mutex Generator::mutex_requests_count_;
 std::vector<int> Generator::count_each_server_;
 
 bool Generator::PrepareOrders() {
-  using json = nlohmann::json;
-  std::string resp;
-  influxdb_cpp::server_info si(db_host_address_, std::stoi(db_port_), "orders",
-                               "", "");
-  int ret = influxdb_cpp::query(resp, "select  * from orders", si);
-  if (0 == ret) {
-    std::cout << "[INFO] query db success" << std::endl;
-  } else {
-    std::cout << "[ERROR] query db failed ret:" << ret << std::endl;
+  std::string resp = database_->GetOrders(db_host_address_, db_port_);
+  if (resp.empty()) {
     return false;
   }
+
+  using json = nlohmann::json;
   json j = json::parse(resp);
 
   int count = 0;
