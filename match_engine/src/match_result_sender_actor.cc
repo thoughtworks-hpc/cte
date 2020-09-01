@@ -7,8 +7,9 @@
 namespace match_engine {
 caf::behavior MatchResultDealActor(caf::event_based_actor*,
                                    SenderMatchInterface* match_engine_grpc) {
-  return {[&match_engine_grpc](const TradeListMsg& match_result) {
+  return {[=](const TradeListMsg& match_result) -> int {
     match_engine_grpc->SendMatchResult(match_result.data);
+    return 0;
   }};
 }
 }  // namespace match_engine

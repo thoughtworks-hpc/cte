@@ -16,7 +16,7 @@
 //
 namespace match_engine {
 
-const int64_t k_send_match_result_timeout = 5;
+const int64_t k_send_match_result_timeout = 2;
 using MatchWriter = ::grpc::ServerWriter< ::match_engine_proto::Trade>*;
 using MatchWriterList = std::vector<MatchWriter>;
 

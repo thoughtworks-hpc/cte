@@ -114,21 +114,30 @@ void AddToOrderTable(OrderTable& order_table, RawOrder& order) {
       order_table.insert(order_list_it, RawOrderList{order});
       return;
     }
+
+    ++order_list_it;
   }
 
   order_table.emplace_back(RawOrderList{order});
 }
 
 void SendMatchResult(caf::stateful_actor<OrderBook>* sender,
-                     const std::vector<MatchedTrade>& match_result) {
+                     const TradeList& match_result) {
   int result_count = match_result.size();
+  if (0 == result_count){
+    return;
+  }
+
   if (nullptr != sender->state.match_result_actor) {
+
+
     sender
         ->request(sender->state.match_result_actor,
-                  std::chrono::seconds(k_send_match_result_timeout),
-                  match_result)
+                  //std::chrono::seconds(k_send_match_result_timeout),
+                  caf::infinite,
+                  TradeListMsg{match_result})
         .then(
-            [result_count]() {
+            [result_count](int) {
               CDCF_LOGGER_DEBUG(
                   "Send match result success, information count:{}",
                   result_count);

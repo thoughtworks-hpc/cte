@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
-#include <cdcf/logger.h>
 
 #include <regex>
 #include <string>
@@ -14,13 +13,6 @@
 #include "../include/match_result_sender_actor.h"
 #include "../include/symbol_id_router.h"
 
-// int main(int argc, char* argv[]){
-//
-//    match_engine::MatchEngineGPPCImpl match_engine_grpc(50066);
-//    match_engine_grpc.RunWithWait();
-//
-//    return 0;
-//}
 
 std::vector<std::string> StrSplit(const std::string& in,
                                   const std::string& tag) {
@@ -45,7 +37,7 @@ void caf_main(caf::actor_system& system, const match_engine::Config& config) {
   caf::scoped_actor self(system);
 
   for (auto& symbol_str : symbol_str_list) {
-    if ("" != symbol_str){
+    if (!symbol_str.empty()){
       int32_t symbol_id = std::stoi(symbol_str);
       auto match_actor = system.spawn(match_engine::MatchActor);
       self->send(router_actor, symbol_id, match_actor);
