@@ -57,7 +57,7 @@ class OrderManagerImpl final
 
 int main(int argc, char* argv[]) {
   std::string port = "50052";
-  if (strcmp( argv[1], "port") == 0) {
+  if (strcmp(argv[1], "port") == 0) {
     port = argv[2];
   }
   std::cout << "This is grpc test" << std::endl;
