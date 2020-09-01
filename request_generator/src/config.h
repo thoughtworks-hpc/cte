@@ -29,7 +29,7 @@ class Config {
   explicit Config(std::string config_file_path)
       : config_file_path_(std::move(config_file_path)) {
     nlohmann::json config;
-    std::ifstream input("request_generator_config.json");
+    std::ifstream input(config_file_path_);
     input >> config;
 
     default_num_of_threads_ = config["default_num_of_threads"];

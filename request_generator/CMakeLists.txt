@@ -7,7 +7,12 @@ find_package(protoc REQUIRED)
 find_package(grpc REQUIRED)
 
 message("---------------------------------------")
-message("------  ${CMAKE_CURRENT_SOURCE_DIR}   ------")
+message(${CMAKE_CURRENT_SOURCE_DIR})
+message(${CMAKE_BINARY_DIR})
+message(${CMAKE_CURRENT_BINARY_DIR})
+message(${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  ${CMAKE_CURRENT_BINARY_DIR})
+#message(${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 message("---------------------------------------")
 
 set(PB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/protobuf_gen")
@@ -35,8 +40,28 @@ add_custom_command(
 list(APPEND PB_ALL_SOURCES ${NODE_MONITOR_PROTO_SRCS} ${NODE_MONITOR_GRPC_SRCS})
 add_library(${PROJECT_NAME}_grpc ${PB_ALL_SOURCES})
 
-add_executable(${PROJECT_NAME}_server src/server.cc)
+add_executable(${PROJECT_NAME}_server test/server.cc)
 target_link_libraries(${PROJECT_NAME}_server ${PROJECT_NAME}_grpc grpc::grpc)
+
 
 add_executable(${PROJECT_NAME}_main src/main.cc src/generator.cc)
 target_link_libraries(${PROJECT_NAME}_main ${PROJECT_NAME}_grpc grpc::grpc)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/request_generator_config.json
+        DESTINATION ${CMAKE_BINARY_DIR}/bin
+        )
+
+
+
+aux_source_directory(test ALL_SOURCES)
+set(TEST_SOURCES ${ALL_SOURCES})
+list(FILTER TEST_SOURCES EXCLUDE REGEX "server.cc$")
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/test/request_generator_config_test.json
+        DESTINATION ${CMAKE_BINARY_DIR}/bin
+        )
+if (NOT "${TEST_SOURCES}" STREQUAL "")
+    add_executable(${PROJECT_NAME}_test ${TEST_SOURCES})
+    find_package(GTest REQUIRED)
+    target_link_libraries(${PROJECT_NAME}_test GTest::GTest grpc::grpc)
+    add_test(NAME ${PROJECT_NAME}_test COMMAND ${PROJECT_NAME}_test)
+    set_tests_properties(${PROJECT_NAME}_test PROPERTIES TIMEOUT 60)
+endif ()

@@ -8,8 +8,8 @@
 #include <iostream>
 #include <utility>
 
-#include "../protobuf_gen/order.grpc.pb.h"
-#include "../protobuf_gen/order.pb.h"
+#include "protobuf_gen/order.grpc.pb.h"
+#include "protobuf_gen/order.pb.h"
 
 class OrderManagerImpl final
     : public order_manager_proto::OrderManager::Service {

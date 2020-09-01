@@ -27,6 +27,7 @@ bool Generator::PrepareOrders() {
     std::cout << "[INFO] query db success" << std::endl;
   } else {
     std::cout << "[ERROR] query db failed ret:" << ret << std::endl;
+    return false;
   }
   json j = json::parse(resp);
 
@@ -98,22 +99,27 @@ void Generator::SendRequest(std::queue<order_manager_proto::Order> orders,
   }
 
   int count = 0;
+  int server_index = 0;
   std::vector<int> count_each_server(grpc_servers.size(), 0);
   while (!orders.empty()) {
     grpc::ClientContext query_context;
     order_manager_proto::Reply reply;
-    grpc::Status status = clients[count % grpc_servers.size()].PlaceOrder(
-        &query_context, orders.front(), &reply);
+    grpc::Status status =
+        clients[server_index % grpc_servers.size()].PlaceOrder(
+            &query_context, orders.front(), &reply);
     orders.pop();
+
     if (status.ok() &&
         reply.error_code() == order_manager_proto::ErrorCode::FAILURE) {
-      count_each_server[count % grpc_servers.size()]++;
+      count_each_server[server_index % grpc_servers.size()]++;
       count++;
     } else {
       std::cout << "[ERROR] request "
-                << grpc_servers[count % grpc_servers.size()].ip_ << " failed"
-                << std::endl;
+                << grpc_servers[server_index % grpc_servers.size()].ip_ << ":"
+                << grpc_servers[server_index % grpc_servers.size()].port_
+                << " failed" << std::endl;
     }
+    server_index++;
   }
   mutex_requests_count_.lock();
   requests_count_ += count;
@@ -128,7 +134,7 @@ void Generator::SendRequest(std::queue<order_manager_proto::Order> orders,
   }
   mutex_requests_count_.unlock();
 
-  std::cout << "[INFO] thread #" << std::this_thread::get_id() << "finished"
+  std::cout << "[INFO] thread #" << std::this_thread::get_id() << " finished"
             << std::endl;
   //  for (int i = 0; i < count_each_server.size(); i++) {
   //    std::cout << "[INFO] thread #" << std::this_thread::get_id() << " send
