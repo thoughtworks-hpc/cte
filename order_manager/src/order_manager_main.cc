@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 
+#include "../../common/include/cxxopts.hpp"
 #include "../include/order_manager.h"
 #include "../include/order_store_influxdb.h"
 
@@ -34,7 +35,7 @@ void split(const std::string& s, char delimiter, Out result) {
 void RunServer(const std::string& order_manager_address,
                std::pair<std::string, int> store_address,
                const std::string& match_engine_main_address,
-               std::vector<const std::string>& match_engine_request_addresses) {
+               const std::vector<std::string>& match_engine_request_addresses) {
   assert(!order_manager_address.empty());
   assert(!match_engine_main_address.empty());
 
@@ -66,26 +67,40 @@ void RunServer(const std::string& order_manager_address,
 }
 
 int main(int argc, char* argv[]) {
-  if (argc < 4) {
-    std::cout
-        << "usage: order_manager localhost:50051 localhost:8086 localhost:4770 "
-           "localhost:4771,localhost:4772,localhost:4773"
-        << std::endl;
+  cxxopts::Options options("Order Manager", "Managing orders");
+  options.add_options()("a,service_address", "Order manager service address",
+                        cxxopts::value<std::string>())(
+      "d,database_address",
+      "Database address which is used by the order manager",
+      cxxopts::value<std::string>())("m,match_engine_main_address",
+                                     "Match engine main address",
+                                     cxxopts::value<std::string>())(
+      "r,match_engine_request_addresses", "Match engine request only addresses",
+      cxxopts::value<std::string>());
+
+  auto result = options.parse(argc, argv);
+  if (!result.count("service_address") || !result.count("database_address") ||
+      !result.count("match_engine_main_address")) {
+    std::cout << options.help() << std::endl;
     return 0;
   }
 
-  std::string order_manager_address = argv[1];
-  std::vector<const std::string> influxdb_address_in_string;
+  std::string order_manager_address =
+      result["service_address"].as<std::string>();
+  std::vector<std::string> influxdb_address_in_string;
   std::pair<std::string, int> influxdb_address;
-  std::string match_engine_main_address = argv[3];
-  std::vector<const std::string> match_engine_request_addresses;
+  std::string match_engine_main_address =
+      result["match_engine_main_address"].as<std::string>();
+  std::vector<std::string> match_engine_request_addresses;
 
-  split(argv[2], ':', std::back_inserter(influxdb_address_in_string));
+  split(result["database_address"].as<std::string>(), ':',
+        std::back_inserter(influxdb_address_in_string));
   influxdb_address.first = influxdb_address_in_string[0];
   influxdb_address.second = std::stoi(influxdb_address_in_string[1]);
 
-  if (argc == 5) {
-    split(argv[4], ',', std::back_inserter(match_engine_request_addresses));
+  if (result.count("match_engine_request_addresses")) {
+    split(result["match_engine_request_addresses"].as<std::string>(), ',',
+          std::back_inserter(match_engine_request_addresses));
   }
 
   RunServer(order_manager_address, influxdb_address, match_engine_main_address,
