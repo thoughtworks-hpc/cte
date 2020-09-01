@@ -41,5 +41,5 @@ target_link_libraries(${PROJECT_NAME}_server ${PROJECT_NAME}_grpc grpc::grpc)
 add_executable(${PROJECT_NAME}_client src/client.cc)
 target_link_libraries(${PROJECT_NAME}_client ${PROJECT_NAME}_grpc grpc::grpc)
 
-add_executable(${PROJECT_NAME}_db src/main.cc src/generator.cc)
-target_link_libraries(${PROJECT_NAME}_db ${PROJECT_NAME}_grpc grpc::grpc)
+add_executable(${PROJECT_NAME}_main src/main.cc src/generator.cc)
+target_link_libraries(${PROJECT_NAME}_main ${PROJECT_NAME}_grpc grpc::grpc)

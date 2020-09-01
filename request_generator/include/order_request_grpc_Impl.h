@@ -5,6 +5,8 @@
 #ifndef REQUEST_GENERATOR_INCLUDE_ORDER_REQUEST_GRPC_IMPL_H_
 #define REQUEST_GENERATOR_INCLUDE_ORDER_REQUEST_GRPC_IMPL_H_
 
+
+
 namespace cte {
 class OrderRequestGrpcImpl final : public ::OrderManager::Service {
  public:
