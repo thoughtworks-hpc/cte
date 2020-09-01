@@ -40,7 +40,7 @@ add_custom_command(
 list(APPEND PB_ALL_SOURCES ${NODE_MONITOR_PROTO_SRCS} ${NODE_MONITOR_GRPC_SRCS})
 add_library(${PROJECT_NAME}_grpc ${PB_ALL_SOURCES})
 
-add_executable(${PROJECT_NAME}_server test/server.cc)
+add_executable(${PROJECT_NAME}_server test/server_starter.cc test/server.cc)
 target_link_libraries(${PROJECT_NAME}_server ${PROJECT_NAME}_grpc grpc::grpc)
 
 
@@ -49,19 +49,16 @@ target_link_libraries(${PROJECT_NAME}_main ${PROJECT_NAME}_grpc grpc::grpc)
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/request_generator_config.json
         DESTINATION ${CMAKE_BINARY_DIR}/bin
         )
-
-
-
 aux_source_directory(test ALL_SOURCES)
 set(TEST_SOURCES ${ALL_SOURCES})
-list(FILTER TEST_SOURCES EXCLUDE REGEX "server.cc$")
+list(FILTER TEST_SOURCES EXCLUDE REGEX "server_starter.cc$")
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/test/request_generator_config_test.json
         DESTINATION ${CMAKE_BINARY_DIR}/bin
         )
 if (NOT "${TEST_SOURCES}" STREQUAL "")
-    add_executable(${PROJECT_NAME}_test ${TEST_SOURCES})
+    add_executable(${PROJECT_NAME}_test  ${TEST_SOURCES} src/generator.cc test/server.cc)
     find_package(GTest REQUIRED)
-    target_link_libraries(${PROJECT_NAME}_test GTest::GTest grpc::grpc)
+    target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME}_grpc GTest::GTest grpc::grpc)
     add_test(NAME ${PROJECT_NAME}_test COMMAND ${PROJECT_NAME}_test)
     set_tests_properties(${PROJECT_NAME}_test PROPERTIES TIMEOUT 60)
 endif ()

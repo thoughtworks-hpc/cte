@@ -16,7 +16,8 @@
 
 #include "../protobuf_gen/order.pb.h"
 struct ip_address {
-  ip_address(std::string ip, std::string port) : ip_(ip), port_(port) {}
+  ip_address(std::string ip, std::string port)
+      : ip_(std::move(ip)), port_(std::move(port)) {}
   std::string ip_;
   std::string port_;
 };
