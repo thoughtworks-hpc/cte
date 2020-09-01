@@ -19,7 +19,7 @@ class OrderStoreMock : public OrderStore {
 
  private:
   std::vector<std::pair<match_engine_proto::Order, std::string> >
-      order_and_status;
+      order_and_status_;
 };
 
 #endif  // ORDER_MANAGER_INCLUDE_ORDER_STORE_MOCK_H_

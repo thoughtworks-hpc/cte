@@ -12,9 +12,11 @@
 #include <vector>
 
 #include "../../common/include/cxxopts.hpp"
+#include "../include/match_engine_stub_grpc.h"
 #include "../include/order_manager.h"
 #include "../include/order_store_influxdb.h"
 
+using grpc::Channel;
 using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
@@ -55,7 +57,10 @@ void RunServer(const std::string& order_manager_address,
   auto order_store = std::make_shared<OrderStoreInfluxDB>(store_address.first,
                                                           store_address.second);
 
-  OrderManagerService service(order_store, main_channel, request_channels);
+  auto match_engine_stub =
+      std::make_shared<MatchEngineStubGrpc>(main_channel, request_channels);
+
+  OrderManagerService service(order_store, match_engine_stub);
 
   ServerBuilder builder;
   builder.AddListeningPort(order_manager_address,
