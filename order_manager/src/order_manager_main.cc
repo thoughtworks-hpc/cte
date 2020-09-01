@@ -39,7 +39,7 @@ void RunServer(const std::string& order_manager_address,
   assert(!match_engine_main_address.empty());
 
   std::shared_ptr<Channel> main_channel;
-  std::vector<const std::shared_ptr<Channel>> request_channels;
+  std::vector<std::shared_ptr<Channel>> request_channels;
 
   main_channel = grpc::CreateChannel(match_engine_main_address,
                                      grpc::InsecureChannelCredentials());

@@ -35,7 +35,7 @@ class OrderManagerService final
   explicit OrderManagerService(
       std::shared_ptr<OrderStore> order_store,
       const std::shared_ptr<Channel>& main_channel,
-      const std::vector<const std::shared_ptr<Channel>>& request_channel);
+      const std::vector<std::shared_ptr<Channel>>& request_channel);
 
   ::grpc::Status PlaceOrder(::grpc::ServerContext* context,
                             const ::order_manager_proto::Order* request,

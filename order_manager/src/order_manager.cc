@@ -12,7 +12,7 @@
 OrderManagerService::OrderManagerService(
     std::shared_ptr<OrderStore> order_store,
     const std::shared_ptr<Channel> &main_channel,
-    const std::vector<const std::shared_ptr<Channel>> &request_channel)
+    const std::vector<std::shared_ptr<Channel>> &request_channel)
     : order_id_(0),
       request_stub_index_(0),
       order_store_(std::move(order_store)) {
