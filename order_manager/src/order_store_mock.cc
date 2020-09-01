@@ -4,7 +4,7 @@
 
 #include "../include/order_store_mock.h"
 int OrderStoreMock::PersistOrder(const match_engine_proto::Order& order,
-                                 std::string status) {
+                                 std::string status, int concluded_amount) {
   order_and_status_.emplace_back(std::make_pair(order, status));
 
   return 0;

@@ -6,7 +6,7 @@
 #include "../../common/include/influxdb.hpp"
 
 int OrderStoreInfluxDB::PersistOrder(const match_engine_proto::Order& order,
-                                     std::string status) {
+                                     std::string status, int concluded_amount) {
   influxdb_cpp::server_info si("127.0.0.1", 8086, "order_manager", "", "");
   std::string resp;
   std::string trading_side =
@@ -21,6 +21,7 @@ int OrderStoreInfluxDB::PersistOrder(const match_engine_proto::Order& order,
                 .field("amount", order.amount())
                 .field("trading_side", trading_side)
                 .field("status", std::string(status))
+                .field("concluded amount", concluded_amount)
                 .timestamp(order.submit_time().seconds() * 1000000000 +
                            order.submit_time().nanos())
                 .post_http(si, &resp);

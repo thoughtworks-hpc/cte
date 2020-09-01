@@ -32,16 +32,16 @@ OrderManagerService::OrderManagerService(
   BuildMatchEngineOrder(*request, order);
 
   SaveOrderStatus(order);
-  PersistOrder(order, "unsubmitted");
+  order_store_->PersistOrder(order, "unsubmitted", 0);
 
   std::string message;
   if (match_engine_stub_) {
     match_engine_stub_->Match(order, &reply);
     int ret = 0;
     if (reply.status() == match_engine_proto::STATUS_SUCCESS) {
-      ret = PersistOrder(order, "order submitted");
+      ret = order_store_->PersistOrder(order, "order submitted", 0);
     } else {
-      ret = PersistOrder(order, "order submission error");
+      ret = order_store_->PersistOrder(order, "order submission error", 0);
     }
     if (0 == ret) {
       std::cout << "submitted and saved order " << order.order_id()
@@ -64,20 +64,21 @@ void OrderManagerService::SaveOrderStatus(
     const match_engine_proto::Order &order) {
   OrderStatus order_status;
   order_status.order = order;
-  order_status.transaction_amount = 0;
+  order_status.concluded_amount = 0;
   std::lock_guard<std::mutex> lock(mutex_);
   order_id_to_order_status_[order.order_id()] = order_status;
 }
 
 void OrderManagerService::HandleMatchResult(
     const ::match_engine_proto::Trade &trade) {
-  int32_t maker_transaction_amount = 0;
-  int32_t taker_transaction_amount = 0;
+  int32_t maker_concluded_amount = 0;
+  int32_t taker_concluded_amount = 0;
   match_engine_proto::Order maker_order;
   match_engine_proto::Order taker_order;
   bool if_order_exists = false;
+  bool if_maker_concluded = false;
+  bool if_taker_concluded = false;
 
-  //  std::this_thread::sleep_for(std::chrono::seconds(2));
   {
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -88,14 +89,21 @@ void OrderManagerService::HandleMatchResult(
       if_order_exists = true;
       auto &maker_order_status = order_id_to_order_status_[trade.maker_id()];
       auto &taker_order_status = order_id_to_order_status_[trade.taker_id()];
-      maker_order_status.transaction_amount =
-          maker_order_status.transaction_amount + trade.amount();
-      taker_order_status.transaction_amount =
-          taker_order_status.transaction_amount + trade.amount();
+      maker_order_status.concluded_amount =
+          maker_order_status.concluded_amount + trade.amount();
+      taker_order_status.concluded_amount =
+          taker_order_status.concluded_amount + trade.amount();
       maker_order = maker_order_status.order;
       taker_order = taker_order_status.order;
-      maker_transaction_amount = maker_order_status.transaction_amount;
-      taker_transaction_amount = taker_order_status.transaction_amount;
+      maker_concluded_amount = maker_order_status.concluded_amount;
+      taker_concluded_amount = taker_order_status.concluded_amount;
+
+      if (maker_order.amount() <= maker_concluded_amount) {
+        if_maker_concluded = true;
+      }
+      if (taker_order.amount() <= taker_concluded_amount) {
+        if_taker_concluded = true;
+      }
     } else {
       if_order_exists = false;
     }
@@ -104,77 +112,29 @@ void OrderManagerService::HandleMatchResult(
   if (if_order_exists) {
     std::cout << "receive trade for order " << trade.maker_id() << " as maker"
               << " and order " << trade.taker_id() << " as taker" << std::endl;
-    PersistOrder(maker_order, "transaction amount " +
-                                  std::to_string(maker_transaction_amount));
-    PersistOrder(taker_order, "transaction amount " +
-                                  std::to_string(taker_transaction_amount));
+    std::string maker_status;
+    std::string taker_status;
+    if (if_maker_concluded) {
+      maker_status = "concluded";
+    } else {
+      maker_status = "partially concluded";
+    }
+
+    if (if_taker_concluded) {
+      taker_status = "concluded";
+    } else {
+      taker_status = "partially concluded";
+    }
+
+    order_store_->PersistOrder(maker_order, maker_status,
+                               maker_concluded_amount);
+    order_store_->PersistOrder(taker_order, taker_status,
+                               taker_concluded_amount);
   } else {
     std::cout << "order in trade doesn't exist for either " << trade.maker_id()
               << " or " << trade.taker_id() << std::endl;
   }
 }
-
-// void OrderManagerService::SubscribeMatchResult() {
-//  ClientContext context;
-//  match_engine_proto::Trade trade;
-//  int32_t maker_transaction_amount = 0;
-//  int32_t taker_transaction_amount = 0;
-//  match_engine_proto::Order maker_order;
-//  match_engine_proto::Order taker_order;
-//  bool if_order_exists = false;
-//
-//  if (main_stub_ != nullptr) {
-//    std::this_thread::sleep_for(std::chrono::seconds(10));
-//
-//    std::unique_ptr<ClientReader<match_engine_proto::Trade>> reader(
-//        main_stub_->SubscribeMatchResult(&context,
-//        google::protobuf::Empty()));
-//    while (reader->Read(&trade)) {
-//      // trade.PrintDebugString();
-//      std::this_thread::sleep_for(std::chrono::seconds(2));
-//      {
-//        std::lock_guard<std::mutex> lock(mutex_);
-//
-//        if (order_id_to_order_status_.find(trade.maker_id()) !=
-//                order_id_to_order_status_.end() &&
-//            order_id_to_order_status_.find(trade.taker_id()) !=
-//                order_id_to_order_status_.end()) {
-//          if_order_exists = true;
-//          auto &maker_order_status =
-//              order_id_to_order_status_[trade.maker_id()];
-//          auto &taker_order_status =
-//              order_id_to_order_status_[trade.taker_id()];
-//          maker_order_status.transaction_amount =
-//              maker_order_status.transaction_amount + trade.amount();
-//          taker_order_status.transaction_amount =
-//              taker_order_status.transaction_amount + trade.amount();
-//          maker_order = maker_order_status.order;
-//          taker_order = taker_order_status.order;
-//          maker_transaction_amount = maker_order_status.transaction_amount;
-//          taker_transaction_amount = taker_order_status.transaction_amount;
-//        } else {
-//          if_order_exists = false;
-//        }
-//      }
-//
-//      if (if_order_exists) {
-//        std::cout << "receive trade for order " << trade.maker_id()
-//                  << " as maker"
-//                  << " and order " << trade.taker_id() << " as taker"
-//                  << std::endl;
-//        PersistOrder(maker_order, "transaction amount " +
-//                                      std::to_string(maker_transaction_amount));
-//        PersistOrder(taker_order, "transaction amount " +
-//                                      std::to_string(taker_transaction_amount));
-//      } else {
-//        std::cout << "order in trade doesn't exist for either "
-//                  << trade.maker_id() << " or " << trade.taker_id()
-//                  << std::endl;
-//      }
-//    }
-//    Status status = reader->Finish();
-//  }
-//}
 
 void OrderManagerService::BuildMatchEngineOrder(
     const order_manager_proto::Order &request,
@@ -200,35 +160,3 @@ void OrderManagerService::BuildMatchEngineOrder(
   order.set_allocated_submit_time(submit_time);
 }
 
-int OrderManagerService::PersistOrder(const match_engine_proto::Order &order,
-                                      std::string status) {
-  return order_store_->PersistOrder(order, status);
-
-  //  influxdb_cpp::server_info si("127.0.0.1", 8086, "order_manager", "", "");
-  //  std::string resp;
-  //  std::string trading_side =
-  //      order.trading_side() == match_engine_proto::TRADING_BUY ? "buy" :
-  //      "sell";
-  //
-  //  int ret = influxdb_cpp::builder()
-  //                .meas("order")
-  //                .tag("order_id", std::to_string(order.order_id()))
-  //                .tag("symbol_id", std::to_string(order.symbol()))
-  //                .field("user_id", order.user_id())
-  //                .field("price", order.price())
-  //                .field("amount", order.amount())
-  //                .field("trading_side", trading_side)
-  //                .field("status", std::string(status))
-  //                .timestamp(order.submit_time().seconds() * 1000000000 +
-  //                           order.submit_time().nanos())
-  //                .post_http(si, &resp);
-  //
-  //  if (0 == ret && resp.empty()) {
-  //    std::cout << "write db success" << std::endl;
-  //  } else {
-  //    std::cout << "write db failed, ret:" << ret << " resp:" << resp
-  //              << std::endl;
-  //  }
-  //
-  //  return ret;
-}

@@ -13,7 +13,8 @@
 
 class OrderStoreMock : public OrderStore {
  public:
-  int PersistOrder(const match_engine_proto::Order& order, std::string status);
+  int PersistOrder(const match_engine_proto::Order& order, std::string status,
+                   int concluded_amount);
   int GetOrderByIndex(int index, match_engine_proto::Order& order,
                       std::string& status);
 

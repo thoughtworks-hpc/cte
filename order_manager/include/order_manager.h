@@ -19,9 +19,8 @@
 
 #include "../../common/protobuf_gen/match_engine.grpc.pb.h"
 #include "../../common/protobuf_gen/order_manager.grpc.pb.h"
-#include "./order_store.h"
 #include "./match_engine_stub.h"
-
+#include "./order_store.h"
 
 class OrderManagerService final
     : public order_manager_proto::OrderManager::Service {
@@ -38,13 +37,12 @@ class OrderManagerService final
   class OrderStatus {
    public:
     match_engine_proto::Order order;
-    int32_t transaction_amount;
+    int32_t concluded_amount;
   };
 
   void BuildMatchEngineOrder(const order_manager_proto::Order& order_in_request,
                              match_engine_proto::Order& order);
   void SaveOrderStatus(const match_engine_proto::Order& order);
-  int PersistOrder(const match_engine_proto::Order& order, std::string status);
   void HandleMatchResult(const ::match_engine_proto::Trade& trade);
 
   std::atomic<int64_t> order_id_;

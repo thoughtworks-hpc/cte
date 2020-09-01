@@ -12,7 +12,7 @@
 class OrderStore {
  public:
   virtual int PersistOrder(const match_engine_proto::Order &order,
-                           std::string status) = 0;
+                           std::string status, int concluded_amount) = 0;
 };
 
 #endif  // ORDER_MANAGER_INCLUDE_ORDER_STORE_H_
