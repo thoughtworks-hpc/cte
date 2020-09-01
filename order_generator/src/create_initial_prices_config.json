@@ -1,0 +1,6 @@
+{
+  "symbol_id_min": 10,
+  "symbol_id_max": 20,
+  "price_min": 1,
+  "price_max": 100
+}
