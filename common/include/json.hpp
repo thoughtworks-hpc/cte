@@ -25285,7 +25285,7 @@ inline nlohmann::json::json_pointer operator "" _json_pointer(const char* s, std
     #pragma GCC diagnostic pop
 #endif
 
-// clean up
+// Clean up
 #undef JSON_ASSERT
 #undef JSON_INTERNAL_CATCH
 #undef JSON_CATCH

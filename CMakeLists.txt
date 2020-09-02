@@ -36,6 +36,7 @@ conan_basic_setup()
 message("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 message("${CONAN_LIBS}")
 
+include(CTest)
 add_subdirectory(common)
 add_subdirectory(influxdb_usa_demo)
 add_subdirectory(match_engine)

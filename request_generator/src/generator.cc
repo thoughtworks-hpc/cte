@@ -22,7 +22,6 @@ bool Generator::PrepareOrders() {
   if (resp.empty()) {
     return false;
   }
-
   using json = nlohmann::json;
   json j = json::parse(resp);
 
@@ -78,6 +77,14 @@ void Generator::Start() {
   for (auto t : thread_vector) {
     t->join();
   }
+
+  const std::vector<int> count_each_server = count_each_server_;
+  for (int i = 0; i < count_each_server.size(); i++) {
+    std::cout << "[INFO] Send " << count_each_server[i] << " requests to "
+              << grpc_servers_[i].ip_ << ":" << grpc_servers_[i].port_
+              << std::endl;
+  }
+  std::cout << "[INFO] Total requests: " << requests_count_ << std::endl;
 }
 
 void Generator::SendRequest(std::queue<order_manager_proto::Order> orders,
@@ -137,8 +144,7 @@ void Generator::SendRequest(std::queue<order_manager_proto::Order> orders,
   //              << i << " : " << count_each_server[i] << std::endl;
   //  }
 }
-
-int Generator::GetRequestsCount() { return requests_count_; }
-const std::vector<int>& Generator::getCountEachServer() {
-  return count_each_server_;
+void Generator::Clean() {
+  requests_count_ = 0;
+  count_each_server_.clear();
 }

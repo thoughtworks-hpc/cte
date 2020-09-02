@@ -44,7 +44,7 @@ add_executable(${PROJECT_NAME}_server test/server_starter.cc test/server.cc)
 target_link_libraries(${PROJECT_NAME}_server ${PROJECT_NAME}_grpc grpc::grpc)
 
 
-add_executable(${PROJECT_NAME}_main src/main.cc src/generator.cc src/InfluxdbReader.cc)
+add_executable(${PROJECT_NAME}_main src/main.cc src/generator.cc src/Influxdb_reader.cc)
 target_link_libraries(${PROJECT_NAME}_main ${PROJECT_NAME}_grpc grpc::grpc)
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/request_generator_config.json
         DESTINATION ${CMAKE_BINARY_DIR}/bin

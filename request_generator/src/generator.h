@@ -26,6 +26,9 @@ struct ip_address {
 
 class Generator {
  public:
+  static int requests_count_;
+  static std::vector<int> count_each_server_;
+
   Generator(int num_of_threads, int num_of_orders,
             std::vector<ip_address>& grpc_server, std::string db_host_address,
             std::string db_port, DatabaseQueryInterface* database)
@@ -37,22 +40,18 @@ class Generator {
         database_(database) {}
 
   void Start();
-  static int GetRequestsCount();
-  static const std::vector<int>& getCountEachServer();
+  void Clean();
 
  private:
   DatabaseQueryInterface* database_;
   int num_of_threads_;
   int num_of_orders_;
-  static int requests_count_;
-  static std::vector<int> count_each_server_;
   std::vector<ip_address> grpc_servers_;
   std::string db_host_address_;
   std::string db_port_;
   std::queue<order_manager_proto::Order> orders_;
   std::vector<std::queue<order_manager_proto::Order>> orders_for_thread_;
   static std::mutex mutex_requests_count_;
-
   bool PrepareOrders();
   static void SendRequest(std::queue<order_manager_proto::Order> orders,
                           std::vector<ip_address> grpc_servers);

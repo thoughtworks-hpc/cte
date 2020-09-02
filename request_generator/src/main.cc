@@ -14,7 +14,7 @@
 #include "../../common/include/json.hpp"
 #include "../protobuf_gen/order.grpc.pb.h"
 #include "../protobuf_gen/order.pb.h"
-#include "InfluxdbReader.h"
+#include "Influxdb_reader.h"
 #include "src/config.h"
 #include "src/generator.h"
 
@@ -42,16 +42,8 @@ int main(int argc, char* argv[]) {
     }
   }
 
-  auto database = new InfluxdbReader();
+  auto database = new Influxdb_reader();
   Generator generator(num_of_threads, num_of_requests, grcp_ip_address,
                       db_host_address, db_port, database);
   generator.Start();
-
-  const std::vector<int> count_each_server = Generator::getCountEachServer();
-  for (int i = 0; i < count_each_server.size(); i++) {
-    std::cout << "Send " << count_each_server[i] << " requests to "
-              << grcp_ip_address[i].ip_ << ":" << grcp_ip_address[i].port_
-              << std::endl;
-  }
-  std::cout << "Total requests: " << Generator::GetRequestsCount() << std::endl;
 }
