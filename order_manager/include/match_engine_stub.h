@@ -12,7 +12,7 @@ class MatchEngineStub {
   virtual int Match(const ::match_engine_proto::Order& request,
                     ::match_engine_proto::Reply* response) = 0;
   virtual void SubscribeMatchResult(
-      std::function<void(::match_engine_proto::Trade)>) = 0;
+      std::function<void(::match_engine_proto::Trade)> handler) = 0;
 };
 
 #endif  // ORDER_MANAGER_INCLUDE_MATCH_ENGINE_STUB_H_
