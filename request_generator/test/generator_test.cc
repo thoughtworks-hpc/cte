@@ -84,21 +84,47 @@ TEST(SingleThreadTest,
   generator.Clean();
 }
 
-// TEST(MultipleThreadsTest,
-//     should_count_three_messages_for_one_server_when_send_three_message) {
-//  std::string port = "50051";
-//  OrderManagerImpl grpc_server_1(port);
-//  grpc_server_1.Run();
-//
-//  auto mockDatabase = new MockDatabase();
-//  std::vector<ip_address> grcp_ip_address{ip_address("127.0.0.1", "50051")};
-//  std::cout << "size:" << grcp_ip_address.size() << std::endl;
-//
-//  Generator generator(3, 3, grcp_ip_address, "127.0.0.1", "8086",
-//  mockDatabase); generator.Start();
-//
-//  const std::vector<int> count_each_server = Generator::GetCountEachServer();
-//
-//  EXPECT_THAT(count_each_server[0], Eq(3));
-//  EXPECT_THAT(Generator::GetRequestsCount(), Eq(3));
-//}
+TEST(MultipleThreadsTest,
+     should_count_three_messages_for_one_server_when_send_three_message) {
+  std::string port = "50051";
+  OrderManagerImpl grpc_server_1(port);
+  grpc_server_1.Run();
+
+  auto mockDatabase = new MockDatabase();
+  std::vector<ip_address> grcp_ip_address{ip_address("127.0.0.1", "50051")};
+  std::cout << "size:" << grcp_ip_address.size() << std::endl;
+
+  Generator generator(3, 3, grcp_ip_address, "127.0.0.1", "8086", mockDatabase);
+  generator.Start();
+
+  const std::vector<int> count_each_server = Generator::count_each_server_;
+
+  EXPECT_THAT(count_each_server[0], Eq(3));
+  EXPECT_THAT(Generator::requests_count_, Eq(3));
+  generator.Clean();
+}
+
+TEST(MultipleThreadsTest, two_threads_send_two_messages_to_two_server) {
+  std::string port = "50051";
+  OrderManagerImpl grpc_server_1(port);
+  grpc_server_1.Run();
+
+  port = "50052";
+  OrderManagerImpl grpc_server_2(port);
+  grpc_server_2.Run();
+
+  auto mockDatabase = new MockDatabase();
+  std::vector<ip_address> grcp_ip_address{ip_address("127.0.0.1", "50051"),
+                                          ip_address("127.0.0.1", "50052")};
+  std::cout << "size:" << grcp_ip_address.size() << std::endl;
+
+  Generator generator(2, 4, grcp_ip_address, "127.0.0.1", "8086", mockDatabase);
+  generator.Start();
+
+  const std::vector<int> count_each_server = Generator::count_each_server_;
+
+  EXPECT_THAT(count_each_server[0], Eq(2));
+  EXPECT_THAT(count_each_server[1], Eq(2));
+  EXPECT_THAT(Generator::requests_count_, Eq(4));
+  generator.Clean();
+}
