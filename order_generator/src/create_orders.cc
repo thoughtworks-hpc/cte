@@ -32,6 +32,7 @@ int main(int argc, char* argv[]) {
 
   auto initial_prices = GetAllInitialPrice(initial_price_file_path);
 
+  // Create one order need 0.105 seconds
   for (int i = 0; i < orders_config["order_amount"]; i++) {
     Order order(initial_prices, orders_config["user_id_min"],
                 orders_config["user_id_max"],
@@ -41,7 +42,7 @@ int main(int argc, char* argv[]) {
         orders_config["database_host"], orders_config["database_port"],
         orders_config["database_name"], orders_config["database_user"],
         orders_config["database_password"]);
-    if (i % 1000 == 0) {
+    if ((i + 1) % 10000 == 0) {
       std::cout << "write db success, the round is: " << i << std::endl;
     }
   }
