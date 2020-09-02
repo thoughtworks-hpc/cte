@@ -14,7 +14,6 @@ set(NODE_MONITOR_GRPC_SRCS "${PB_DIR}/match_engine.grpc.pb.cc")
 set(NODE_MONITOR_GRPC_HDRS "${PB_DIR}/match_engine.grpc.pb.h")
 
 execute_process(COMMAND mkdir -p ${PB_DIR} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-
 set(GRPC_CPP_PLUGIN ${grpc_LIB_DIRS}/../bin/grpc_cpp_plugin)
 
 add_custom_command(
