@@ -43,20 +43,26 @@ add_library(${PROJECT_NAME}_grpc ${PB_ALL_SOURCES})
 add_executable(${PROJECT_NAME}_server test/server_starter.cc test/server.cc)
 target_link_libraries(${PROJECT_NAME}_server ${PROJECT_NAME}_grpc grpc::grpc)
 
+set(CONFIG_INI_FILE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/src/request_generator_config.json)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/config_manager.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/config_manager.h)
 
 add_executable(${PROJECT_NAME}_main src/main.cc src/generator.cc src/Influxdb_reader.cc)
 target_link_libraries(${PROJECT_NAME}_main ${PROJECT_NAME}_grpc grpc::grpc)
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/request_generator_config.json
-        DESTINATION ${CMAKE_BINARY_DIR}/bin
-        )
+#file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/request_generator_config.json
+#        DESTINATION ${CMAKE_BINARY_DIR}/bin
+#        )
 aux_source_directory(test ALL_SOURCES)
-set(TEST_SOURCES ${ALL_SOURCES})
+set(TEST_SOURCES ${ALL_SOURCES} test/config_manager_test.h)
 list(FILTER TEST_SOURCES EXCLUDE REGEX "server_starter.cc$")
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/test/request_generator_config_test.json
-        DESTINATION ${CMAKE_BINARY_DIR}/bin
-        )
+#file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/test/request_generator_config_test.json
+#        DESTINATION ${CMAKE_BINARY_DIR}/bin
+#        )
 
 # list(APPEND TEST_SOURCES protobuf/order.proto)
+
+set(TEST_INI_FILE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/test/request_generator_config_test.json)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test/config_manager_test.h.in ${CMAKE_CURRENT_SOURCE_DIR}/test/config_manager_test.h)
+
 if (NOT "${TEST_SOURCES}" STREQUAL "")
     add_executable(${PROJECT_NAME}_test  ${TEST_SOURCES} src/generator.cc test/server.cc)
     find_package(GTest REQUIRED)

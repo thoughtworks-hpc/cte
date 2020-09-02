@@ -14,12 +14,12 @@
     ::grpc::ServerContext* context, const ::order_manager_proto::Order* request,
     ::order_manager_proto::Reply* response) {
   std::cout << "Receive #" << ++count_ << " request from client" << std::endl;
-  //  std::cout << "symbol: " << request->symbol() << std::endl;
-  //  std::cout << "user_id: " << request->user_id() << std::endl;
-  //  std::cout << "trading_side: " << request->trading_side() << std::endl;
-  //  std::cout << "amount: " << request->amount() << std::endl;
-  //  std::cout << "price: " << request->price() << std::endl;
-  //  std::cout << "-------------------------------" << std::endl;
+  //    std::cout << "symbol: " << request->symbol() << std::endl;
+  //    std::cout << "user_id: " << request->user_id() << std::endl;
+  //    std::cout << "trading_side: " << request->trading_side() << std::endl;
+  //    std::cout << "amount: " << request->amount() << std::endl;
+  //    std::cout << "price: " << request->price() << std::endl;
+  //    std::cout << "-------------------------------" << std::endl;
 
   response->set_error_code(order_manager_proto::ErrorCode::FAILURE);
   std::string response_message =

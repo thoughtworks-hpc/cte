@@ -14,12 +14,14 @@
 #include "../../common/include/json.hpp"
 #include "../protobuf_gen/order.grpc.pb.h"
 #include "../protobuf_gen/order.pb.h"
+#include "./config_manager.h"
 #include "Influxdb_reader.h"
 #include "src/config.h"
 #include "src/generator.h"
 
-int main(int argc, char* argv[]) {
-  request_generator::Config config("request_generator_config.json");
+int main(int argc, char *argv[]) {
+  char **config_file_path = new char *[2] { INI_FILE_PARAMETER };
+  request_generator::Config config(config_file_path[0]);
   int num_of_threads = config.default_num_of_threads_;
   int num_of_requests = config.default_num_of_requests_;
   std::string db_host_address = config.default_db_host_address_;

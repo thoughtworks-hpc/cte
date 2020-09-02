@@ -5,6 +5,7 @@
 #include <gmock/gmock.h>
 #include <grpcpp/create_channel.h>
 
+#include "./config_manager_test.h"
 #include "./server.h"
 #include "src/config.h"
 
@@ -21,7 +22,8 @@ class MockDatabase : public DatabaseQueryInterface {
 };
 
 TEST(ConfigTest, check_config_initialization) {
-  request_generator::Config config("request_generator_config_test.json");
+  char **config_file_path = new char *[2] { INI_FILE_PARAMETER };
+  request_generator::Config config(config_file_path[0]);
   EXPECT_THAT(config.default_num_of_requests_, Eq(1));
   EXPECT_THAT(config.default_num_of_threads_, Eq(1));
   EXPECT_THAT(config.default_db_host_address_, Eq("127.0.0.1"));
