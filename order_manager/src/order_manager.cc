@@ -39,9 +39,9 @@ OrderManagerService::OrderManagerService(
     match_engine_stub_->Match(order, &reply);
     int ret = 0;
     if (reply.status() == match_engine_proto::STATUS_SUCCESS) {
-      ret = order_store_->PersistOrder(order, "order submitted", 0);
+      ret = order_store_->PersistOrder(order, "submitted", 0);
     } else {
-      ret = order_store_->PersistOrder(order, "order submission error", 0);
+      ret = order_store_->PersistOrder(order, "submission error", 0);
     }
     if (0 == ret) {
       std::cout << "submitted and saved order " << order.order_id()
