@@ -81,9 +81,14 @@ int main(int argc, char* argv[]) {
                                      "Match engine main address",
                                      cxxopts::value<std::string>())(
       "r,match_engine_request_addresses", "Match engine request only addresses",
-      cxxopts::value<std::string>());
+      cxxopts::value<std::string>())("h,help", "print usage");
 
   auto result = options.parse(argc, argv);
+  if (result.count("help")) {
+    std::cout << options.help() << std::endl;
+    return 0;
+  }
+
   if (!result.count("service_address") || !result.count("database_address") ||
       !result.count("match_engine_main_address")) {
     std::cout << options.help() << std::endl;
