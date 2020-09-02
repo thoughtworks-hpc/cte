@@ -2,8 +2,8 @@
  * Copyright (c) 2019-2020 ThoughtWorks Inc.
  */
 
-#ifndef CTE_MATCH_ENGINE_STUB_FAKE_H
-#define CTE_MATCH_ENGINE_STUB_FAKE_H
+#ifndef ORDER_MANAGER_INCLUDE_MATCH_ENGINE_STUB_FAKE_H_
+#define ORDER_MANAGER_INCLUDE_MATCH_ENGINE_STUB_FAKE_H_
 
 #include "./match_engine_stub.h"
 
@@ -23,4 +23,4 @@ class MatchEngineStubFake : public MatchEngineStub {
   std::function<void(::match_engine_proto::Trade)> handler_;
 };
 
-#endif  // CTE_MATCH_ENGINE_STUB_FAKE_H
+#endif  // ORDER_MANAGER_INCLUDE_MATCH_ENGINE_STUB_FAKE_H_
