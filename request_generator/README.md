@@ -1,11 +1,9 @@
 ## Config File
 
-**src / request_generator_config.json**
 
 This file defines  basic configurations for request generator, you can modify it to meet your needs.
 
->  note: "default_num_of_requests : -1" means  generator will send all orders in database. 
-
+**src / request_generator_config.json**
 ```
 {
   "default_num_of_threads": 4,
@@ -28,7 +26,7 @@ This file defines  basic configurations for request generator, you can modify it
   ]
 }
 ```
-
+>  note: "default_num_of_requests : -1" means  generator will send all orders in database. 
 
 
 ## Usage Example
