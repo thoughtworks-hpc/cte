@@ -89,8 +89,11 @@ void match_engine::MatchEngineGRPCImpl::Run() {
 }
 
 MatchEngineGRPCImpl::MatchEngineGRPCImpl(
-    uint64_t server_port, MatchEngineCluster &match_engine_cluster, bool is_test)
-    : server_port_(server_port), match_engine_cluster_(match_engine_cluster), is_test_(is_test) {}
+    uint64_t server_port, MatchEngineCluster &match_engine_cluster,
+    bool is_test)
+    : server_port_(server_port),
+      match_engine_cluster_(match_engine_cluster),
+      is_test_(is_test) {}
 
 void match_engine::MatchEngineGRPCImpl::RunWithWait() {
   Run();
@@ -151,7 +154,7 @@ void MatchEngineGRPCImpl::SendMatchResult(const TradeList &trade_list) {
         match_writer_it = match_result_writer_keepers.erase(match_writer_it);
         CDCF_LOGGER_WARN("A client is disconnect");
       } else {
-        if (is_test_){
+        if (is_test_) {
           match_writer_it->writer_promise->set_value(0);
         }
         ++match_writer_it;
