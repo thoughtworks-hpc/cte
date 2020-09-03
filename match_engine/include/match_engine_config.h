@@ -129,6 +129,8 @@ class Config : public cdcf::actor_system::Config {
         .add(symbol_id_list, "symbol_id_list", "symbol list")
         .add(merge_result_port, "merge_result_port",
              "Match result port, if set 0, this node will not merge result")
+        .add(is_merge_result_node, "is_merge_result_node",
+             "set if is a merge result node")
         .add(match_router_port, "match_router_port",
              "match router publish port");
   }
