@@ -23,4 +23,4 @@ add_subdirectory(influxdb_usa_demo)
 add_subdirectory(match_engine)
 add_subdirectory(order_generator)
 add_subdirectory(order_manager)
-
+add_subdirectory(request_generator)

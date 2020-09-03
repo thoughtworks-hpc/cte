@@ -20,8 +20,9 @@
 #include "src/generator.h"
 
 int main(int argc, char *argv[]) {
-  char **config_file_path = new char *[2] { INI_FILE_PARAMETER };
-  request_generator::Config config(config_file_path[0]);
+  //  char **config_file_path = new char *[2] { INI_FILE_PARAMETER };
+  //  request_generator::Config config(config_file_path[0]);
+  request_generator::Config config("request_generator_config.json");
   int num_of_threads = config.default_num_of_threads_;
   int num_of_requests = config.default_num_of_requests_;
   std::string db_host_address = config.default_db_host_address_;
