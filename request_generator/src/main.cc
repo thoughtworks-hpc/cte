@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
         num_of_requests = std::stoi(optarg);
         break;
       case '?':
-        printf("Unknown option: %c\n", static_cast<char>(optopt));
+        printf("Unknown option:  %c\n", static_cast<char>(optopt));
         exit(1);
     }
   }
