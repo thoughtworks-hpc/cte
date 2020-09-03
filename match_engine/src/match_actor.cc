@@ -124,18 +124,26 @@ void AddToOrderTable(OrderTable& order_table, RawOrder& order) {
 void SendMatchResult(caf::stateful_actor<OrderBook>* sender,
                      const TradeList& match_result) {
   int result_count = match_result.size();
-  if (0 == result_count){
+  if (0 == result_count) {
     return;
   }
 
   if (nullptr != sender->state.match_result_actor) {
-
+    for (auto& one_match : match_result) {
+      CDCF_LOGGER_INFO(
+          "Match actor send match result, symbol id:{}, price: {}, amount:{}, "
+          "taker id:{}, maker id:{}, trade side:{}, seller id:{}, buyer id:{}, "
+          "match time:{}",
+          one_match.symbol_id, one_match.price, one_match.amount,
+          one_match.taker_id, one_match.maker_id, one_match.trading_side,
+          one_match.seller_user_id, one_match.buyer_user_id,
+          one_match.submit_time);
+    }
 
     sender
         ->request(sender->state.match_result_actor,
-                  //std::chrono::seconds(k_send_match_result_timeout),
-                  caf::infinite,
-                  TradeListMsg{match_result})
+                  // std::chrono::seconds(k_send_match_result_timeout),
+                  caf::infinite, TradeListMsg{match_result})
         .then(
             [result_count](int) {
               CDCF_LOGGER_DEBUG(
@@ -158,6 +166,14 @@ void SendMatchResult(caf::stateful_actor<OrderBook>* sender,
 caf::behavior MatchActor(caf::stateful_actor<OrderBook>* self) {
   return {
       [=](RawOrder& order) {
+        CDCF_LOGGER_INFO(
+            "match actor Receive new order, id:{}, price:{}, amount:{}, trade "
+            "site:{}, "
+            "submit time: {}, "
+            "symbol id:{}, user id:{}",
+            order.order_id, order.price, order.amount, order.trading_side,
+            order.submit_time, order.symbol_id, order.user_id);
+
         if (TRADING_SITE_BUY == order.trading_side) {
           auto trade_list = MatchOrderFromTable(self->state.sell_list, order);
 
@@ -177,7 +193,8 @@ caf::behavior MatchActor(caf::stateful_actor<OrderBook>* self) {
         }
       },
       [=](caf::actor& result_receiver) {
-        CDCF_LOGGER_INFO("set result_receiver success, actor id:{}", self->id());
+        CDCF_LOGGER_INFO("set result_receiver success, actor id:{}",
+                         self->id());
         self->state.match_result_actor = result_receiver;
       }};
 }

@@ -17,15 +17,21 @@
 namespace match_engine {
 
 const int64_t k_send_match_result_timeout = 2;
-using MatchWriter = ::grpc::ServerWriter< ::match_engine_proto::Trade>*;
-using MatchWriterList = std::vector<MatchWriter>;
+using MatchResultWriter = ::grpc::ServerWriter< ::match_engine_proto::Trade>*;
+
+struct MatchResultWriterKeeper {
+  MatchResultWriter writer;
+  std::promise<int>* writer_promise;
+};
+
+using MatchResultWriteKeepers = std::vector<MatchResultWriterKeeper>;
 
 using GetAtom = caf::atom_constant<caf::atom("get")>;
 
 struct SymbolActorInfo {
   int32_t symbol_id;
   caf::actor symbol_actor;
-  SymbolActorInfo() {};
+  SymbolActorInfo(){};
   SymbolActorInfo(int32_t symbolId, const caf::actor& symbolActor)
       : symbol_id(symbolId), symbol_actor(symbolActor) {}
 };
@@ -70,7 +76,7 @@ struct MatchedTrade {
 
 using TradeList = std::vector<MatchedTrade>;
 
-struct TradeListMsg{
+struct TradeListMsg {
   TradeList data;
 };
 
@@ -80,11 +86,11 @@ typename Inspector::result_type inspect(Inspector& f, const RawOrder& x) {
            x.trading_side, x.amount, x.price, x.submit_time);
 }
 
-
 template <class Inspector>
 typename Inspector::result_type inspect(Inspector& f,
                                         const SymbolActorInfo& x) {
-  return f(caf::meta::type_name("SymbolActorInfo"), x.symbol_id, x.symbol_actor);
+  return f(caf::meta::type_name("SymbolActorInfo"), x.symbol_id,
+           x.symbol_actor);
 }
 
 template <class Inspector>
@@ -119,13 +125,13 @@ class Config : public cdcf::actor_system::Config {
     opt_group{custom_options_, "global"}
         .add(grpc_server_port, "grpc_server_port", "GRPC server port")
         .add(symbol_id_list, "symbol_id_list", "symbol list")
-        .add(merge_result_port, "merge_result_port", "Match result port, if set 0, this node will not merge result")
+        .add(merge_result_port, "merge_result_port",
+             "Match result port, if set 0, this node will not merge result")
         .add(match_router_port, "match_router_port",
              "match router publish port");
   }
 };
 
 }  // namespace match_engine
-
 
 #endif  // CTE_MATCH_ENGINE_CONFIG_H

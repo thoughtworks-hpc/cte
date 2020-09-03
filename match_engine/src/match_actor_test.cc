@@ -10,7 +10,6 @@
 
 #include <caf/test/unit_test_impl.hpp>
 
-#include "../include/match_engine_config.h"
 #include "../include/match_result_sender_actor.h"
 
 namespace {

@@ -35,7 +35,7 @@ caf::behavior SymbolRouterActor(caf::stateful_actor<SymbolRouterData>* self) {
             // get local symbol list;
             return self->state.local_symbol_actors;
           },
-          [=](caf::actor merge_result_actor) {
+          [=](caf::actor& merge_result_actor) {
             // set merge result actor to local
             for (auto& local_symbol_actor : self->state.local_symbol_actors) {
               self->send(local_symbol_actor.symbol_actor, merge_result_actor);

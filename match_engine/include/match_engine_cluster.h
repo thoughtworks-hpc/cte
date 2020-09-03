@@ -19,6 +19,7 @@ class MatchEngineCluster : public cdcf::cluster::Observer {
                      caf::actor  symbolIdRouter);
   void Match(RawOrder raw_order);
 
+
  private:
   caf::actor_system& system_;
   uint16_t symbol_router_port_;

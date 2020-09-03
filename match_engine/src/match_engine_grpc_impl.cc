@@ -32,7 +32,8 @@ bool TransformGrpcOrder(const ::match_engine_proto::Order &grpc_order,
   raw_order.user_id = grpc_order.user_id();
   raw_order.submit_time =
       ::google::protobuf::util::TimeUtil::TimestampToMilliseconds(
-          grpc_order.submit_time()) / 1000000;
+          grpc_order.submit_time()) /
+      1000000;
 
   return true;
 }
@@ -40,26 +41,44 @@ bool TransformGrpcOrder(const ::match_engine_proto::Order &grpc_order,
 grpc::Status match_engine::MatchEngineGRPCImpl::Match(
     ::grpc::ServerContext *context, const ::match_engine_proto::Order *request,
     ::match_engine_proto::Reply *response) {
-  CDCF_LOGGER_INFO("Receive Match request");
-  RawOrder raw_order;
+  CDCF_LOGGER_INFO(
+      "Receive Match request order, id:{}, symbol id: {}, user id:{}, "
+      "price:{}, "
+      "amount:{}, commit time:{}",
+      request->order_id(), request->symbol_id(), request->user_id(),
+      request->price(), request->amount(), request->submit_time().seconds());
+
+  RawOrder raw_order{};
   bool can_transform = TransformGrpcOrder(*request, raw_order);
 
-  if (!can_transform){
+  if (!can_transform) {
     CDCF_LOGGER_ERROR("receive bad order data");
-    return ::grpc::Status(::grpc::StatusCode::FAILED_PRECONDITION, "data form error");
+    return ::grpc::Status(::grpc::StatusCode::FAILED_PRECONDITION,
+                          "data form error");
   }
 
   match_engine_cluster_.Match(raw_order);
+  response->set_status(::match_engine_proto::STATUS_SUCCESS);
 
   return ::grpc::Status::OK;
 }
+
 grpc::Status match_engine::MatchEngineGRPCImpl::SubscribeMatchResult(
     ::grpc::ServerContext *context, const ::google::protobuf::Empty *request,
     ::grpc::ServerWriter< ::match_engine_proto::Trade> *writer) {
   CDCF_LOGGER_INFO("SubscribeMatchResult request");
-  match_writer_list_.push_back(writer);
+  MatchResultWriterKeeper result_writer_keeper;
+  result_writer_keeper.writer = writer;
+  result_writer_keeper.writer_promise = new std::promise<int>();
+
+  match_result_writer_keepers.push_back(result_writer_keeper);
+
+  // waiting for writer end
+  (void)result_writer_keeper.writer_promise->get_future().get();
+  delete result_writer_keeper.writer_promise;
   return ::grpc::Status::OK;
 }
+
 void match_engine::MatchEngineGRPCImpl::Run() {
   std::string server_address("0.0.0.0:" + std::to_string(server_port_));
   CDCF_LOGGER_INFO("Match engine service up at port:{}", server_port_);
@@ -70,17 +89,16 @@ void match_engine::MatchEngineGRPCImpl::Run() {
 }
 
 MatchEngineGRPCImpl::MatchEngineGRPCImpl(
-    uint64_t server_port, MatchEngineCluster &match_engine_cluster)
-    : server_port_(server_port), match_engine_cluster_(match_engine_cluster) {}
+    uint64_t server_port, MatchEngineCluster &match_engine_cluster, bool is_test)
+    : server_port_(server_port), match_engine_cluster_(match_engine_cluster), is_test_(is_test) {}
 
 void match_engine::MatchEngineGRPCImpl::RunWithWait() {
   Run();
   server_->Wait();
 }
 
-::match_engine_proto::Trade TransformGrpcTrade(const MatchedTrade &trade) {
-  ::match_engine_proto::Trade grpc_trade;
-
+void TransformGrpcTrade(const MatchedTrade &trade,
+                        ::match_engine_proto::Trade grpc_trade) {
   grpc_trade.set_taker_id(trade.taker_id);
   grpc_trade.set_seller_user_id(trade.seller_user_id);
   grpc_trade.set_buyer_user_id(trade.buyer_user_id);
@@ -98,19 +116,44 @@ void match_engine::MatchEngineGRPCImpl::RunWithWait() {
   auto grpc_timestamp =
       ::google::protobuf::util::TimeUtil::SecondsToTimestamp(trade.submit_time);
   grpc_trade.set_allocated_deal_time(&grpc_timestamp);
-
-  return grpc_trade;
 }
 
 void MatchEngineGRPCImpl::SendMatchResult(const TradeList &trade_list) {
-  for (auto match_writer_it = match_writer_list_.begin();
-       match_writer_it != match_writer_list_.end();) {
-    for (const auto &trade : trade_list) {
-      bool success = (*match_writer_it)->Write(TransformGrpcTrade(trade));
+  for (const auto &trade : trade_list) {
+    CDCF_LOGGER_ERROR(
+        "send merge trade to client: taker id:{}, maker id:{}, buyer:{}, "
+        "seller:{}, deal time:{}, trade side:{}, price:{}, amount:{}",
+        trade.taker_id, trade.maker_id, trade.buyer_user_id,
+        trade.seller_user_id, trade.submit_time, trade.trading_side,
+        trade.price, trade.amount);
+
+    for (auto match_writer_it = match_result_writer_keepers.begin();
+         match_writer_it != match_result_writer_keepers.end();) {
+      ::match_engine_proto::Trade grpc_trade;
+      grpc_trade.set_taker_id(trade.taker_id);
+      grpc_trade.set_seller_user_id(trade.seller_user_id);
+      grpc_trade.set_buyer_user_id(trade.buyer_user_id);
+      grpc_trade.set_amount(trade.amount);
+      grpc_trade.set_price(trade.price);
+      grpc_trade.set_symbol_id(trade.symbol_id);
+      grpc_trade.set_maker_id(trade.maker_id);
+
+      if (TRADING_SITE_BUY == trade.trading_side) {
+        grpc_trade.set_trading_side(::match_engine_proto::TRADING_BUY);
+      } else {
+        grpc_trade.set_trading_side(::match_engine_proto::TRADING_SELL);
+      }
+
+      bool success = (*match_writer_it).writer->Write(grpc_trade);
+
       if (!success) {
-        match_writer_it = match_writer_list_.erase(match_writer_it);
+        match_writer_it->writer_promise->set_value(0);
+        match_writer_it = match_result_writer_keepers.erase(match_writer_it);
         CDCF_LOGGER_WARN("A client is disconnect");
       } else {
+        if (is_test_){
+          match_writer_it->writer_promise->set_value(0);
+        }
         ++match_writer_it;
       }
     }
