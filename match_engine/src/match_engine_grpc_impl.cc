@@ -123,7 +123,7 @@ void TransformGrpcTrade(const MatchedTrade &trade,
 
 void MatchEngineGRPCImpl::SendMatchResult(const TradeList &trade_list) {
   for (const auto &trade : trade_list) {
-    CDCF_LOGGER_ERROR(
+    CDCF_LOGGER_INFO(
         "send merge trade to client: taker id:{}, maker id:{}, buyer:{}, "
         "seller:{}, deal time:{}, trade side:{}, price:{}, amount:{}",
         trade.taker_id, trade.maker_id, trade.buyer_user_id,
