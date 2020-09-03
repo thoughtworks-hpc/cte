@@ -164,4 +164,3 @@ void MatchEngineGRPCImpl::SendMatchResult(const TradeList &trade_list) {
 }
 
 }  // namespace match_engine
-

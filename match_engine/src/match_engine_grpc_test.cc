@@ -173,4 +173,3 @@ TEST_F(MatchEngineGRPCTest, one_match) {
   EXPECT_EQ(10, trade.buyer_user_id());
   EXPECT_EQ(::match_engine_proto::TRADING_SELL, trade.trading_side());
 }
-
