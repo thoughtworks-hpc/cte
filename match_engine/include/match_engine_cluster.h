@@ -2,14 +2,14 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
-#ifndef CTE_MATCH_ENGINE_CLUSTER_H
-#define CTE_MATCH_ENGINE_CLUSTER_H
+#ifndef MATCH_ENGINE_INCLUDE_MATCH_ENGINE_CLUSTER_H_
+#define MATCH_ENGINE_INCLUDE_MATCH_ENGINE_CLUSTER_H_
 
 #include <cdcf/actor_system.h>
 
 #include <caf/all.hpp>
 
-#include "match_engine_config.h"
+#include "./match_engine_config.h"
 namespace match_engine {
 class MatchEngineCluster : public cdcf::cluster::Observer {
  public:
@@ -27,4 +27,4 @@ class MatchEngineCluster : public cdcf::cluster::Observer {
 };
 }  // namespace match_engine
 
-#endif  // CTE_MATCH_ENGINE_CLUSTER_H
+#endif  // MATCH_ENGINE_INCLUDE_MATCH_ENGINE_CLUSTER_H_

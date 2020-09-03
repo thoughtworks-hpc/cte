@@ -1,6 +1,6 @@
-//
-// Created by Mingfei Deng on 2020/8/25.
-//
+/*
+ * Copyright (c) 2020 ThoughtWorks Inc.
+ */
 
 #include "../include/match_engine_grpc_impl.h"
 
@@ -164,3 +164,4 @@ void MatchEngineGRPCImpl::SendMatchResult(const TradeList &trade_list) {
 }
 
 }  // namespace match_engine
+

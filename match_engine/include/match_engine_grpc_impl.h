@@ -2,15 +2,17 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
-#ifndef CTE_MATCH_ENGINE_GRPC_IMPL_H
-#define CTE_MATCH_ENGINE_GRPC_IMPL_H
+#ifndef MATCH_ENGINE_INCLUDE_MATCH_ENGINE_GRPC_IMPL_H_
+#define MATCH_ENGINE_INCLUDE_MATCH_ENGINE_GRPC_IMPL_H_
 
 #include <grpcpp/server.h>
 
+#include <memory>
+
 #include <caf/all.hpp>
 
-#include "match_engine_cluster.h"
-#include "match_engine_config.h"
+#include "./match_engine_cluster.h"
+#include "./match_engine_config.h"
 
 namespace match_engine {
 
@@ -42,4 +44,4 @@ class MatchEngineGRPCImpl final
 
 }  // namespace match_engine
 
-#endif  // CTE_MATCH_ENGINE_GRPC_IMPL_H
+#endif  // MATCH_ENGINE_INCLUDE_MATCH_ENGINE_GRPC_IMPL_H_

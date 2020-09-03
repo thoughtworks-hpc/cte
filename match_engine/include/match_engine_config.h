@@ -2,10 +2,13 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
-#ifndef CTE_MATCH_ENGINE_CONFIG_H
-#define CTE_MATCH_ENGINE_CONFIG_H
+#ifndef MATCH_ENGINE_INCLUDE_MATCH_ENGINE_CONFIG_H_
+#define MATCH_ENGINE_INCLUDE_MATCH_ENGINE_CONFIG_H_
 
 #include <cdcf/actor_system.h>
+
+#include <string>
+#include <vector>
 
 #include "../../common/protobuf_gen/match_engine.grpc.pb.h"
 
@@ -31,7 +34,7 @@ using GetAtom = caf::atom_constant<caf::atom("get")>;
 struct SymbolActorInfo {
   int32_t symbol_id;
   caf::actor symbol_actor;
-  SymbolActorInfo(){};
+  SymbolActorInfo() {}
   SymbolActorInfo(int32_t symbolId, const caf::actor& symbolActor)
       : symbol_id(symbolId), symbol_actor(symbolActor) {}
 };
@@ -44,7 +47,6 @@ struct RawOrder {
   int32_t user_id;
   TRADING_SITE_E trading_side;
   int32_t amount;
-  //考虑到浮点误差的风险，使用int（比如价格为12.34，那传输的时候应该传递1234）
   int32_t price;
   int64_t submit_time;  // 订单提交时间
 };
@@ -59,7 +61,7 @@ struct MatchedTrade {
   int32_t buyer_user_id;
   int32_t symbol_id;
   int64_t submit_time;  // 成交时间
-  MatchedTrade(){};
+  MatchedTrade() {}
   MatchedTrade(int64_t makerId, int64_t takerId, TRADING_SITE_E tradingSide,
                int32_t amount, int32_t price, int32_t sellerUserId,
                int32_t buyerUserId, int32_t symbolId, int64_t submitTime)
@@ -134,4 +136,4 @@ class Config : public cdcf::actor_system::Config {
 
 }  // namespace match_engine
 
-#endif  // CTE_MATCH_ENGINE_CONFIG_H
+#endif  // MATCH_ENGINE_INCLUDE_MATCH_ENGINE_CONFIG_H_

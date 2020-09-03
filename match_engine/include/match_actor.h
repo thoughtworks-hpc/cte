@@ -3,12 +3,14 @@
  */
 
 #ifndef MATCH_ENGINE_INCLUDE_MATCH_ACTOR_H_
+#define MATCH_ENGINE_INCLUDE_MATCH_ACTOR_H_
 
+#include <list>
 #include <vector>
 
 #include <caf/io/all.hpp>
 
-#include "match_engine_config.h"
+#include "./match_engine_config.h"
 
 namespace match_engine {
 
