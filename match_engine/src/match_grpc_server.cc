@@ -13,7 +13,6 @@
 #include "../include/match_result_sender_actor.h"
 #include "../include/symbol_id_router.h"
 
-
 std::vector<std::string> StrSplit(const std::string& in,
                                   const std::string& tag) {
   std::regex re{tag};
@@ -37,7 +36,7 @@ void caf_main(caf::actor_system& system, const match_engine::Config& config) {
   caf::scoped_actor self(system);
 
   for (auto& symbol_str : symbol_str_list) {
-    if (!symbol_str.empty()){
+    if (!symbol_str.empty()) {
       int32_t symbol_id = std::stoi(symbol_str);
       auto match_actor = system.spawn(match_engine::MatchActor);
       self->send(router_actor, symbol_id, match_actor);

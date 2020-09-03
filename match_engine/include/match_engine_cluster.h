@@ -15,10 +15,8 @@ class MatchEngineCluster : public cdcf::cluster::Observer {
  public:
   void Update(const cdcf::cluster::Event& event) override;
   MatchEngineCluster(caf::actor_system& system, uint16_t symbolRouterPort,
-                     uint16_t mergeResultPort,
-                     caf::actor  symbolIdRouter);
+                     uint16_t mergeResultPort, caf::actor symbolIdRouter);
   void Match(RawOrder raw_order);
-
 
  private:
   caf::actor_system& system_;
@@ -27,6 +25,6 @@ class MatchEngineCluster : public cdcf::cluster::Observer {
   caf::actor symbol_id_router_;
   caf::scoped_actor self_actor_;
 };
-}
+}  // namespace match_engine
 
 #endif  // CTE_MATCH_ENGINE_CLUSTER_H

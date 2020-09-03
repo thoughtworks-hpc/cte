@@ -14,7 +14,9 @@
 
 namespace match_engine {
 
-class MatchEngineGRPCImpl final : public match_engine_proto::TradingEngine::Service, public SenderMatchInterface {
+class MatchEngineGRPCImpl final
+    : public match_engine_proto::TradingEngine::Service,
+      public SenderMatchInterface {
  public:
   grpc::Status Match(::grpc::ServerContext *context,
                      const ::match_engine_proto::Order *request,
@@ -27,7 +29,8 @@ class MatchEngineGRPCImpl final : public match_engine_proto::TradingEngine::Serv
   void RunWithWait();
   void SendMatchResult(const TradeList &trade_list) override;
   MatchEngineGRPCImpl(uint64_t server_port,
-                      MatchEngineCluster &match_engine_cluster, bool is_test = false);
+                      MatchEngineCluster &match_engine_cluster,
+                      bool is_test = false);
 
  private:
   uint64_t server_port_;

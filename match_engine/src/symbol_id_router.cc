@@ -51,4 +51,4 @@ caf::behavior SymbolRouterActor(caf::stateful_actor<SymbolRouterData>* self) {
             return true;
           }};
 }
-}
+}  // namespace match_engine

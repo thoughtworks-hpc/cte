@@ -94,7 +94,6 @@ void MatchEngineCluster::Update(const cdcf::cluster::Event& event) {
           caf::actor merge_result_actor = *merge_result_actor_ptr;
           self_actor_->send(symbol_id_router_, merge_result_actor);
         }
-
       }
       break;
     }

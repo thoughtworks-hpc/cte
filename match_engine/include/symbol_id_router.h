@@ -10,10 +10,9 @@
 #include <vector>
 
 #include <caf/all.hpp>
+
 #include "match_engine_config.h"
 namespace match_engine {
-
-
 
 struct SymbolRouterData {
   std::map<int32_t, caf::actor> symbol_actor_map;
