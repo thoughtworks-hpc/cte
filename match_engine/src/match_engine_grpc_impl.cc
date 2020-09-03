@@ -81,7 +81,7 @@ grpc::Status match_engine::MatchEngineGRPCImpl::SubscribeMatchResult(
 
 void match_engine::MatchEngineGRPCImpl::Run() {
   std::string server_address("0.0.0.0:" + std::to_string(server_port_));
-  CDCF_LOGGER_INFO("Match engine service up at port:{}", server_port_);
+  CDCF_LOGGER_INFO("Match engine service up at port:{}", server_address);
   grpc::ServerBuilder builder;
   builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
   builder.RegisterService(this);
