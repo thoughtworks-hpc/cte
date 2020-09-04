@@ -112,7 +112,7 @@ void Generator::SendRequest(std::queue<order_manager_proto::Order> orders,
     orders.pop();
 
     if (status.ok() &&
-        reply.error_code() == order_manager_proto::ErrorCode::FAILURE) {
+        reply.error_code() == order_manager_proto::ErrorCode::SUCCESS) {
       count_each_server[server_index % grpc_servers.size()]++;
       count++;
     } else {
