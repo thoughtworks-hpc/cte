@@ -12,6 +12,8 @@ WORKDIR /cte
 
 COPY conanfile.txt .
 RUN conan install . -s compiler.libcxx=libstdc++11 --build missing
+# copy node_keeper to dir /cte
+RUN find /root/.conan/data/cdcf/1.0/hpc/stable/package -name node_keeper | xargs cp -t .
 
 COPY CMakeLists.txt .
 COPY common common
@@ -39,4 +41,4 @@ COPY --from=builder /cte/bin/order_manager /bin/order_manager
 COPY --from=builder /cte/bin/create_initial_prices_config.json /bin/create_initial_prices_config.json
 COPY --from=builder /cte/bin/create_orders_config.json /bin/create_orders_config.json
 COPY --from=builder /cte/bin/request_generator_config.json /bin/request_generator_config.json
-COPY --from=builder /root/.conan/data/cdcf/1.0/hpc/stable/build/ae47b99da20a4b216786c6c96c73310f97f306a2/bin/node_keeper /bin/node_keeper
+COPY --from=builder /cte/node_keeper /bin/node_keeper
