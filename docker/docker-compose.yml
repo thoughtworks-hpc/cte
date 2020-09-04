@@ -1,7 +1,8 @@
 version: "3.7"
 services:
-  step1:
+  request_generator:
     image: cte:latest
+#    ports:
     networks:
       - cte
     command: /bin/bash -c "sleep 1000000000"

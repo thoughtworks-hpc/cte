@@ -7,12 +7,6 @@ RUN apt-get clean \
 RUN pip install conan \
     && conan remote add inexorgame "https://api.bintray.com/conan/inexorgame/inexor-conan" \
     && conan remote add hpc "https://api.bintray.com/conan/grandmango/cdcf"
-RUN apt-get clean \
-    && apt-get update \
-    && apt install influxdb -y
-RUN apt-get clean \
-    && apt-get update \
-    && apt install influxdb-client
 
 WORKDIR /cte
 
@@ -31,6 +25,12 @@ RUN cmake . -DCMAKE_TOOLCHAIN_FILE=conan_paths.cmake -DCMAKE_BUILD_TYPE=Release 
     && ctest --output-on-failure
 
 FROM debian
+RUN apt-get clean \
+    && apt-get update \
+    && apt-get install influxdb -y
+RUN apt-get clean \
+    && apt-get update \
+    && apt-get install influxdb-client
 COPY --from=builder /cte/bin/create_orders /bin/create_orders
 COPY --from=builder /cte/bin/create_initial_prices /bin/create_initial_prices
 COPY --from=builder /cte/bin/request_generator_main /bin/request_generator_main
