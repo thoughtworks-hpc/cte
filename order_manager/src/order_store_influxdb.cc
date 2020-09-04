@@ -15,7 +15,7 @@ int OrderStoreInfluxDB::PersistOrder(const match_engine_proto::Order& order,
   int ret = influxdb_cpp::builder()
                 .meas("order")
                 .tag("order_id", std::to_string(order.order_id()))
-                .tag("symbol_id", std::to_string(order.symbol()))
+                .tag("symbol_id", std::to_string(order.symbol_id()))
                 .field("user_id", order.user_id())
                 .field("price", order.price())
                 .field("amount", order.amount())

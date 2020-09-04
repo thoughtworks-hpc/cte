@@ -11,7 +11,7 @@
     ::match_engine_proto::Reply *response) {
   std::cout << "receive order:" << std::endl;
   std::cout << "order id: " << request->order_id() << std::endl;
-  std::cout << "symbol: " << request->symbol() << std::endl;
+  std::cout << "symbol: " << request->symbol_id() << std::endl;
   std::cout << "submit_time: " << request->submit_time().DebugString();
   std::cout << "price: " << request->price() << std::endl;
   std::cout << "amount: " << request->amount() << std::endl;

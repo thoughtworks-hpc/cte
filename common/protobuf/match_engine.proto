@@ -25,7 +25,7 @@ enum TradingSide {
 
 message Order {
     int64 order_id = 1;
-    int32 symbol = 2;
+    int32 symbol_id = 2;
     int32 user_id = 3;
     TradingSide trading_side = 4;
     int32 amount = 5;

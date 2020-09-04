@@ -32,7 +32,7 @@ TEST(OrderManager, should_store_order_correctly_when_place_an_order) {
   EXPECT_EQ(order_stored.amount(), 7);
   EXPECT_EQ(order_stored.user_id(), 6);
   EXPECT_EQ(order_stored.price(), 27);
-  EXPECT_EQ(order_stored.symbol(), 1);
+  EXPECT_EQ(order_stored.symbol_id(), 1);
   EXPECT_EQ(order_stored.trading_side(), order_manager_proto::TRADING_BUY);
   auto submit_time = order_stored.submit_time();
   EXPECT_GT(submit_time.seconds(), 0);

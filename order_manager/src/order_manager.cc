@@ -148,7 +148,7 @@ void OrderManagerService::BuildMatchEngineOrder(
       current_time_stamp.time_since_epoch().count();
 
   order.set_order_id(++order_id_);
-  order.set_symbol(request.symbol());
+  order.set_symbol_id(request.symbol());
   order.set_user_id(request.user_id());
   order.set_price(request.price());
   order.set_amount(request.amount());

@@ -51,6 +51,7 @@ target_link_libraries(${PROJECT_NAME}_main ${PROJECT_NAME}_grpc grpc::grpc)
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/request_generator_config.json
         DESTINATION ${CMAKE_BINARY_DIR}/bin
         )
+
 aux_source_directory(test ALL_SOURCES)
 set(TEST_SOURCES ${ALL_SOURCES} test/config_manager_test.h)
 list(FILTER TEST_SOURCES EXCLUDE REGEX "server_starter.cc$")
