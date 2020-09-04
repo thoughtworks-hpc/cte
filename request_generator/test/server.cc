@@ -21,7 +21,7 @@
   //    std::cout << "price: " << request->price() << std::endl;
   //    std::cout << "-------------------------------" << std::endl;
 
-  response->set_error_code(order_manager_proto::ErrorCode::FAILURE);
+  response->set_error_code(order_manager_proto::ErrorCode::SUCCESS);
   std::string response_message =
       "#" + std::to_string(count_) + " Response form server";
   response->set_message(response_message);

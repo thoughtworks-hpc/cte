@@ -11,7 +11,8 @@
 
 #include "../../common/include/influxdb.hpp"
 #include "../../common/include/json.hpp"
-#include "protobuf_gen/order.grpc.pb.h"
+#include "../../common/protobuf_gen/order_manager.grpc.pb.h"
+#include "../../common/protobuf_gen/order_manager.pb.h"
 
 int Generator::requests_count_ = 0;
 std::mutex Generator::mutex_requests_count_;
