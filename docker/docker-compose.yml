@@ -15,6 +15,31 @@ services:
     networks:
       - cte
     command: ./order_manager -a localhost:50051 -d localhost:8086 -m akkagateway:50051 -r akkanode:50051
+
+  cte_match_engin_result_host:
+    image: cte:latest
+    environment:
+      HOST: cte_match_engin_result_host
+      ROLE: merge_result_host
+      SEEDS: cte_match_engin_result_host:4445
+      APP: /bin/match_engine_server
+      APP_ARGS: --symbol_id_list="10,20" --is_merge_result_node
+
+    networks:
+      - cte
+
+  cte_match_engin_normal:
+    image: cte:latest
+    environment:
+      HOST: cte_match_engin_normal
+      ROLE: normal_host
+      SEEDS: cte_match_engin_result_host:4445
+      APP: /bin/match_engine_server
+      APP_ARGS: --symbol_id_list="10,20"
+
+    networks:
+      - cte
+
   #  akka gateway
   akkagateway:
     image: akka-te:latest
@@ -29,6 +54,7 @@ services:
       APP_CONFIG_FILE: "./node.conf"
     networks:
       - cte
+
 networks:
   cte:
     driver: bridge

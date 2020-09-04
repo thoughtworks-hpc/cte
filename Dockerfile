@@ -43,3 +43,7 @@ COPY --from=builder /cte/bin/create_initial_prices_config.json /bin/create_initi
 COPY --from=builder /cte/bin/create_orders_config.json /bin/create_orders_config.json
 COPY --from=builder /cte/bin/request_generator_config.json /bin/request_generator_config.json
 COPY --from=builder /cte/node_keeper /bin/node_keeper
+
+COPY docker/script.sh /bin/script.sh
+
+CMD ["/bin/script.sh"]
