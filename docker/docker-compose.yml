@@ -2,8 +2,6 @@ version: "3.7"
 services:
   step1:
     image: cte:latest
-    ports:
-      - 8086:8086
     networks:
       - cte
     command: /bin/bash -c "sleep 1000000000"
