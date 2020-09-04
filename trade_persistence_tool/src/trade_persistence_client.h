@@ -1,14 +1,14 @@
-//
-// Created by Yuecheng Pei on 2020/9/3.
-//
+/*
+ * Copyright (c) 2020 ThoughtWorks Inc.
+ */
 
-#ifndef CTE_TRADE_PERSISTENCE_CLIENT_H
-#define CTE_TRADE_PERSISTENCE_CLIENT_H
+#ifndef TRADE_PERSISTENCE_TOOL_SRC_TRADE_PERSISTENCE_CLIENT_H_
+#define TRADE_PERSISTENCE_TOOL_SRC_TRADE_PERSISTENCE_CLIENT_H_
 
 #include <string>
 #include <utility>
 
-#include "database_write_interface.h"
+#include "./database_write_interface.h"
 
 class TradePersistenceClient {
  public:
@@ -23,4 +23,4 @@ class TradePersistenceClient {
   std::string trade_engine_address_;
 };
 
-#endif  // CTE_TRADE_PERSISTENCE_CLIENT_H
+#endif  // TRADE_PERSISTENCE_TOOL_SRC_TRADE_PERSISTENCE_CLIENT_H_

@@ -1,24 +1,26 @@
-//
-// Created by Yuecheng Pei on 2020/9/3.
-//
+/*
+ * Copyright (c) 2020 ThoughtWorks Inc.
+ */
 
-#include "trade_persist_influxdb.h"
+#include "src/trade_persist_influxdb.h"
+
+#include <string>
 
 #include "../../common/include/influxdb.hpp"
 
-bool TradePersistInfluxdb::PersistTrade(
-    const match_engine_proto::Trade& trade, std::string uuid) {
+bool TradePersistInfluxdb::PersistTrade(const match_engine_proto::Trade& trade,
+                                        std::string uuid) {
   influxdb_cpp::server_info si(ip_, std::stoi(port_), database_name_, "", "");
   std::string resp;
 
   std::string buy_trade_id;
   std::string sell_trade_id;
-  if( trade.trading_side() == ::match_engine_proto::TRADING_BUY) {
+  if (trade.trading_side() == ::match_engine_proto::TRADING_BUY) {
     buy_trade_id = std::to_string(trade.taker_id());
     sell_trade_id = std::to_string(trade.maker_id());
   }
 
-  if( trade.trading_side() == ::match_engine_proto::TRADING_SELL) {
+  if (trade.trading_side() == ::match_engine_proto::TRADING_SELL) {
     sell_trade_id = std::to_string(trade.taker_id());
     buy_trade_id = std::to_string(trade.maker_id());
   }

@@ -1,11 +1,13 @@
-//
-// Created by Yuecheng Pei on 2020/9/3.
-//
+/*
+ * Copyright (c) 2020 ThoughtWorks Inc.
+ */
 
-#ifndef CTE_SERVER_H
-#define CTE_SERVER_H
-
+#ifndef TRADE_PERSISTENCE_TOOL_TEST_SERVER_H_
+#define TRADE_PERSISTENCE_TOOL_TEST_SERVER_H_
 #include <grpcpp/server.h>
+
+#include <memory>
+#include <string>
 
 #include "../../common/protobuf_gen/match_engine.grpc.pb.h"
 #include "../../common/protobuf_gen/match_engine.pb.h"
@@ -29,4 +31,4 @@ class MatchEngineImpl final
   std::unique_ptr<grpc::Server> server_;
 };
 
-#endif  // CTE_SERVER_H
+#endif  // TRADE_PERSISTENCE_TOOL_TEST_SERVER_H_

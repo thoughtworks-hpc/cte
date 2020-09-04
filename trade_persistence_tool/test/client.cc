@@ -1,6 +1,6 @@
-//
-// Created by Yuecheng Pei on 2020/9/3.
-//
+/*
+ * Copyright (c) 2020 ThoughtWorks Inc.
+ */
 
 #include <grpcpp/create_channel.h>
 

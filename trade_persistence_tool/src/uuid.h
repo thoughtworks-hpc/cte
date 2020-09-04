@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2019-2020 ThoughtWorks Inc.
+ * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
-#ifndef NODE_KEEPER_SRC_UUID_H_
-#define NODE_KEEPER_SRC_UUID_H_
+#ifndef TRADE_PERSISTENCE_TOOL_SRC_UUID_H_
+#define TRADE_PERSISTENCE_TOOL_SRC_UUID_H_
 
 #include <random>
 #include <sstream>
@@ -43,4 +43,4 @@ std::string generate_uuid_v4() {
 }
 }  // namespace uuid
 
-#endif  // NODE_KEEPER_SRC_UUID_H_
+#endif  // TRADE_PERSISTENCE_TOOL_SRC_UUID_H_

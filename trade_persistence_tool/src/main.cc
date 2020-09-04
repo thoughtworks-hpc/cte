@@ -1,21 +1,22 @@
-//
-// Created by Yuecheng Pei on 2020/9/3.
-//
+/*
+ * Copyright (c) 2020 ThoughtWorks Inc.
+ */
+
 #include <unistd.h>
 
-#include "trade_persist_influxdb.h"
-#include "trade_persistence_client.h"
+#include "./trade_persist_influxdb.h"
+#include "./trade_persistence_client.h"
 
 std::vector<std::string> ParseIpAddress(std::string address) {
   std::vector<std::string> output;
   std::string ip;
   std::string port;
-  for( int i=0; i<address.size(); i++) {
-    if( address[i] == ':') {
-      port += address[i+1];
+  for (int i = 0; i < address.size(); i++) {
+    if (address[i] == ':') {
+      port += address[i + 1];
       i = i + 2;
     }
-    if(port.empty()) {
+    if (port.empty()) {
       ip += address[i];
     } else {
       port += address[i];
@@ -54,7 +55,8 @@ int main(int argc, char* argv[]) {
 
   DatabaseWriteInterface* influxdb =
       new TradePersistInfluxdb(database_name, db_ip, db_port);
-  TradePersistenceClient tradePersistenceClient(influxdb, order_manager_address);
+  TradePersistenceClient tradePersistenceClient(influxdb,
+                                                order_manager_address);
 
   tradePersistenceClient.PersistTrades();
 }

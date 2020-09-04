@@ -1,11 +1,11 @@
-//
-// Created by Yuecheng Pei on 2020/9/3.
-//
+/*
+ * Copyright (c) 2020 ThoughtWorks Inc.
+ */
 
 #include <iostream>
 #include <string>
 
-#include "server.h"
+#include "./server.h"
 
 int main(int argc, char* argv[]) {
   std::string port = "50051";

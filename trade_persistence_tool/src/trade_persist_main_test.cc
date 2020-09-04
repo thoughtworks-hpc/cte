@@ -1,3 +1,3 @@
-//
-// Created by Yuecheng Pei on 2020/9/4.
-//
+/*
+ * Copyright (c) 2020 ThoughtWorks Inc.
+ */

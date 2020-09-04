@@ -1,13 +1,14 @@
-//
-// Created by Yuecheng Pei on 2020/9/3.
-//
+/*
+ * Copyright (c) 2020 ThoughtWorks Inc.
+ */
 
-#include "server.h"
+#include "test/server.h"
 
 #include <google/protobuf/util/time_util.h>
 #include <grpcpp/security/server_credentials.h>
 #include <grpcpp/server_builder.h>
 
+#include <string>
 #include <thread>
 
 ::grpc::Status MatchEngineImpl::Match(
@@ -19,7 +20,6 @@
 ::grpc::Status MatchEngineImpl::SubscribeMatchResult(
     ::grpc::ServerContext *context, const ::google::protobuf::Empty *request,
     ::grpc::ServerWriter< ::match_engine_proto::Trade> *writer) {
-
   int count_down = 5;
   while (count_down--) {
     match_engine_proto::Trade trade;
@@ -31,17 +31,16 @@
     trade.set_seller_user_id(2);
     trade.set_price(100);
 
-//    auto time = google::protobuf::util::TimeUtil::GetCurrentTime();
-//    trade.set_allocated_deal_time(&time);
+    //    auto time = google::protobuf::util::TimeUtil::GetCurrentTime();
+    //    trade.set_allocated_deal_time(&time);
 
     std::cout << "send #" << 5 - count_down << " trade back:" << std::endl;
-    //std::this_thread::sleep_for(std::chrono::seconds(1));
+    // std::this_thread::sleep_for(std::chrono::seconds(1));
     writer->Write(trade);
 
     std::cout << "amount: " << trade.amount() << std::endl;
     std::cout << "maker_id: " << trade.maker_id() << std::endl;
     std::cout << "taker_id: " << trade.taker_id() << std::endl;
-
   }
 
   return ::grpc::Status(::grpc::StatusCode::OK, "");
