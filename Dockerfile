@@ -39,11 +39,15 @@ COPY --from=builder /cte/bin/create_initial_prices /bin/create_initial_prices
 COPY --from=builder /cte/bin/request_generator_main /bin/request_generator_main
 COPY --from=builder /cte/bin/match_engine_server /bin/match_engine_server
 COPY --from=builder /cte/bin/order_manager /bin/order_manager
-COPY --from=builder /cte/bin/create_initial_prices_config.json /bin/create_initial_prices_config.json
+#COPY --from=builder /cte/bin/create_initial_prices_config.json /bin/create_initial_prices_config.json
 COPY --from=builder /cte/bin/create_orders_config.json /bin/create_orders_config.json
 COPY --from=builder /cte/bin/request_generator_config.json /bin/request_generator_config.json
 COPY --from=builder /cte/node_keeper /bin/node_keeper
 
 COPY docker/script.sh /bin/script.sh
+COPY docker/request_generator_akka_config.json /bin/request_generator_akka_config.json
+COPY docker/request_generator_cte_config.json /bin/request_generator_cte_config.json
+COPY docker/order_to_akka.sh /bin/order_to_akka.sh
+COPY docker/order_to_cte.sh /bin/order_to_cte.sh
 
 CMD ["/bin/script.sh"]
