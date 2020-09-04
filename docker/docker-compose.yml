@@ -5,12 +5,12 @@ services:
     networks:
       - cte
     command: /bin/bash -c "sleep 1000000000"
-  order_manager_a:
+  order_manager_akka:
     image: cte:latest
     networks:
       - cte
     command: ./order_manager -a localhost:50051 -d localhost:8086 -m akkagateway:50051 -r akkanode:50051
-  order_manager_b:
+  order_manager_cte:
     image: cte:latest
     networks:
       - cte
