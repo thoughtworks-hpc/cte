@@ -2,10 +2,19 @@ version: "3.7"
 services:
   request_generator:
     image: cte:latest
-#    ports:
     networks:
       - cte
     command: /bin/bash -c "sleep 1000000000"
+  order_manager_a:
+    image: cte:latest
+    networks:
+      - cte
+    command: ./order_manager -a localhost:50051 -d localhost:8086 -m akkagateway:50051 -r akkanode:50051
+  order_manager_b:
+    image: cte:latest
+    networks:
+      - cte
+    command: ./order_manager -a localhost:50051 -d localhost:8086 -m akkagateway:50051 -r akkanode:50051
   #  akka gateway
   akkagateway:
     image: akka-te:latest

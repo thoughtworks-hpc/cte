@@ -22,6 +22,7 @@ COPY order_manager order_manager
 COPY request_generator request_generator
 COPY influxdb_usa_demo influxdb_usa_demo
 COPY match_engine match_engine
+COPY docker docker
 RUN cmake . -DCMAKE_TOOLCHAIN_FILE=conan_paths.cmake -DCMAKE_BUILD_TYPE=Release \
     && cmake --build . -j 3 \
     && ctest --output-on-failure

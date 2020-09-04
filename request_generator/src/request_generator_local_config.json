@@ -9,11 +9,11 @@
       "port": "50051"
     },
     {
-      "ip": "order_manager_a",
-      "port": "50051"
+      "ip": "127.0.0.1",
+      "port": "50052"
     },
     {
-      "ip": "order_manager_b",
+      "ip": "127.0.0.1",
       "port": "50053"
     }
   ]
