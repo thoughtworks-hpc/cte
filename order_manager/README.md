@@ -16,7 +16,7 @@
 ```
 # Order Storage Location
 Orders will be persisted to the specified influxdb in database "order_manager" with measurement of "order'.
-#Database Schema
+# Database Schema
 Orders will be persisted to the database in the following form:
 ```text
 time                        amount concluded amount order_id price status              symbol_id trading_side user_id
