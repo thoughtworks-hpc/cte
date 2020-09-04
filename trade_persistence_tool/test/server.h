@@ -16,7 +16,7 @@ class MatchEngineImpl final
     : public match_engine_proto::TradingEngine::Service {
  public:
   std::string port_;
-  MatchEngineImpl(const std::string &port);
+  explicit MatchEngineImpl(const std::string &port);
   ::grpc::Status Match(::grpc::ServerContext *context,
                        const ::match_engine_proto::Order *request,
                        ::match_engine_proto::Reply *response) override;
