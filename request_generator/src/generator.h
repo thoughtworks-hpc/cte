@@ -14,7 +14,8 @@
 #include <utility>
 #include <vector>
 
-#include "../protobuf_gen/order.pb.h"
+#include "../../common/protobuf_gen/order_manager.grpc.pb.h"
+#include "../../common/protobuf_gen/order_manager.pb.h"
 #include "./database_interface.h"
 
 struct ip_address {

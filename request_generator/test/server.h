@@ -11,8 +11,8 @@
 #include <string>
 #include <utility>
 
-#include "protobuf_gen/order.grpc.pb.h"
-#include "protobuf_gen/order.pb.h"
+#include "../../common/protobuf_gen/order_manager.grpc.pb.h"
+#include "../../common/protobuf_gen/order_manager.pb.h"
 
 class OrderManagerImpl final
     : public order_manager_proto::OrderManager::Service {

@@ -12,8 +12,8 @@
 
 #include "../../common/include/influxdb.hpp"
 #include "../../common/include/json.hpp"
-#include "../protobuf_gen/order.grpc.pb.h"
-#include "../protobuf_gen/order.pb.h"
+#include "../../common/protobuf_gen/order_manager.grpc.pb.h"
+#include "../../common/protobuf_gen/order_manager.pb.h"
 #include "./config_manager.h"
 #include "Influxdb_reader.h"
 #include "src/config.h"
