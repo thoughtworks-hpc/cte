@@ -23,7 +23,7 @@ class TradePersistInfluxdb : public DatabaseWriteInterface {
     CreateDatabase();
   }
 
-  bool PersistTrade(const match_engine_proto::Trade& trade) override;
+  bool PersistTrade(const match_engine_proto::Trade& trade, std::string uuid) override;
 
  private:
   int CreateDatabase();

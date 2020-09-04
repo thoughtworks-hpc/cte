@@ -4,6 +4,7 @@
 
 #include "server.h"
 
+#include <google/protobuf/util/time_util.h>
 #include <grpcpp/security/server_credentials.h>
 #include <grpcpp/server_builder.h>
 
@@ -18,21 +19,29 @@
 ::grpc::Status MatchEngineImpl::SubscribeMatchResult(
     ::grpc::ServerContext *context, const ::google::protobuf::Empty *request,
     ::grpc::ServerWriter< ::match_engine_proto::Trade> *writer) {
-  match_engine_proto::Trade trade;
-  trade.set_amount(1);
-  trade.set_maker_id(1);
-  trade.set_taker_id(2);
-  int count_down = 10;
 
-  std::this_thread::sleep_for(std::chrono::seconds(20));
-
+  int count_down = 5;
   while (count_down--) {
+    match_engine_proto::Trade trade;
+    trade.set_amount(1);
+    trade.set_maker_id(1);
+    trade.set_taker_id(2);
+    trade.set_trading_side(match_engine_proto::TradingSide::TRADING_BUY);
+    trade.set_buyer_user_id(1);
+    trade.set_seller_user_id(2);
+    trade.set_price(100);
+
+//    auto time = google::protobuf::util::TimeUtil::GetCurrentTime();
+//    trade.set_allocated_deal_time(&time);
+
+    std::cout << "send #" << 5 - count_down << " trade back:" << std::endl;
+    //std::this_thread::sleep_for(std::chrono::seconds(1));
     writer->Write(trade);
-    std::cout << "send trade back:" << std::endl;
+
     std::cout << "amount: " << trade.amount() << std::endl;
     std::cout << "maker_id: " << trade.maker_id() << std::endl;
     std::cout << "taker_id: " << trade.taker_id() << std::endl;
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+
   }
 
   return ::grpc::Status(::grpc::StatusCode::OK, "");

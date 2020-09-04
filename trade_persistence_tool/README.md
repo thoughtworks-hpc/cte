@@ -1,43 +1,13 @@
-## Config File
-
-**src / request_generator_config.json**
-
-This file defines  basic configurations for request generator, you can modify it to meet your needs.
-
->  note: "default_num_of_requests : -1" means  generator will send all orders in database. 
-
-```
-{
-  "default_num_of_threads": 4,
-  "default_num_of_requests": -1,                  
-  "default_db_host_address": "127.0.0.1",
-  "default_db_port": "8086",
-  "grpc_server": [
-    {
-      "ip": "127.0.0.1",
-      "port": "50051"
-    },
-    {
-      "ip": "127.0.0.1",
-      "port": "50052"
-    },
-    {
-      "ip": "127.0.0.1",
-      "port": "50053"
-    }
-  ]
-}
-```
-
-
-
 ## Usage Example
 
 ```
-./request_generator_main -t 4 -n 10
+./trade_persistence_tool_main -n cte -m 127.0.0.1:50051 -d 127.0.0.1:8086
 ```
 
-> -t, can overwrite the number of threads in config file
+> -n, define database name, tool will create a database named by this argument
+>     and create a new table called trades 
 
-> -n can overwrite the number of requests to be sent in. config file
+> -b, define database ip and port
+
+> -m, define match engine ip and port
 

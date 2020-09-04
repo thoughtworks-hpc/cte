@@ -11,7 +11,7 @@
 
 class DatabaseWriteInterface {
  public:
-  virtual bool PersistTrade(const match_engine_proto::Trade& trade) = 0;
+  virtual bool PersistTrade(const match_engine_proto::Trade& trade, std::string uuid) = 0;
 };
 
 #endif  // REQUEST_GENERATOR_SRC_DATABASE_INTERFACE_H_
