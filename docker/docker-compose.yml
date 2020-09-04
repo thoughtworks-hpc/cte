@@ -6,6 +6,20 @@ services:
     networks:
       - cte
     command: /bin/bash -c "sleep 1000000000"
+  #  akka gateway
+  akkagateway:
+    image: akka-te:latest
+    environment:
+      APP_CONFIG_FILE: "./gateway.conf"
+    networks:
+      - cte
+  # akka node
+  akkanode:
+    image: akka-te:latest
+    environment:
+      APP_CONFIG_FILE: "./node.conf"
+    networks:
+      - cte
 networks:
   cte:
     driver: bridge
