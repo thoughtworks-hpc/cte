@@ -4,7 +4,7 @@ services:
     image: cte:latest
     networks:
       - cte
-    command: /bin/bash -c "sleep 1000000000"
+    command: /bin/bash request_generator_script.sh
 
   order_manager_akka:
     image: cte:latest
