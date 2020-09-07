@@ -10,37 +10,25 @@
 
 #include "../../common/include/influxdb.hpp"
 
-bool TradePersistInfluxdb::PersistTrade(const match_engine_proto::Trade& trade,
-                                        std::string uuid) {
-  influxdb_cpp::server_info si(ip_, std::stoi(port_), database_name_, "", "");
+bool TradePersistInfluxdb::PersistTrade(TradeEntity trade) {
+  influxdb_cpp::server_info si(ip_, std::stoi(port_), database_name_, username_,
+                               password_);
   std::string resp;
-
-  std::string buy_trade_id;
-  std::string sell_trade_id;
-  if (trade.trading_side() == ::match_engine_proto::TRADING_BUY) {
-    buy_trade_id = std::to_string(trade.taker_id());
-    sell_trade_id = std::to_string(trade.maker_id());
-  }
-
-  if (trade.trading_side() == ::match_engine_proto::TRADING_SELL) {
-    sell_trade_id = std::to_string(trade.taker_id());
-    buy_trade_id = std::to_string(trade.maker_id());
-  }
 
   int ret = influxdb_cpp::builder()
                 .meas("trades")
-                .tag("buy_trade_id", buy_trade_id)
-                .tag("sell_trade_id", sell_trade_id)
-                .field("symbol_id", std::to_string(trade.symbol_id()))
-                .field("trade_id", uuid)
-                .field("price", trade.price())
-                .field("amount", trade.amount())
-                .field("sell_user_id", std::to_string(trade.seller_user_id()))
-                .field("buy_user_id", std::to_string(trade.buyer_user_id()))
+                .tag("buy_trade_id", trade.buy_trade_id_)
+                .tag("sell_trade_id", trade.sell_trade_id_)
+                .field("symbol_id", trade.symbol_id_)
+                .field("trade_id", trade.uuid_)
+                .field("price", trade.price_)
+                .field("amount", trade.amount_)
+                .field("sell_user_id", trade.sell_user_id_)
+                .field("buy_user_id", trade.buy_user_id_)
                 .post_http(si, &resp);
 
   if (0 == ret && resp.empty()) {
-    CDCF_LOGGER_INFO("  Write db success");
+    CDCF_LOGGER_DEBUG("  Write db success");
     return true;
   } else {
     CDCF_LOGGER_ERROR("  Write db failed, ret:{} resp:{}", ret, resp);
@@ -51,7 +39,8 @@ bool TradePersistInfluxdb::PersistTrade(const match_engine_proto::Trade& trade,
 int TradePersistInfluxdb::CreateDatabase() {
   std::string resp;
   int ret;
-  influxdb_cpp::server_info si(ip_, std::stoi(port_), database_name_, "", "");
+  influxdb_cpp::server_info si(ip_, std::stoi(port_), database_name_, username_,
+                               password_);
   influxdb_cpp::query(resp, "drop database " + database_name_, si);
   ret = influxdb_cpp::create_db(resp, database_name_, si);
   if (0 != ret) {

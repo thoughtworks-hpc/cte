@@ -5,14 +5,12 @@
 #include "src/trade_persistence_client.h"
 
 #include <cdcf/logger.h>
-#include <google/protobuf/util/time_util.h>
 #include <grpcpp/create_channel.h>
 
 #include <memory>
 #include <vector>
 
 #include "../../common/protobuf_gen/match_engine.grpc.pb.h"
-#include "./uuid.h"
 
 bool TradePersistenceClient::PersistTrades() {
   auto channel = grpc::CreateChannel(trade_engine_address_,
@@ -26,11 +24,18 @@ bool TradePersistenceClient::PersistTrades() {
       clinet.SubscribeMatchResult(&client_context, google::protobuf::Empty()));
   int count = 0;
   while (reader->Read(&trade)) {
-    CDCF_LOGGER_INFO("Receive #{} trade", ++count);
+    CDCF_LOGGER_DEBUG("Receive #{} trade", ++count);
+    CDCF_LOGGER_DEBUG("symbol_id: {}", trade.symbol_id());
+    CDCF_LOGGER_DEBUG("maker_id: {}", trade.maker_id());
+    CDCF_LOGGER_DEBUG("taker_id: {}", trade.taker_id());
+    CDCF_LOGGER_DEBUG("price: {}", trade.price());
+    CDCF_LOGGER_DEBUG("trading_side: {}", trade.trading_side());
+    CDCF_LOGGER_DEBUG("amount: {}", trade.amount());
+    CDCF_LOGGER_DEBUG("buyer_user_id: {}", trade.buyer_user_id());
+    CDCF_LOGGER_DEBUG("seller_user_id: {}", trade.seller_user_id());
 
-    std::string uuid = uuid::generate_uuid_v4();
-    if (!database->PersistTrade(trade, uuid)) {
-      CDCF_LOGGER_DEBUG("  Write Database Failed");
+    if (!database->PersistTrade(TradeEntity(trade))) {
+      CDCF_LOGGER_ERROR("  Write Database Failed");
       return false;
     }
   }

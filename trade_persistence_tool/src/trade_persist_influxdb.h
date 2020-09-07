@@ -15,17 +15,21 @@ class TradePersistInfluxdb : public DatabaseWriteInterface {
   std::string database_name_;
   std::string ip_;
   std::string port_;
+  std::string username_;
+  std::string password_;
 
   TradePersistInfluxdb(std::string databaseName, std::string ip,
-                       std::string port)
+                       std::string port, std::string username,
+                       std::string password)
       : database_name_(std::move(databaseName)),
         ip_(std::move(ip)),
-        port_(std::move(port)) {
+        port_(std::move(port)),
+        username_(std::move(username)),
+        password_(std::move(password)) {
     CreateDatabase();
   }
 
-  bool PersistTrade(const match_engine_proto::Trade& trade,
-                    std::string uuid) override;
+  bool PersistTrade(TradeEntity trade) override;
 
  private:
   int CreateDatabase();

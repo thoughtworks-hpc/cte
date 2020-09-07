@@ -8,11 +8,11 @@
 #include <string>
 
 #include "../../common/protobuf_gen/match_engine.pb.h"
+#include "./trade_entity.h"
 
 class DatabaseWriteInterface {
  public:
-  virtual bool PersistTrade(const match_engine_proto::Trade& trade,
-                            std::string uuid) = 0;
+  virtual bool PersistTrade(TradeEntity trade) = 0;
 };
 
 #endif  // TRADE_PERSISTENCE_TOOL_SRC_DATABASE_WRITE_INTERFACE_H_
