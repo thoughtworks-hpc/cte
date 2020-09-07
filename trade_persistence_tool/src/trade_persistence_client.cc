@@ -43,5 +43,3 @@ bool TradePersistenceClient::PersistTrades() {
   ::grpc::Status status = reader->Finish();
   return true;
 }
-
-
