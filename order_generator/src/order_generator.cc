@@ -84,7 +84,7 @@ Order::Order(const std::map<int, int>& all_initial_prices,
   this->price_ = GenerateRandomNumber(static_cast<int>(0.9 * initial_price),
                                       static_cast<int>(1.1 * initial_price));
   this->amount_ = GenerateRandomNumber(amount_min, amount_max);
-  this->trading_side_ = GenerateRandomNumber(0, 1);
+  this->trading_side_ = GenerateRandomNumber(1, 2);
 }
 
 int Order::CreateOrderInDatabase(const std::string& database_host,

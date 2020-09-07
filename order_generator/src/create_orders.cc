@@ -32,7 +32,6 @@ int main(int argc, char* argv[]) {
 
   auto initial_prices = GetAllInitialPrice(initial_price_file_path);
 
-  // Create one order need 0.105 seconds
   for (int i = 0; i < orders_config["order_amount"]; i++) {
     Order order(initial_prices, orders_config["user_id_min"],
                 orders_config["user_id_max"],
