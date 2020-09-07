@@ -7,26 +7,6 @@
 #include "./trade_persist_influxdb.h"
 #include "./trade_persistence_client.h"
 
-std::vector<std::string> ParseIpAddress(std::string address) {
-  std::vector<std::string> output;
-  std::string ip;
-  std::string port;
-  for (int i = 0; i < address.size(); i++) {
-    if (address[i] == ':') {
-      port += address[i + 1];
-      i = i + 2;
-    }
-    if (port.empty()) {
-      ip += address[i];
-    } else {
-      port += address[i];
-    }
-  }
-  output.push_back(ip);
-  output.push_back(port);
-  return output;
-}
-
 int main(int argc, char* argv[]) {
   std::string db_ip;
   std::string db_port;

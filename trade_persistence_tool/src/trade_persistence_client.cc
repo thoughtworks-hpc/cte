@@ -4,10 +4,12 @@
 
 #include "src/trade_persistence_client.h"
 
+#include <cdcf/logger.h>
 #include <google/protobuf/util/time_util.h>
 #include <grpcpp/create_channel.h>
 
 #include <memory>
+#include <vector>
 
 #include "../../common/protobuf_gen/match_engine.grpc.pb.h"
 #include "./uuid.h"
@@ -24,28 +26,35 @@ bool TradePersistenceClient::PersistTrades() {
       clinet.SubscribeMatchResult(&client_context, google::protobuf::Empty()));
   int count = 0;
   while (reader->Read(&trade)) {
-    // trade.PrintDebugString();
-    std::cout << "receive #" << ++count << " trade:" << std::endl;
-    //    std::cout << "amount: " << trade.amount() << std::endl;
-    //    std::cout << "maker_id: " << trade.maker_id() << std::endl;
-    //    std::cout << "taker_id: " << trade.taker_id() << std::endl;
+    CDCF_LOGGER_INFO("Receive #{} trade", ++count);
+
     std::string uuid = uuid::generate_uuid_v4();
-    std::cout << "uuid: " << uuid << std::endl;
     if (!database->PersistTrade(trade, uuid)) {
-      std::cout << "[ERROR] Write Database Failed" << std::endl;
+      CDCF_LOGGER_DEBUG("  Write Database Failed");
       return false;
     }
   }
+  CDCF_LOGGER_INFO("  Write Database succeed");
   ::grpc::Status status = reader->Finish();
   return true;
 }
 
-// std::string TradePersistenceClient::GenerateTradeID(std::string seed) {
-//  unsigned int hash = 0;
-//  for (int i = 0; i < seed.size(); i++) {
-//    // equivalent to: hash = 65599*hash + (*str++);
-//    hash = seed[i] + (hash << 6) + (hash << 16) - hash;
-//  }
-//  std::cout << "hash_id: " << hash << std::endl;
-//  return "(hash & 0x7FFFFFFF)";
-//}
+std::vector<std::string> ParseIpAddress(std::string address) {
+  std::vector<std::string> output;
+  std::string ip;
+  std::string port;
+  for (int i = 0; i < address.size(); i++) {
+    if (address[i] == ':') {
+      port += address[i + 1];
+      i = i + 2;
+    }
+    if (port.empty()) {
+      ip += address[i];
+    } else {
+      port += address[i];
+    }
+  }
+  output.push_back(ip);
+  output.push_back(port);
+  return output;
+}

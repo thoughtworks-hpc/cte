@@ -2,8 +2,8 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
-#ifndef TRADE_PERSISTENCE_TOOL_TEST_SERVER_H_
-#define TRADE_PERSISTENCE_TOOL_TEST_SERVER_H_
+#ifndef TRADE_PERSISTENCE_TOOL_TEST_FAKE_SERVER_H_
+#define TRADE_PERSISTENCE_TOOL_TEST_FAKE_SERVER_H_
 #include <grpcpp/server.h>
 
 #include <memory>
@@ -31,4 +31,4 @@ class MatchEngineImpl final
   std::unique_ptr<grpc::Server> server_;
 };
 
-#endif  // TRADE_PERSISTENCE_TOOL_TEST_SERVER_H_
+#endif  // TRADE_PERSISTENCE_TOOL_TEST_FAKE_SERVER_H_

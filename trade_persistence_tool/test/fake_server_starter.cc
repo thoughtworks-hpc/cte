@@ -5,7 +5,7 @@
 #include <iostream>
 #include <string>
 
-#include "./server.h"
+#include "./fake_server.h"
 
 int main(int argc, char* argv[]) {
   std::string port = "50051";

@@ -7,6 +7,7 @@
 
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "./database_write_interface.h"
 
@@ -22,5 +23,7 @@ class TradePersistenceClient {
   DatabaseWriteInterface* database;
   std::string trade_engine_address_;
 };
+
+std::vector<std::string> ParseIpAddress(std::string address);
 
 #endif  // TRADE_PERSISTENCE_TOOL_SRC_TRADE_PERSISTENCE_CLIENT_H_

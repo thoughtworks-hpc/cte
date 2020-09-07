@@ -2,7 +2,7 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
-#include "test/server.h"
+#include "test/fake_server.h"
 
 #include <google/protobuf/util/time_util.h>
 #include <grpcpp/security/server_credentials.h>
