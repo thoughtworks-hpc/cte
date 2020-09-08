@@ -10,6 +10,9 @@
 class DataSource {
  public:
   virtual void GetDataEntries(int limit, int offset, std::string& data) = 0;
+  virtual std::function<bool(const std::string& source,
+                             const std::string& target)>
+  GetCompareFunction() = 0;
 };
 
 #endif  // CTE_DATA_SOURCE_H

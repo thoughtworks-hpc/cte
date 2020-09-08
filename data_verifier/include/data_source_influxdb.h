@@ -17,6 +17,10 @@ class DataSourceInfluxDB : public DataSource {
 
   void GetDataEntries(int limit, int offset, std::string& data);
 
+    std::function<bool(const std::string& source,
+                       const std::string& target)>
+    GetCompareFunction();
+
   struct Algorithm {
     static bool CompareTradeJson(const std::string& source, const std::string& target);
 
