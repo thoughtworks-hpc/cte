@@ -15,6 +15,8 @@ service TradingEngine {
     }
     rpc SubscribeMatchResult (google.protobuf.Empty) returns (stream Trade) {
     }
+    rpc OpenCloseEngine (EngineSwitch) returns (Reply){
+    }
 }
 
 enum TradingSide {
@@ -54,4 +56,13 @@ message Trade {
     int32 buyer_user_id = 7;
     int32 symbol_id = 8;
     google.protobuf.Timestamp deal_time = 9; // 成交时间
+}
+
+enum EngineStatus {
+    ENGINE_CLOSE = 0;
+    ENGINE_OPEN = 1;
+}
+
+message EngineSwitch {
+    EngineStatus engine_status = 3;
 }
