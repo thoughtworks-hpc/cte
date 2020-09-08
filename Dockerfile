@@ -22,6 +22,7 @@ COPY order_manager order_manager
 COPY request_generator request_generator
 COPY influxdb_usa_demo influxdb_usa_demo
 COPY match_engine match_engine
+COPY trade_persistence_tool trade_persistence_tool
 COPY docker docker
 RUN cmake . -DCMAKE_TOOLCHAIN_FILE=conan_paths.cmake -DCMAKE_BUILD_TYPE=Release \
     && cmake --build . -j 3 \
@@ -39,6 +40,7 @@ COPY --from=builder /cte/bin/create_initial_prices /bin/create_initial_prices
 COPY --from=builder /cte/bin/request_generator_main /bin/request_generator_main
 COPY --from=builder /cte/bin/match_engine_server /bin/match_engine_server
 COPY --from=builder /cte/bin/order_manager /bin/order_manager
+COPY --from=builder /cte/bin/trade_persistence_tool_main /bin/trade_persistence_tool_main
 COPY --from=builder /cte/bin/create_initial_prices_config.json /bin/create_initial_prices_config.json
 COPY --from=builder /cte/bin/create_orders_config.json /bin/create_orders_config.json
 #COPY --from=builder /cte/bin/request_generator_config.json /bin/request_generator_config.json
@@ -50,5 +52,6 @@ COPY docker/request_generator_cte_config.json /bin/request_generator_cte_config.
 COPY docker/order_to_akka.sh /bin/order_to_akka.sh
 COPY docker/order_to_cte.sh /bin/order_to_cte.sh
 COPY docker/request_generator_script.sh /bin/request_generator_script.sh
+COPY docker/trade_reciever_cte.sh /bin/trade_reciever_cte.sh
 
 CMD ["/bin/script.sh"]
