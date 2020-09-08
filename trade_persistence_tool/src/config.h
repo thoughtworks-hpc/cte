@@ -17,6 +17,7 @@ class Config {
   std::string db_ip;
   std::string db_port;
   std::string database_name;
+  std::string database_table_name;
   std::string order_manager_address;
   std::string db_username;
   std::string db_password;
