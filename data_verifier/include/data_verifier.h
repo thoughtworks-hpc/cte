@@ -13,10 +13,9 @@ class DataVerifier {
                std::shared_ptr<DataSource> data_source_b)
       : data_source_a_(data_source_a), data_source_b_(data_source_b) {}
 
-  int VerifyEquality();
+  bool VerifyEquality();
 
  private:
-  int CompareData();
 
   std::shared_ptr<DataSource> data_source_a_;
   std::shared_ptr<DataSource> data_source_b_;

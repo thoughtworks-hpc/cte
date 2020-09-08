@@ -5,7 +5,7 @@ project(data_verifier)
 #
 #target_link_libraries(${PROJECT_NAME} common common_grpc)
 
-add_executable(${PROJECT_NAME}_test src/data_verifier_test.cc src/data_source_influxdb.cc)
+add_executable(${PROJECT_NAME}_test src/data_verifier_test.cc src/data_verifier.cc src/data_source_influxdb.cc src/data_source_mock.cc)
 find_package(GTest REQUIRED)
 target_link_libraries(${PROJECT_NAME}_test GTest::GTest common common_grpc)
 enable_testing()
