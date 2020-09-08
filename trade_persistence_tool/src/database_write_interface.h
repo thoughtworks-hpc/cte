@@ -12,7 +12,7 @@
 
 class DatabaseWriteInterface {
  public:
-  virtual bool PersistTrade(TradeEntity trade) = 0;
+  virtual bool PersistTrade(TradeEntity& trade) = 0;
 };
 
 #endif  // TRADE_PERSISTENCE_TOOL_SRC_DATABASE_WRITE_INTERFACE_H_
