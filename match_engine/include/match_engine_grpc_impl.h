@@ -27,8 +27,8 @@ class MatchEngineGRPCImpl final
       ::grpc::ServerContext *context, const ::google::protobuf::Empty *request,
       ::grpc::ServerWriter<::match_engine_proto::Trade> *writer) override;
   grpc::Status OpenCloseEngine(::grpc::ServerContext *context,
-                     const ::match_engine_proto::EngineSwitch *status,
-                     ::match_engine_proto::Reply *response) override;
+                        const ::match_engine_proto::EngineSwitch *status,
+                        ::match_engine_proto::Reply *response) override;
 
   void Run();
   void RunWithWait();
