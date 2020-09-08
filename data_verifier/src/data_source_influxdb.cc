@@ -8,11 +8,39 @@
 
 using json = nlohmann::json;
 
+int DataSourceInfluxDB::GetDataEntryNumber() {
+  int ret;
+  std::string resp;
+  std::string data;
+  std::string sql = BuildGetDataEntryNumberQuery();
+  ret = influxdb_cpp::query(data, sql, si_);
+  if (0 == ret) {
+    std::cout << "query db success" << std::endl;
+  } else {
+    std::cout << "query db failed ret:" << ret << std::endl;
+  }
+
+  int count = 0;
+  try {
+    json j = json::parse(data);
+
+    json j_results = j["results"].get<json>()[0];
+    json j_series = j_results["series"].get<json>()[0];
+    json j_values = j_series["values"].get<json>();
+    count = j_values[0][1].get<int>();
+  } catch (const std::exception& e) {
+    std::cout << "get data entry number error: " << e.what() << std::endl;
+    count = 0;
+  }
+
+  return count;
+}
+
 void DataSourceInfluxDB::GetDataEntries(int limit, int offset,
                                         std::string& data) {
   int ret;
   std::string resp;
-  std::string sql = BuildQuerySql(limit, offset);
+  std::string sql = BuildGetDataEntriesQuery(limit, offset);
   ret = influxdb_cpp::query(data, sql, si_);
   if (0 == ret) {
     std::cout << "query db success" << std::endl;
@@ -28,13 +56,24 @@ DataSourceInfluxDB::GetCompareFunction() {
   };
 }
 
-std::string DataSourceInfluxDB::BuildQuerySql(int limit, int offset) {
+std::string DataSourceInfluxDB::BuildGetDataEntriesQuery(int limit,
+                                                         int offset) {
   std::string sql = "select * from ";
   sql += "\"";
   sql += measurement_;
   sql += "\"";
   sql += " limit " + std::to_string(limit);
   sql += " offset " + std::to_string(offset);
+
+  std::cout << "sql: " << sql << std::endl;
+  return sql;
+}
+
+std::string DataSourceInfluxDB::BuildGetDataEntryNumberQuery() {
+  std::string sql = "select count(trade_id) from ";
+  sql += "\"";
+  sql += measurement_;
+  sql += "\"";
 
   std::cout << "sql: " << sql << std::endl;
   return sql;
@@ -78,7 +117,7 @@ bool DataSourceInfluxDB::Algorithm::CompareTradeJsonElement(
       return false;
     }
   } catch (const std::exception& e) {
-    std::cout << "compare data entry error: " << e.what() << std::endl;
+    std::cout << "compare trade json element error: " << e.what() << std::endl;
     return false;
   }
   return true;
@@ -92,7 +131,7 @@ int DataSourceInfluxDB::Algorithm::ExtractValuesJsonArray(
     json j_series = j_results["series"].get<json>()[0];
     values_array = j_series["values"].get<json>();
   } catch (const std::exception& e) {
-    std::cout << "compare data entry error: " << e.what() << std::endl;
+    std::cout << "extract values json array error: " << e.what() << std::endl;
     return 1;
   }
 

@@ -8,12 +8,13 @@
 
 using nlohmann::json;
 
-// TEST(DataVerifier, test_json_parsing) {
+//TEST(DataVerifier, test_json_parsing) {
 //  influxdb_cpp::server_info si("127.0.0.1", 8086, "akka", "", "");
 //  DataSourceInfluxDB db(si, "trades");
-//
+
 //  std::string data;
 //  db.GetDataEntries(5, 1, data);
+//  EXPECT_EQ(db.GetDataEntryNumber(), 3);
 //
 //  using json = nlohmann::json;
 //  json j = json::parse(data);
@@ -84,3 +85,4 @@ TEST(DataVerifier, should_return_false_when_comparing_unequal_trade_json) {
     EXPECT_FALSE(DataSourceInfluxDB::Algorithm::CompareTradeJson(json_string_src,
                                                                 json_string_tar));
 }
+

@@ -9,6 +9,7 @@
 
 class DataSource {
  public:
+  virtual int GetDataEntryNumber() = 0;
   virtual void GetDataEntries(int limit, int offset, std::string& data) = 0;
   virtual std::function<bool(const std::string& source,
                              const std::string& target)>
