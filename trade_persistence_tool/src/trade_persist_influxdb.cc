@@ -10,7 +10,7 @@
 
 #include "../../common/include/influxdb.hpp"
 
-bool TradePersistInfluxdb::PersistTrade(TradeEntity trade) {
+bool TradePersistInfluxdb::PersistTrade(TradeEntity& trade) {
   influxdb_cpp::server_info si(ip_, std::stoi(port_), database_name_, username_,
                                password_);
   CDCF_LOGGER_DEBUG(

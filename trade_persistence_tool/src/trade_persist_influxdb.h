@@ -29,7 +29,7 @@ class TradePersistInfluxdb : public DatabaseWriteInterface {
     CreateDatabase();
   }
 
-  bool PersistTrade(TradeEntity trade) override;
+  bool PersistTrade(TradeEntity& trade) override;
 
  private:
   int CreateDatabase();
