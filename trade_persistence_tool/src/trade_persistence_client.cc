@@ -34,8 +34,8 @@ bool TradePersistenceClient::PersistTrades() {
     CDCF_LOGGER_DEBUG("buyer_user_id: {}", trade.buyer_user_id());
     CDCF_LOGGER_DEBUG("seller_user_id: {}", trade.seller_user_id());
 
-    auto t = TradeEntity(trade);
-    if (!database->PersistTrade(t)) {
+    auto trade_entity = TradeEntity(trade);
+    if (!database->PersistTrade(trade_entity)) {
       CDCF_LOGGER_ERROR("  Write Database Failed");
       return false;
     }
