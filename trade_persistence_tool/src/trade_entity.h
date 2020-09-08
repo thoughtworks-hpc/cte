@@ -12,8 +12,8 @@
 
 class TradeEntity {
  public:
-  std::string buy_trade_id_;
-  std::string sell_trade_id_;
+  std::string buy_order_id_;
+  std::string sell_order_id_;
   std::string symbol_id_;
   std::string trade_id_;
   std::string price_;

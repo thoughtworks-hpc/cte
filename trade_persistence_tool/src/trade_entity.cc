@@ -14,12 +14,12 @@ TradeEntity::TradeEntity(const match_engine_proto::Trade& trade) {
   trade_id_ = uuid::generate_uuid_v4();
 
   if (trade.trading_side() == ::match_engine_proto::TRADING_BUY) {
-    buy_trade_id_ = std::to_string(trade.taker_id());
-    sell_trade_id_ = std::to_string(trade.maker_id());
+    buy_order_id_ = std::to_string(trade.taker_id());
+    sell_order_id_ = std::to_string(trade.maker_id());
   }
 
   if (trade.trading_side() == ::match_engine_proto::TRADING_SELL) {
-    sell_trade_id_ = std::to_string(trade.taker_id());
-    buy_trade_id_ = std::to_string(trade.maker_id());
+    sell_order_id_ = std::to_string(trade.taker_id());
+    buy_order_id_ = std::to_string(trade.maker_id());
   }
 }

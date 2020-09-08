@@ -13,7 +13,7 @@ int main(int argc, char* argv[]) {
 
   DatabaseWriteInterface* influxdb = new TradePersistInfluxdb(
       config.database_name, config.db_ip, config.db_port, config.db_username,
-      config.db_password);
+      config.db_password, config.database_table_name);
   TradePersistenceClient tradePersistenceClient(influxdb,
                                                 config.order_manager_address);
 

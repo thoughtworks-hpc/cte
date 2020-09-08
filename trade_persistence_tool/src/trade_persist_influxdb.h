@@ -17,15 +17,17 @@ class TradePersistInfluxdb : public DatabaseWriteInterface {
   std::string port_;
   std::string username_;
   std::string password_;
+  std::string database_table_name_;
 
   TradePersistInfluxdb(std::string databaseName, std::string ip,
                        std::string port, std::string username,
-                       std::string password)
+                       std::string password, std::string database_table_name)
       : database_name_(std::move(databaseName)),
         ip_(std::move(ip)),
         port_(std::move(port)),
         username_(std::move(username)),
-        password_(std::move(password)) {
+        password_(std::move(password)),
+        database_table_name_(std::move(database_table_name)) {
     CreateDatabase();
   }
 

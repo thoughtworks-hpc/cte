@@ -24,7 +24,8 @@ bool TradePersistenceClient::PersistTrades() {
       clinet.SubscribeMatchResult(&client_context, google::protobuf::Empty()));
   int count = 0;
   while (reader->Read(&trade)) {
-    CDCF_LOGGER_DEBUG("Receive #{} trade", ++count);
+    CDCF_LOGGER_INFO("Receive #{} trade", ++count);
+    CDCF_LOGGER_DEBUG("#{} trade info:", count);
     CDCF_LOGGER_DEBUG("symbol_id: {}", trade.symbol_id());
     CDCF_LOGGER_DEBUG("maker_id: {}", trade.maker_id());
     CDCF_LOGGER_DEBUG("taker_id: {}", trade.taker_id());
@@ -38,9 +39,11 @@ bool TradePersistenceClient::PersistTrades() {
     if (!database->PersistTrade(trade_entity)) {
       CDCF_LOGGER_ERROR("  Write Database Failed");
       return false;
+    } else {
+      CDCF_LOGGER_INFO("Write #{} trade to db success", count);
     }
   }
-  CDCF_LOGGER_INFO("  Write Database succeed");
+  CDCF_LOGGER_INFO("GRPC Reader finished");
   ::grpc::Status status = reader->Finish();
   return true;
 }
