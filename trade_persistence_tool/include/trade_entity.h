@@ -8,7 +8,7 @@
 #include <string>
 
 #include "../../common/protobuf_gen/match_engine.pb.h"
-#include "./uuid.h"
+#include "uuid.h"
 
 class TradeEntity {
  public:

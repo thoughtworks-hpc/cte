@@ -9,7 +9,7 @@
 
 class DatabaseQueryInterface {
  public:
-  virtual std::string GetOrders(std::string ip, std::string port) = 0;
+  virtual std::string GetOrders() = 0;
 };
 
 #endif  // REQUEST_GENERATOR_SRC_DATABASE_INTERFACE_H_

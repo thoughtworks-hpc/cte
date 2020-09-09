@@ -2,7 +2,7 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
-#include "src/trade_persistence_client.h"
+#include "include/trade_persistence_client.h"
 
 #include <cdcf/logger.h>
 #include <grpcpp/create_channel.h>

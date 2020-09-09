@@ -10,43 +10,23 @@
 #include <iostream>
 #include <queue>
 
-#include "../../common/include/influxdb.hpp"
 #include "../../common/include/json.hpp"
 #include "../../common/protobuf_gen/order_manager.grpc.pb.h"
 #include "../../common/protobuf_gen/order_manager.pb.h"
-#include "./config_manager.h"
-#include "Influxdb_reader.h"
-#include "src/config.h"
-#include "src/generator.h"
+#include "include/Influxdb_reader.h"
+#include "include/config.h"
+#include "include/generator.h"
 
 int main(int argc, char *argv[]) {
-  //  char **config_file_path = new char *[2] { INI_FILE_PARAMETER };
-  //  request_generator::Config config(config_file_path[0]);
-  request_generator::Config config("request_generator_config.json");
-  int num_of_threads = config.default_num_of_threads_;
-  int num_of_requests = config.default_num_of_requests_;
-  std::string db_host_address = config.default_db_host_address_;
-  std::string db_port = config.default_db_port_;
-  std::vector<ip_address> grcp_ip_address = config.grcp_ip_address_;
+  request_generator::Config config(argc, argv);
 
-  int option;
-  std::queue<order_manager_proto::Order> orders;
-  while ((option = getopt(argc, argv, "t:n:")) != -1) {
-    switch (option) {
-      case 't':
-        num_of_threads = std::stoi(optarg);
-        break;
-      case 'n':
-        num_of_requests = std::stoi(optarg);
-        break;
-      case '?':
-        printf("Unknown option:  %c\n", static_cast<char>(optopt));
-        exit(1);
-    }
-  }
+  influxdb_cpp::server_info si(
+      config.database_ip_, std::stoi(config.database_port_),
+      config.database_name_, config.database_user_name_,
+      config.database_password_);
+  auto database = new InfluxdbReader(si);
+  Generator generator(config.num_of_threads_, config.num_of_requests_,
+                      config.grcp_ip_address_, database);
 
-  auto database = new Influxdb_reader();
-  Generator generator(num_of_threads, num_of_requests, grcp_ip_address,
-                      db_host_address, db_port, database);
   generator.Start();
 }

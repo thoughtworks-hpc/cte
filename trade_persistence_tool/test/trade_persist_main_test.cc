@@ -4,8 +4,8 @@
 
 #include <gmock/gmock.h>
 
-#include "src/config.h"
-#include "src/trade_persistence_client.h"
+#include "include/config.h"
+#include "include/trade_persistence_client.h"
 
 using testing::Eq;
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
-#include "src/trade_entity.h"
+#include "include/trade_entity.h"
 
 TradeEntity::TradeEntity(const match_engine_proto::Trade& trade) {
   buy_user_id_ = std::to_string(trade.buyer_user_id());

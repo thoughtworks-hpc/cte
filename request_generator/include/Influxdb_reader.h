@@ -4,13 +4,19 @@
 
 #ifndef REQUEST_GENERATOR_SRC_INFLUXDB_READER_H_
 #define REQUEST_GENERATOR_SRC_INFLUXDB_READER_H_
+#include <iostream>
 #include <string>
 
+#include "../../common/include/influxdb.hpp"
 #include "./database_interface.h"
 
-class Influxdb_reader : public DatabaseQueryInterface {
+class InfluxdbReader : public DatabaseQueryInterface {
  public:
-  std::string GetOrders(std::string ip, std::string port) override;
+  influxdb_cpp::server_info& si_;
+
+  explicit InfluxdbReader(influxdb_cpp::server_info& si) : si_(si) {}
+
+  std::string GetOrders() override;
 };
 
 #endif  //  REQUEST_GENERATOR_SRC_INFLUXDB_READER_H_

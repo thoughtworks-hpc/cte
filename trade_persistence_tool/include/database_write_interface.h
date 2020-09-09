@@ -8,7 +8,7 @@
 #include <string>
 
 #include "../../common/protobuf_gen/match_engine.pb.h"
-#include "./trade_entity.h"
+#include "trade_entity.h"
 
 class DatabaseWriteInterface {
  public:

@@ -2,7 +2,7 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
-#include "src/trade_persist_influxdb.h"
+#include "include/trade_persist_influxdb.h"
 
 #include <cdcf/logger.h>
 
