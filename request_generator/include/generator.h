@@ -2,8 +2,8 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
-#ifndef REQUEST_GENERATOR_SRC_GENERATOR_H_
-#define REQUEST_GENERATOR_SRC_GENERATOR_H_
+#ifndef REQUEST_GENERATOR_INCLUDE_GENERATOR_H_
+#define REQUEST_GENERATOR_INCLUDE_GENERATOR_H_
 #include <grpcpp/channel_impl.h>
 
 #include <memory>
@@ -60,4 +60,4 @@ class Generator {
                           std::vector<ip_address> grpc_servers);
 };
 
-#endif  // REQUEST_GENERATOR_SRC_GENERATOR_H_
+#endif  // REQUEST_GENERATOR_INCLUDE_GENERATOR_H_

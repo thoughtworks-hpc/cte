@@ -2,8 +2,8 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
-#ifndef REQUEST_GENERATOR_SRC_INFLUXDB_READER_H_
-#define REQUEST_GENERATOR_SRC_INFLUXDB_READER_H_
+#ifndef REQUEST_GENERATOR_INCLUDE_INFLUXDB_READER_H_
+#define REQUEST_GENERATOR_INCLUDE_INFLUXDB_READER_H_
 #include <iostream>
 #include <string>
 
@@ -19,4 +19,4 @@ class InfluxdbReader : public DatabaseQueryInterface {
   std::string GetOrders() override;
 };
 
-#endif  //  REQUEST_GENERATOR_SRC_INFLUXDB_READER_H_
+#endif  //  REQUEST_GENERATOR_INCLUDE_INFLUXDB_READER_H_

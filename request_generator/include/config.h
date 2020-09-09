@@ -2,8 +2,8 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
-#ifndef REQUEST_GENERATOR_SRC_CONFIG_H_
-#define REQUEST_GENERATOR_SRC_CONFIG_H_
+#ifndef REQUEST_GENERATOR_INCLUDE_CONFIG_H_
+#define REQUEST_GENERATOR_INCLUDE_CONFIG_H_
 
 /*
  * Copyright (c) 2020 ThoughtWorks Inc.
@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-#include "generator.h"
+#include "./generator.h"
 
 namespace request_generator {
 class Config {
@@ -31,4 +31,4 @@ class Config {
 };
 }  // namespace request_generator
 
-#endif  // REQUEST_GENERATOR_SRC_CONFIG_H_
+#endif  // REQUEST_GENERATOR_INCLUDE_CONFIG_H_

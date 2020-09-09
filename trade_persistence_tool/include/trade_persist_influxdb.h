@@ -2,8 +2,8 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
-#ifndef TRADE_PERSISTENCE_TOOL_SRC_TRADE_PERSIST_INFLUXDB_H_
-#define TRADE_PERSISTENCE_TOOL_SRC_TRADE_PERSIST_INFLUXDB_H_
+#ifndef TRADE_PERSISTENCE_TOOL_INCLUDE_TRADE_PERSIST_INFLUXDB_H_
+#define TRADE_PERSISTENCE_TOOL_INCLUDE_TRADE_PERSIST_INFLUXDB_H_
 
 #include <string>
 #include <utility>
@@ -37,4 +37,4 @@ class TradePersistInfluxdb : public DatabaseWriteInterface {
   int CreateDatabase();
 };
 
-#endif  // TRADE_PERSISTENCE_TOOL_SRC_TRADE_PERSIST_INFLUXDB_H_
+#endif  // TRADE_PERSISTENCE_TOOL_INCLUDE_TRADE_PERSIST_INFLUXDB_H_
