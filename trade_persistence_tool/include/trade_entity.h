@@ -2,8 +2,8 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
-#ifndef TRADE_PERSISTENCE_TOOL_SRC_TRADE_ENTITY_H_
-#define TRADE_PERSISTENCE_TOOL_SRC_TRADE_ENTITY_H_
+#ifndef TRADE_PERSISTENCE_TOOL_INCLUDE_TRADE_ENTITY_H_
+#define TRADE_PERSISTENCE_TOOL_INCLUDE_TRADE_ENTITY_H_
 
 #include <string>
 
@@ -24,4 +24,4 @@ class TradeEntity {
   explicit TradeEntity(const match_engine_proto::Trade& trade);
 };
 
-#endif  // TRADE_PERSISTENCE_TOOL_SRC_TRADE_ENTITY_H_
+#endif  // TRADE_PERSISTENCE_TOOL_INCLUDE_TRADE_ENTITY_H_

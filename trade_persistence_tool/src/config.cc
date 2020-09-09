@@ -2,7 +2,7 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
-#include "src/config.h"
+#include "include/config.h"
 
 #include <unistd.h>
 

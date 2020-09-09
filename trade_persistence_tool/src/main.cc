@@ -4,9 +4,9 @@
 
 #include <unistd.h>
 
-#include "./config.h"
-#include "./trade_persist_influxdb.h"
-#include "./trade_persistence_client.h"
+#include "include/config.h"
+#include "include/trade_persist_influxdb.h"
+#include "include/trade_persistence_client.h"
 
 int main(int argc, char* argv[]) {
   trade_persistence_tool::Config config(argc, argv);
