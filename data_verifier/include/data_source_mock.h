@@ -5,9 +5,10 @@
 #ifndef CTE_DATA_SOURCE_MOCK_H
 #define CTE_DATA_SOURCE_MOCK_H
 
+#include <bitset>
+#include <mutex>
 #include <string>
 #include <vector>
-#include <bitset>
 
 #include "./data_source.h"
 
@@ -20,6 +21,7 @@ class DataSourceMock : public DataSource {
   bool IfGotAllDataEntries();
  private:
   std::bitset<270> record_;
+  mutable std::mutex record_mutex_;
 };
 
 #endif  // CTE_DATA_SOURCE_MOCK_H
