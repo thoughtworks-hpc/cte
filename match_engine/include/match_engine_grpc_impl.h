@@ -26,6 +26,9 @@ class MatchEngineGRPCImpl final
   grpc::Status SubscribeMatchResult(
       ::grpc::ServerContext *context, const ::google::protobuf::Empty *request,
       ::grpc::ServerWriter<::match_engine_proto::Trade> *writer) override;
+  grpc::Status OpenCloseEngine(::grpc::ServerContext *context,
+                               const ::match_engine_proto::EngineSwitch *status,
+                               ::match_engine_proto::Reply *response) override;
 
   void Run();
   void RunWithWait();
@@ -40,6 +43,7 @@ class MatchEngineGRPCImpl final
   MatchEngineCluster &match_engine_cluster_;
   MatchResultWriteKeepers match_result_writer_keepers{};
   bool is_test_ = false;
+  std::atomic_bool engine_is_open_ = true;
 };
 
 }  // namespace match_engine

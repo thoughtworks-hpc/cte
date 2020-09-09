@@ -2,7 +2,7 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
-#include "src/uuid.h"
+#include "include/uuid.h"
 
 std::string uuid::generate_uuid_v4() {
   std::stringstream ss;

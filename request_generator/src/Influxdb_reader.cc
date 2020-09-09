@@ -2,17 +2,17 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
-#include "Influxdb_reader.h"
+#include "include/Influxdb_reader.h"
 
 #include <iostream>
 #include <string>
+#include <utility>
 
-#include "../../common/include/influxdb.hpp"
-
-std::string Influxdb_reader::GetOrders(std::string ip, std::string port) {
+std::string InfluxdbReader::GetOrders() {
   std::string resp;
-  influxdb_cpp::server_info si(ip, std::stoi(port), "orders", "", "");
-  int ret = influxdb_cpp::query(resp, "select  * from orders", si);
+
+  int ret =
+      influxdb_cpp::query(resp, "select  * from orders order by time", si_);
   if (0 == ret) {
     std::cout << "[INFO] query db success" << std::endl;
   } else {

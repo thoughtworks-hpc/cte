@@ -38,9 +38,29 @@ bool TransformGrpcOrder(const ::match_engine_proto::Order &grpc_order,
   return true;
 }
 
+grpc::Status match_engine::MatchEngineGRPCImpl::OpenCloseEngine(
+    ::grpc::ServerContext *context,
+    const ::match_engine_proto::EngineSwitch *status,
+    ::match_engine_proto::Reply *response) {
+  if (::match_engine_proto::ENGINE_CLOSE == status->engine_status()) {
+    CDCF_LOGGER_INFO("Match Engine switch to close.");
+    this->engine_is_open_ = false;
+  } else if (::match_engine_proto::ENGINE_OPEN == status->engine_status()) {
+    CDCF_LOGGER_INFO("Match Engine switch to open.");
+    this->engine_is_open_ = true;
+  }
+  response->set_status(::match_engine_proto::STATUS_SUCCESS);
+  return ::grpc::Status::OK;
+}
+
 grpc::Status match_engine::MatchEngineGRPCImpl::Match(
     ::grpc::ServerContext *context, const ::match_engine_proto::Order *request,
     ::match_engine_proto::Reply *response) {
+  if (!this->engine_is_open_) {
+    CDCF_LOGGER_INFO("Match Engine is close.");
+    return ::grpc::Status(::grpc::StatusCode::UNAVAILABLE, "Engine is close");
+  }
+
   CDCF_LOGGER_INFO(
       "Receive Match request order, id:{}, symbol id: {}, user id:{}, "
       "price:{}, "
