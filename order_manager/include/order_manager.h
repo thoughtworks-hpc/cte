@@ -16,6 +16,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <chrono>
 
 #include "../../common/protobuf_gen/match_engine.grpc.pb.h"
 #include "../../common/protobuf_gen/order_manager.grpc.pb.h"
@@ -52,6 +53,11 @@ class OrderManagerService final
   std::shared_ptr<OrderStore> order_store_;
 
   std::shared_ptr<MatchEngineStub> match_engine_stub_;
+
+  std::atomic_int send_data_amount_ = 0;
+  std::atomic_int receive_data_amount_;
+  std::chrono::milliseconds latency_;
+
 };
 
 #endif  // ORDER_MANAGER_INCLUDE_ORDER_MANAGER_H_

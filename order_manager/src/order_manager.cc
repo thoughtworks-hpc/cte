@@ -36,14 +36,26 @@ OrderManagerService::OrderManagerService(
 
   std::string message;
   if (match_engine_stub_) {
+    //TODO: 1. 发消息 　3.cte吞
+    send_data_amount_ += 1;
+    auto send_time = std::chrono::system_clock::now();
+    std::cout<<"sendeeeeeeeeeeeee: "<<send_data_amount_<<std::endl;
+
     match_engine_stub_->Match(order, &reply);
     int ret = 0;
+
+    auto receive_time = std::chrono::system_clock::now();
+    latency_ = std::chrono::duration_cast<std::chrono::milliseconds>(receive_time - send_time);
+
     if (reply.status() == match_engine_proto::STATUS_SUCCESS) {
+//      TODO: 1. 收消息
       ret = order_store_->PersistOrder(order, "submitted", 0);
     } else {
       ret = order_store_->PersistOrder(order, "submission error", 0);
     }
     if (0 == ret) {
+      std::cout <<"latency now: "<< (int)latency_.count() << std::endl;
+      std::cout <<std::chrono::system_clock::to_time_t(send_time)<<std::endl;
       std::cout << "submitted and saved order " << order.order_id()
                 << std::endl;
       message = "order submitted";
@@ -78,7 +90,9 @@ void OrderManagerService::HandleMatchResult(
   bool if_order_exists = false;
   bool if_maker_concluded = false;
   bool if_taker_concluded = false;
-
+//TODO: 3. cte吐
+  receive_data_amount_ += 1;
+  std::cout << "receiveeeeeeeeeeeeee: "<<receive_data_amount_<<std::endl;
   {
     std::lock_guard<std::mutex> lock(mutex_);
 

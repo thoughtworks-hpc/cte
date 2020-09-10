@@ -54,6 +54,7 @@ class Generator {
   std::vector<ip_address> grpc_servers_;
   std::queue<order_manager_proto::Order> orders_;
   std::vector<std::queue<order_manager_proto::Order>> orders_for_thread_;
+  std::unordered_map<int, int> symbol_to_thread_;
 
   bool PrepareOrders();
   static void SendRequest(std::queue<order_manager_proto::Order> orders,
