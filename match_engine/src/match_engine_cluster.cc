@@ -69,8 +69,8 @@ void MatchEngineCluster::Update(const cdcf::cluster::Event& event) {
                         symbol_actor_info_list) {
                   caf::scoped_actor self(system_);
                   for (const auto& symbol_actor_info : symbol_actor_info_list) {
-                    self->send(symbol_id_router_, event.member.host,
-                               symbol_actor_info.symbol_id,
+                    self->send(symbol_id_router_, symbol_actor_info.symbol_id,
+                               event.member.host,
                                symbol_actor_info.symbol_actor);
                   }
                 },
@@ -87,10 +87,12 @@ void MatchEngineCluster::Update(const cdcf::cluster::Event& event) {
             event.member.host, merge_result_port_);
         if (merge_result_actor_ptr) {
           CDCF_LOGGER_ERROR(
-              "Get remote merge result actor failed, remote host{}, remote "
-              "port{}",
+              "Get remote merge result actor failed, remote host:{}, port:{}",
               event.member.host, merge_result_port_);
         } else {
+          CDCF_LOGGER_INFO(
+              "get remote merge result host success. remote host:{}, port:{}",
+              event.member.host, merge_result_port_);
           caf::actor merge_result_actor = *merge_result_actor_ptr;
           self_actor_->send(symbol_id_router_, merge_result_actor);
         }
