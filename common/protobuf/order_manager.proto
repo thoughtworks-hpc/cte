@@ -5,6 +5,8 @@ package order_manager_proto;
 service OrderManager {
     rpc PlaceOrder (Order) returns (Reply) {
     }
+    rpc StartEndManager (ManagerStatus) returns (Reply) {
+    }
 }
 
 enum TradingSide {
@@ -29,4 +31,13 @@ enum ErrorCode {
 message Reply {
     ErrorCode error_code = 1;
     string message = 2;
+}
+
+enum Status {
+    MANAGER_START = 0;
+    MANAGER_END = 1;
+}
+
+message ManagerStatus {
+    Status status = 3;
 }

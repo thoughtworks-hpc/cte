@@ -11,12 +11,12 @@
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
 
+#include <chrono>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <chrono>
 
 #include "../../common/protobuf_gen/match_engine.grpc.pb.h"
 #include "../../common/protobuf_gen/order_manager.grpc.pb.h"
@@ -33,6 +33,10 @@ class OrderManagerService final
   ::grpc::Status PlaceOrder(::grpc::ServerContext* context,
                             const ::order_manager_proto::Order* request,
                             ::order_manager_proto::Reply* response) override;
+  ::grpc::Status StartEndManager(
+      ::grpc::ServerContext* context,
+      const ::order_manager_proto::ManagerStatus* status,
+      ::order_manager_proto::Reply* response) override;
 
  private:
   class OrderStatus {
@@ -45,6 +49,7 @@ class OrderManagerService final
                              match_engine_proto::Order& order);
   void SaveOrderStatus(const match_engine_proto::Order& order);
   void HandleMatchResult(const ::match_engine_proto::Trade& trade);
+  int PrintRecordResult();
 
   std::atomic<int64_t> order_id_;
   mutable std::mutex mutex_;
@@ -54,10 +59,11 @@ class OrderManagerService final
 
   std::shared_ptr<MatchEngineStub> match_engine_stub_;
 
+  std::atomic_bool record_is_start_ = false;
   std::atomic_int send_data_amount_ = 0;
-  std::atomic_int receive_data_amount_;
-  std::chrono::milliseconds latency_;
-
+  std::atomic_int receive_data_amount_ = 0;
+  std::chrono::milliseconds latency_ = std::chrono::milliseconds(0);
+  //  std::chrono::time_point;
 };
 
 #endif  // ORDER_MANAGER_INCLUDE_ORDER_MANAGER_H_
