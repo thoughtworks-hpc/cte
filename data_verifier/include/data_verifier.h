@@ -2,8 +2,10 @@
  * Copyright (c) 2019-2020 ThoughtWorks Inc.
  */
 
-#ifndef CTE_DATA_VERIFIER_H
-#define CTE_DATA_VERIFIER_H
+#ifndef DATA_VERIFIER_INCLUDE_DATA_VERIFIER_H_
+#define DATA_VERIFIER_INCLUDE_DATA_VERIFIER_H_
+
+#include <memory>
 
 #include "./data_source.h"
 
@@ -16,9 +18,8 @@ class DataVerifier {
   bool VerifyEquality();
 
  private:
-
   std::shared_ptr<DataSource> data_source_a_;
   std::shared_ptr<DataSource> data_source_b_;
 };
 
-#endif  // CTE_DATA_VERIFIER_H
+#endif  // DATA_VERIFIER_INCLUDE_DATA_VERIFIER_H_

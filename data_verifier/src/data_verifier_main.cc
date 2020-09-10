@@ -5,7 +5,7 @@
 #include <fstream>
 #include <iostream>
 
-//#include "../../common/include/influxdb.hpp"
+// #include "../../common/include/influxdb.hpp"
 #include "../../common/include/json.hpp"
 #include "../include/data_source_influxdb.h"
 #include "../include/data_verifier.h"
@@ -52,7 +52,8 @@ int main(int argc, char* argv[]) {
     std::ifstream in(argv[1]);
     in >> config;
   } else {
-    std::cout << "Usage: data_verifier [data_verifier_config.json]" << std::endl;
+    std::cout << "Usage: data_verifier [data_verifier_config.json]"
+              << std::endl;
     return 1;
   }
 

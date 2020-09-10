@@ -2,9 +2,10 @@
  * Copyright (c) 2019-2020 ThoughtWorks Inc.
  */
 
+#include "../include/data_verifier.h"
+
 #include <gtest/gtest.h>
 
-#include "../include/data_verifier.h"
 #include "../include/data_source_influxdb.h"
 #include "../include/data_source_mock.h"
 
@@ -35,7 +36,8 @@ using nlohmann::json;
 //  }
 //}
 
-TEST(DataVerifier, should_retrieve_all_data_from_data_source_when_verify_equality) {
+TEST(DataVerifier,
+     should_retrieve_all_data_from_data_source_when_verify_equality) {
   auto data_source_a = std::make_shared<DataSourceMock>();
   auto data_source_b = std::make_shared<DataSourceMock>();
 

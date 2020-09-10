@@ -2,8 +2,8 @@
  * Copyright (c) 2019-2020 ThoughtWorks Inc.
  */
 
-#ifndef CTE_DATA_SOURCE_MOCK_H
-#define CTE_DATA_SOURCE_MOCK_H
+#ifndef DATA_VERIFIER_INCLUDE_DATA_SOURCE_MOCK_H_
+#define DATA_VERIFIER_INCLUDE_DATA_SOURCE_MOCK_H_
 
 #include <bitset>
 #include <mutex>
@@ -19,9 +19,10 @@ class DataSourceMock : public DataSource {
   std::function<bool(const std::string& source, const std::string& target)>
   GetCompareFunction() override;
   bool IfGotAllDataEntries();
+
  private:
   std::bitset<270> record_;
   mutable std::mutex record_mutex_;
 };
 
-#endif  // CTE_DATA_SOURCE_MOCK_H
+#endif  // DATA_VERIFIER_INCLUDE_DATA_SOURCE_MOCK_H_

@@ -2,9 +2,10 @@
  * Copyright (c) 2019-2020 ThoughtWorks Inc.
  */
 
-#ifndef CTE_DATA_SOURCE_H
-#define CTE_DATA_SOURCE_H
+#ifndef DATA_VERIFIER_INCLUDE_DATA_SOURCE_H_
+#define DATA_VERIFIER_INCLUDE_DATA_SOURCE_H_
 
+#include <functional>
 #include <string>
 
 class DataSource {
@@ -16,4 +17,5 @@ class DataSource {
   GetCompareFunction() = 0;
 };
 
-#endif  // CTE_DATA_SOURCE_H
+#endif  // DATA_VERIFIER_INCLUDE_DATA_SOURCE_H_
+
