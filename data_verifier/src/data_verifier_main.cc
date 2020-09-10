@@ -2,10 +2,11 @@
  * Copyright (c) 2019-2020 ThoughtWorks Inc.
  */
 
+#include <cdcf/logger.h>
+
 #include <fstream>
 #include <iostream>
 
-// #include "../../common/include/influxdb.hpp"
 #include "../../common/include/json.hpp"
 #include "../include/data_source_influxdb.h"
 #include "../include/data_verifier.h"
@@ -57,6 +58,11 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
+  cdcf::CDCFConfig cdcf_config;
+  cdcf_config.log_level_ = "info";
+  cdcf_config.log_file_ = "/tmp/data_verifier.log";
+  cdcf::Logger::Init(cdcf_config);
+
   influxdb_cpp::server_info server_info_a("127.0.0.1", 8086);
   influxdb_cpp::server_info server_info_b("127.0.0.1", 8086);
   std::string measurement_a;
@@ -76,10 +82,8 @@ int main(int argc, char* argv[]) {
   DataVerifier data_verifier(data_source_a, data_source_b);
 
   if (data_verifier.VerifyEquality()) {
-    std::cout << "trade data matches between 2 data sources"
-              << data_verifier.VerifyEquality() << std::endl;
+    CDCF_LOGGER_INFO("trade data matches between 2 data sources");
   } else {
-    std::cout << "trade data doesn't match between 2 data sources"
-              << data_verifier.VerifyEquality() << std::endl;
+    CDCF_LOGGER_INFO("trade data doesn't match between 2 data sources");
   }
 }

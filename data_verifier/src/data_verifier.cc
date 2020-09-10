@@ -1,8 +1,9 @@
 /*
  * Copyright (c) 2019-2020 ThoughtWorks Inc.
  */
-
 #include "../include/data_verifier.h"
+
+#include <cdcf/logger.h>
 
 #include <iostream>
 #include <thread>
@@ -15,6 +16,8 @@ bool DataVerifier::VerifyEquality() {
   int data_source_b_number = data_source_b_->GetDataEntryNumber();
 
   if (data_source_a_number != data_source_b_number) {
+    CDCF_LOGGER_INFO("trade data entry number inconsistent between {} and {}",
+                     data_source_a_number, data_source_b_number);
     return false;
   }
 

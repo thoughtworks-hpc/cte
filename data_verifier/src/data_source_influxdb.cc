@@ -1,8 +1,9 @@
 /*
  * Copyright (c) 2019-2020 ThoughtWorks Inc.
  */
-
 #include "../include/data_source_influxdb.h"
+
+#include <cdcf/logger.h>
 
 #include <iostream>
 
@@ -15,9 +16,9 @@ int DataSourceInfluxDB::GetDataEntryNumber() {
   std::string sql = BuildGetDataEntryNumberQuery();
   ret = influxdb_cpp::query(data, sql, si_);
   if (0 == ret) {
-    std::cout << "query db success" << std::endl;
+    CDCF_LOGGER_DEBUG("query db success");
   } else {
-    std::cout << "query db failed ret:" << ret << std::endl;
+    CDCF_LOGGER_ERROR("query db failed ret: {}", ret);
   }
 
   int count = 0;
@@ -29,7 +30,7 @@ int DataSourceInfluxDB::GetDataEntryNumber() {
     json j_values = j_series["values"].get<json>();
     count = j_values[0][1].get<int>();
   } catch (const std::exception& e) {
-    std::cout << "get data entry number error: " << e.what() << std::endl;
+    CDCF_LOGGER_ERROR("get data entry number error:  {}", e.what());
     count = 0;
   }
 
@@ -43,9 +44,9 @@ void DataSourceInfluxDB::GetDataEntries(int limit, int offset,
   std::string sql = BuildGetDataEntriesQuery(limit, offset);
   ret = influxdb_cpp::query(data, sql, si_);
   if (0 == ret) {
-    std::cout << "query db success" << std::endl;
+    CDCF_LOGGER_DEBUG("query db success");
   } else {
-    std::cout << "query db failed ret:" << ret << std::endl;
+    CDCF_LOGGER_ERROR("query db failed ret: {}", ret);
   }
 }
 
@@ -65,7 +66,7 @@ std::string DataSourceInfluxDB::BuildGetDataEntriesQuery(int limit,
   sql += " limit " + std::to_string(limit);
   sql += " offset " + std::to_string(offset);
 
-  std::cout << "sql: " << sql << std::endl;
+  CDCF_LOGGER_DEBUG("BuildGetDataEntriesQuery SQL: {}", sql);
   return sql;
 }
 
@@ -75,7 +76,7 @@ std::string DataSourceInfluxDB::BuildGetDataEntryNumberQuery() {
   sql += measurement_;
   sql += "\"";
 
-  std::cout << "sql: " << sql << std::endl;
+  CDCF_LOGGER_DEBUG("BuildGetDataEntryNumberQuery SQL: {}", sql);
   return sql;
 }
 
@@ -117,7 +118,7 @@ bool DataSourceInfluxDB::Algorithm::CompareTradeJsonElement(
       return false;
     }
   } catch (const std::exception& e) {
-    std::cout << "compare trade json element error: " << e.what() << std::endl;
+    CDCF_LOGGER_ERROR("compare trade json element error:  {}", e.what());
     return false;
   }
   return true;
@@ -131,7 +132,7 @@ int DataSourceInfluxDB::Algorithm::ExtractValuesJsonArray(
     json j_series = j_results["series"].get<json>()[0];
     values_array = j_series["values"].get<json>();
   } catch (const std::exception& e) {
-    std::cout << "extract values json array error: " << e.what() << std::endl;
+    CDCF_LOGGER_ERROR("extract values json array error:  {}", e.what());
     return 1;
   }
 
@@ -163,6 +164,9 @@ bool DataSourceInfluxDB::Algorithm::CompareTradeJson(
     json j_trade_element_target = j_target_values[i].get<json>();
     if (!CompareTradeJsonElement(j_trade_element_source,
                                  j_trade_element_target)) {
+      CDCF_LOGGER_INFO("trade inconsistent between {} and {}",
+                       j_trade_element_source.dump(),
+                       j_trade_element_target.dump());
       return false;
     }
   }
