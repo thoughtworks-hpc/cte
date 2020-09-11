@@ -13,6 +13,7 @@
 #include <thread>
 #include <utility>
 #include <vector>
+#include <algorithm>
 
 #include "../../common/protobuf_gen/order_manager.grpc.pb.h"
 #include "../../common/protobuf_gen/order_manager.pb.h"

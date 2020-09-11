@@ -14,9 +14,11 @@
 #include <chrono>
 #include <memory>
 #include <mutex>
+#include <shared_mutex>
 #include <string>
 #include <unordered_map>
 #include <vector>
+
 
 #include "../../common/protobuf_gen/match_engine.grpc.pb.h"
 #include "../../common/protobuf_gen/order_manager.grpc.pb.h"
@@ -38,6 +40,7 @@ class OrderManagerService final
       const ::order_manager_proto::ManagerStatus* status,
       ::order_manager_proto::Reply* response) override;
 
+  void RecordTracker(int& time_interval_in_minute);
  private:
   class OrderStatus {
    public:
@@ -62,7 +65,15 @@ class OrderManagerService final
   std::atomic_bool record_is_start_ = false;
   std::atomic_int send_data_amount_ = 0;
   std::atomic_int receive_data_amount_ = 0;
-  std::chrono::milliseconds latency_ = std::chrono::milliseconds(0);
+  std::atomic_int latency_sum_ = 0;
+  std::atomic_int latency_max_ = 0;
+  std::atomic_int latency_min_ = 100000;
+//  std::chrono::milliseconds latency_sum_ = std::chrono::milliseconds(0);
+//  std::chrono::milliseconds latency_max_ = std::chrono::milliseconds(0);
+//  std::chrono::milliseconds latency_min_ = std::chrono::milliseconds(100000000);
+  mutable std::shared_mutex latency_mutex_;
+  std::vector<int> send_data_list_;
+  std::vector<int> receive_data_list_;
   //  std::chrono::time_point;
 };
 

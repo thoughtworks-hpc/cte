@@ -4,12 +4,11 @@
 
 #include "../include/order_manager.h"
 
-#include <cdcf/logger.h>
-
 #include <thread>
 #include <utility>
 
 #include "../../common/include/influxdb.hpp"
+#include "cdcf/logger.h"
 
 OrderManagerService::OrderManagerService(
     std::shared_ptr<OrderStore> order_store,
@@ -25,18 +24,65 @@ OrderManagerService::OrderManagerService(
   }
 }
 
+void OrderManagerService::RecordTracker(int &time_interval_in_minute) {
+  std::thread t([this, time_interval_in_minute] {
+    auto start_time = std::chrono::system_clock::now();
+    send_data_list_.push_back(0);
+    receive_data_list_.push_back(0);
+//    auto time_interval = std::chrono::minutes(time_interval_in_minute);
+    auto time_interval = std::chrono::seconds(time_interval_in_minute * 5);
+    while (record_is_start_) {
+      auto time_now = std::chrono::system_clock::now();
+      if (time_now - start_time > time_interval) {
+        std::cout <<"aaaaaaaaaaaaaaa"<<std::endl;
+
+        auto send_data_now = send_data_amount_ - send_data_list_.back();
+        auto receive_data_now = receive_data_amount_ - receive_data_list_.back();
+        send_data_list_.push_back(send_data_now);
+        receive_data_list_.push_back(receive_data_now);
+        CDCF_LOGGER_INFO("Send {} data in {} minute", send_data_now,
+                         time_interval_in_minute);
+        CDCF_LOGGER_INFO("Receive {} data in {} minute", receive_data_now,
+                         time_interval_in_minute);
+        if (send_data_amount_ != 0){
+          CDCF_LOGGER_INFO("Latency average: {} milliseconds",
+                           latency_sum_ / send_data_amount_);
+          CDCF_LOGGER_INFO("Latency max: {} milliseconds", latency_max_);
+          CDCF_LOGGER_INFO("Latency min: {} milliseconds", latency_min_);
+        }
+        start_time = time_now;
+      }
+    }
+  });
+  t.detach();
+}
+
 ::grpc::Status OrderManagerService::StartEndManager(
     ::grpc::ServerContext *context,
     const ::order_manager_proto::ManagerStatus *status,
     ::order_manager_proto::Reply *response) {
   if (::order_manager_proto::MANAGER_START == status->status()) {
     CDCF_LOGGER_INFO("Order manger record is open.");
-    record_is_start_ = true;
+    if (!record_is_start_) {
+      record_is_start_ = true;
+      int time_temp = 1;
+      RecordTracker(time_temp);
+    }
+    else{
+      CDCF_LOGGER_INFO("Order manger record is already open.");
+    }
   } else if (::order_manager_proto::MANAGER_END == status->status()) {
     CDCF_LOGGER_INFO("Order manger record is close.");
-    order_id_to_order_status_.clear();
-    record_is_start_ = false;
-    PrintRecordResult();
+    if (record_is_start_){
+      PrintRecordResult();
+      record_is_start_ = false;
+      order_id_to_order_status_.clear();
+      send_data_amount_ = 0;
+      receive_data_amount_ = 0;
+    }
+    else{
+      CDCF_LOGGER_INFO("Order manger record is already close.");
+    }
   }
 
   response->set_error_code(order_manager_proto::SUCCESS);
@@ -45,18 +91,21 @@ OrderManagerService::OrderManagerService(
 
 int OrderManagerService::PrintRecordResult() {
   if (!record_is_start_) {
-    std::cout << "Record is empty without start!" << std::endl;
     CDCF_LOGGER_INFO("Record is empty without start!");
     return 1;
   }
   std::ofstream outfile;
   outfile.open("Performance_testing.csv");
   outfile << "This is the first cell in the first column.\n";
-  outfile << "Manager send: " << send_data_amount_ << std::endl;
-  outfile << "Manager receive: " << receive_data_amount_ << std::endl;
-  outfile << "c,s,v,\n";
-  outfile << "1,2,3.456\n";
-  outfile << "semi;colon";
+  outfile << "Manager send," << send_data_amount_ << std::endl;
+  outfile << "Manager receive," << receive_data_amount_ << std::endl;
+  if (send_data_amount_ != 0 ){
+    outfile << "Latency average," << latency_sum_ / send_data_amount_
+            << std::endl;
+    outfile << "Latency max," << latency_max_ << std::endl;
+    outfile << "Latency min," << latency_min_ << std::endl;
+  }
+
   outfile.close();
 
   return 0;
@@ -76,30 +125,35 @@ int OrderManagerService::PrintRecordResult() {
   std::string message;
   if (match_engine_stub_) {
     // TODO: 1. 发消息 　3.cte吞
-    send_data_amount_ += 1;
-    auto send_time = std::chrono::system_clock::now();
-    std::cout << "send data amount: " << send_data_amount_ << std::endl;
-
+    std::chrono::system_clock::time_point send_time;
+    if (record_is_start_){
+      send_data_amount_ += 1;
+      send_time = std::chrono::system_clock::now();
+      std::cout << "send data amount: " << send_data_amount_ << std::endl;
+    }
     match_engine_stub_->Match(order, &reply);
-    int ret = 0;
+    if (record_is_start_){
+      auto receive_time = std::chrono::system_clock::now();
+//      std::unique_lock lock(latency_mutex_);
+      auto latency = std::chrono::duration_cast<std::chrono::milliseconds>(
+          receive_time - send_time);
+      latency_sum_ += latency.count();
+      if (latency.count() < latency_min_){
+        latency_min_ = latency.count();
+      }
+      if (latency.count() > latency_max_){
+        latency_max_ = latency.count();
+      }
+    }
 
-    auto receive_time = std::chrono::system_clock::now();
-    latency_ = std::chrono::duration_cast<std::chrono::milliseconds>(
-        receive_time - send_time);
+    int ret;
 
     if (reply.status() == match_engine_proto::STATUS_SUCCESS) {
-      //      TODO: 1. 收消息
-      std::cout << "latency nowaaaaa: " << (int)latency_.count() << std::endl;
       ret = order_store_->PersistOrder(order, "submitted", 0);
     } else {
-      std::cout << "latency now?????: " << (int)latency_.count() << std::endl;
       ret = order_store_->PersistOrder(order, "submission error", 0);
     }
     if (0 == ret) {
-      std::cout << "latency now: " << (int)latency_.count() << std::endl;
-      //      std::cout
-      //      <<std::chrono::system_clock::to_time_t(send_time)<<std::endl;
-
       std::cout << "submitted and saved order " << order.order_id()
                 << std::endl;
       message = "order submitted";
@@ -134,9 +188,10 @@ void OrderManagerService::HandleMatchResult(
   bool if_order_exists = false;
   bool if_maker_concluded = false;
   bool if_taker_concluded = false;
-  // TODO: 3. cte吐
-  receive_data_amount_ += 1;
-  std::cout << "receiveeeeeeeeeeeeee: " << receive_data_amount_ << std::endl;
+  if (record_is_start_){
+    receive_data_amount_ += 1;
+    std::cout << "receiveeeeeeeeeeeeee: " << receive_data_amount_ << std::endl;
+  }
   {
     std::lock_guard<std::mutex> lock(mutex_);
 
