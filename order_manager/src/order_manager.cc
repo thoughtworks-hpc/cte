@@ -4,11 +4,9 @@
 
 #include "../include/order_manager.h"
 
-#include <thread>
 #include <utility>
 
 #include "../../common/include/influxdb.hpp"
-#include "cdcf/logger.h"
 
 OrderManagerService::OrderManagerService(
     std::shared_ptr<OrderStore> order_store,
@@ -29,22 +27,27 @@ void OrderManagerService::RecordTracker(int &time_interval_in_minute) {
     auto start_time = std::chrono::system_clock::now();
     send_data_list_.push_back(0);
     receive_data_list_.push_back(0);
-//    auto time_interval = std::chrono::minutes(time_interval_in_minute);
-    auto time_interval = std::chrono::seconds(time_interval_in_minute * 5);
+    //    auto time_interval = std::chrono::minutes(time_interval_in_minute);
+    auto time_interval = std::chrono::seconds(time_interval_in_minute * 10);
+    auto send_data_amount_before = 0;
+    auto receive_data_amount_before = 0;
     while (record_is_start_) {
       auto time_now = std::chrono::system_clock::now();
       if (time_now - start_time > time_interval) {
-        std::cout <<"aaaaaaaaaaaaaaa"<<std::endl;
-
-        auto send_data_now = send_data_amount_ - send_data_list_.back();
-        auto receive_data_now = receive_data_amount_ - receive_data_list_.back();
+        std::cout << "aaaaaaaaaaaaaaa" << std::endl;
+        CDCF_LOGGER_INFO("In {} minute:", time_interval_in_minute);
+        auto send_data_now = send_data_amount_ - send_data_amount_before;
+        auto receive_data_now =
+            receive_data_amount_ - receive_data_amount_before;
+        send_data_amount_before += send_data_now;
+        receive_data_amount_before += receive_data_now;
         send_data_list_.push_back(send_data_now);
         receive_data_list_.push_back(receive_data_now);
-        CDCF_LOGGER_INFO("Send {} data in {} minute", send_data_now,
+        CDCF_LOGGER_INFO("Send data amount: {}", send_data_now,
                          time_interval_in_minute);
-        CDCF_LOGGER_INFO("Receive {} data in {} minute", receive_data_now,
+        CDCF_LOGGER_INFO("Receive data amount: {}", receive_data_now,
                          time_interval_in_minute);
-        if (send_data_amount_ != 0){
+        if (send_data_amount_ != 0) {
           CDCF_LOGGER_INFO("Latency average: {} milliseconds",
                            latency_sum_ / send_data_amount_);
           CDCF_LOGGER_INFO("Latency max: {} milliseconds", latency_max_);
@@ -65,22 +68,19 @@ void OrderManagerService::RecordTracker(int &time_interval_in_minute) {
     CDCF_LOGGER_INFO("Order manger record is open.");
     if (!record_is_start_) {
       record_is_start_ = true;
-      int time_temp = 1;
-      RecordTracker(time_temp);
-    }
-    else{
+      RecordTracker(record_time_interval_);
+    } else {
       CDCF_LOGGER_INFO("Order manger record is already open.");
     }
   } else if (::order_manager_proto::MANAGER_END == status->status()) {
     CDCF_LOGGER_INFO("Order manger record is close.");
-    if (record_is_start_){
+    if (record_is_start_) {
       PrintRecordResult();
+      // TODO：更多记录的重置
       record_is_start_ = false;
-      order_id_to_order_status_.clear();
       send_data_amount_ = 0;
       receive_data_amount_ = 0;
-    }
-    else{
+    } else {
       CDCF_LOGGER_INFO("Order manger record is already close.");
     }
   }
@@ -96,16 +96,22 @@ int OrderManagerService::PrintRecordResult() {
   }
   std::ofstream outfile;
   outfile.open("Performance_testing.csv");
-  outfile << "This is the first cell in the first column.\n";
+  outfile << "This is the total performance:" << std::endl;
   outfile << "Manager send," << send_data_amount_ << std::endl;
   outfile << "Manager receive," << receive_data_amount_ << std::endl;
-  if (send_data_amount_ != 0 ){
+  if (send_data_amount_ != 0) {
     outfile << "Latency average," << latency_sum_ / send_data_amount_
             << std::endl;
     outfile << "Latency max," << latency_max_ << std::endl;
     outfile << "Latency min," << latency_min_ << std::endl;
   }
-
+  outfile << " " << std::endl;
+  outfile << "Elapsed time/minute,send amount,receive amount" << std::endl;
+  for (int i = 0; i < send_data_list_.size(); i++) {
+    outfile << i * record_time_interval_ << ",";
+    outfile << send_data_list_[i] << ",";
+    outfile << receive_data_list_[i] << "," << std::endl;
+  }
   outfile.close();
 
   return 0;
@@ -126,22 +132,22 @@ int OrderManagerService::PrintRecordResult() {
   if (match_engine_stub_) {
     // TODO: 1. 发消息 　3.cte吞
     std::chrono::system_clock::time_point send_time;
-    if (record_is_start_){
+    if (record_is_start_) {
       send_data_amount_ += 1;
       send_time = std::chrono::system_clock::now();
       std::cout << "send data amount: " << send_data_amount_ << std::endl;
     }
     match_engine_stub_->Match(order, &reply);
-    if (record_is_start_){
+    if (record_is_start_) {
       auto receive_time = std::chrono::system_clock::now();
-//      std::unique_lock lock(latency_mutex_);
+      //      std::unique_lock lock(latency_mutex_);
       auto latency = std::chrono::duration_cast<std::chrono::milliseconds>(
           receive_time - send_time);
       latency_sum_ += latency.count();
-      if (latency.count() < latency_min_){
+      if (latency.count() < latency_min_) {
         latency_min_ = latency.count();
       }
-      if (latency.count() > latency_max_){
+      if (latency.count() > latency_max_) {
         latency_max_ = latency.count();
       }
     }
@@ -188,9 +194,9 @@ void OrderManagerService::HandleMatchResult(
   bool if_order_exists = false;
   bool if_maker_concluded = false;
   bool if_taker_concluded = false;
-  if (record_is_start_){
+  if (record_is_start_) {
     receive_data_amount_ += 1;
-    std::cout << "receiveeeeeeeeeeeeee: " << receive_data_amount_ << std::endl;
+    std::cout << "receive data amount: " << receive_data_amount_ << std::endl;
   }
   {
     std::lock_guard<std::mutex> lock(mutex_);

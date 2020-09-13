@@ -18,12 +18,13 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-
+#include <thread>
 
 #include "../../common/protobuf_gen/match_engine.grpc.pb.h"
 #include "../../common/protobuf_gen/order_manager.grpc.pb.h"
 #include "./match_engine_stub.h"
 #include "./order_store.h"
+#include "cdcf/logger.h"
 
 class OrderManagerService final
     : public order_manager_proto::OrderManager::Service {
@@ -68,13 +69,9 @@ class OrderManagerService final
   std::atomic_int latency_sum_ = 0;
   std::atomic_int latency_max_ = 0;
   std::atomic_int latency_min_ = 100000;
-//  std::chrono::milliseconds latency_sum_ = std::chrono::milliseconds(0);
-//  std::chrono::milliseconds latency_max_ = std::chrono::milliseconds(0);
-//  std::chrono::milliseconds latency_min_ = std::chrono::milliseconds(100000000);
-  mutable std::shared_mutex latency_mutex_;
   std::vector<int> send_data_list_;
   std::vector<int> receive_data_list_;
-  //  std::chrono::time_point;
+  int record_time_interval_ = 1;
 };
 
 #endif  // ORDER_MANAGER_INCLUDE_ORDER_MANAGER_H_

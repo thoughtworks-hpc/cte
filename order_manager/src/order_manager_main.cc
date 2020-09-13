@@ -61,8 +61,6 @@ void RunServer(const std::string& order_manager_address,
       std::make_shared<MatchEngineStubGrpc>(main_channel, request_channels);
 
   OrderManagerService service(order_store, match_engine_stub);
-//  int temp = 1;
-//  std::thread th(&OrderManagerService::RecordTracker, &service, temp);
 
   ServerBuilder builder;
   builder.AddListeningPort(order_manager_address,

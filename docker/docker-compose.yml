@@ -16,6 +16,8 @@ services:
     image: cte:latest
     networks:
       - cte
+    ports:
+      - 50051:50051
     command: /bin/bash order_to_cte.sh
 
   cte_match_engin_result_host:
