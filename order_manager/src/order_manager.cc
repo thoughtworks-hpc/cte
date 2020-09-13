@@ -94,8 +94,7 @@ int OrderManagerService::PrintRecordResult() {
     CDCF_LOGGER_INFO("Record is empty without start!");
     return 1;
   }
-  std::ofstream outfile;
-  outfile.open("Performance_testing.csv");
+  std::ofstream outfile("performance_testing.csv");
   outfile << "This is the total performance:" << std::endl;
   outfile << "Manager send," << send_data_amount_ << std::endl;
   outfile << "Manager receive," << receive_data_amount_ << std::endl;
@@ -112,7 +111,6 @@ int OrderManagerService::PrintRecordResult() {
     outfile << send_data_list_[i] << ",";
     outfile << receive_data_list_[i] << "," << std::endl;
   }
-  outfile.close();
 
   return 0;
 }
