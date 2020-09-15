@@ -8,7 +8,7 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v2
         with:
-          ref: develop
+          ref: prepare_for_deployment
       - name: Publish Docker
         uses: elgohr/Publish-Docker-Github-Action@2.21
         with:
