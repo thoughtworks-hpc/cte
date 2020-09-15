@@ -9,7 +9,7 @@
         state: present
         pull: yes
         recreate: always
-        definetion:
+        definition:
           version: "2.2"
           services:
             cte_database:
