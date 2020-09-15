@@ -1,0 +1,4 @@
+{
+  "record_time_interval_in_seconds": 10,
+  "latency_average_warning_in_milliseconds": 3
+}

@@ -22,19 +22,18 @@ OrderManagerService::OrderManagerService(
   }
 }
 
-void OrderManagerService::RecordTracker(int &time_interval_in_minute) {
-  std::thread t([this, time_interval_in_minute] {
+void OrderManagerService::RecordTracker(int &time_interval_in_seconds) {
+  std::thread t([this, time_interval_in_seconds] {
     auto start_time = std::chrono::system_clock::now();
     send_data_list_.push_back(0);
     receive_data_list_.push_back(0);
-    //    auto time_interval = std::chrono::minutes(time_interval_in_minute);
-    auto time_interval = std::chrono::seconds(time_interval_in_minute * 10);
+    auto time_interval = std::chrono::seconds (time_interval_in_seconds);
     auto send_data_amount_before = 0;
     auto receive_data_amount_before = 0;
     while (record_is_start_) {
       auto time_now = std::chrono::system_clock::now();
       if (time_now - start_time > time_interval) {
-        CDCF_LOGGER_INFO("In {} minute:", time_interval_in_minute);
+        CDCF_LOGGER_INFO("In {} seconds:", time_interval_in_seconds);
         auto send_data_now = send_data_amount_ - send_data_amount_before;
         auto receive_data_now =
             receive_data_amount_ - receive_data_amount_before;
@@ -43,9 +42,9 @@ void OrderManagerService::RecordTracker(int &time_interval_in_minute) {
         send_data_list_.push_back(send_data_now);
         receive_data_list_.push_back(receive_data_now);
         CDCF_LOGGER_INFO("Send data amount: {}", send_data_now,
-                         time_interval_in_minute);
+                         time_interval_in_seconds);
         CDCF_LOGGER_INFO("Receive data amount: {}", receive_data_now,
-                         time_interval_in_minute);
+                         time_interval_in_seconds);
         if (send_data_amount_ != 0) {
           auto latency_average = latency_sum_ / send_data_amount_;
           CDCF_LOGGER_INFO("Latency average: {} milliseconds", latency_average);
@@ -113,7 +112,7 @@ int OrderManagerService::PrintRecordResult() {
     outfile << "Latency min," << latency_min_ << " milliseconds" << std::endl;
   }
   outfile << " " << std::endl;
-  outfile << "Elapsed time/minute,send amount,receive amount" << std::endl;
+  outfile << "Elapsed time(seconds),send amount,receive amount" << std::endl;
   for (int i = 0; i < send_data_list_.size(); i++) {
     outfile << i * record_time_interval_ << ",";
     outfile << send_data_list_[i] << ",";
@@ -286,4 +285,10 @@ void OrderManagerService::BuildMatchEngineOrder(
   submit_time->set_seconds(nanoseconds_since_epoch / 1000000000);
   submit_time->set_nanos(nanoseconds_since_epoch % 1000000000);
   order.set_allocated_submit_time(submit_time);
+}
+void OrderManagerService::SetRecordTimeInterval(int interval) {
+  record_time_interval_ = interval;
+}
+void OrderManagerService::SetLatencyAverageWarning(int latency_average_warning) {
+  latency_average_warning_ = latency_average_warning;
 }

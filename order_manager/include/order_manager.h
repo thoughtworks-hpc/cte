@@ -41,7 +41,7 @@ class OrderManagerService final
       const ::order_manager_proto::ManagerStatus* status,
       ::order_manager_proto::Reply* response) override;
 
-  void RecordTracker(int& time_interval_in_minute);
+  void RecordTracker(int& time_interval_in_seconds);
  private:
   class OrderStatus {
    public:
@@ -71,8 +71,12 @@ class OrderManagerService final
   std::atomic_int latency_min_ = 100000;
   std::vector<int> send_data_list_;
   std::vector<int> receive_data_list_;
-  int record_time_interval_ = 1;
-  int latency_average_warning_ = 3;
+  int record_time_interval_ = 0;
+  int latency_average_warning_ = 0;
+
+ public:
+  void SetRecordTimeInterval(int interval);
+  void SetLatencyAverageWarning(int latency_average_warning);
 };
 
 #endif  // ORDER_MANAGER_INCLUDE_ORDER_MANAGER_H_

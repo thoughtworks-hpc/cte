@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "../../common/include/cxxopts.hpp"
+#include "../../common/include/json.hpp"
 #include "../include/match_engine_stub_grpc.h"
 #include "../include/order_manager.h"
 #include "../include/order_store_influxdb.h"
@@ -61,6 +62,13 @@ void RunServer(const std::string& order_manager_address,
       std::make_shared<MatchEngineStubGrpc>(main_channel, request_channels);
 
   OrderManagerService service(order_store, match_engine_stub);
+  nlohmann::json record_config;
+  std::ifstream input("order_manager_record_config.json");
+  input >> record_config;
+  service.SetRecordTimeInterval(
+      record_config["record_time_interval_in_minute"]);
+  service.SetLatencyAverageWarning(
+      record_config["latency_average_warning_in_milliseconds"]);
 
   ServerBuilder builder;
   builder.AddListeningPort(order_manager_address,
