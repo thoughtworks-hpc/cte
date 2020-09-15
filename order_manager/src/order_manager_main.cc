@@ -66,7 +66,7 @@ void RunServer(const std::string& order_manager_address,
   std::ifstream input("order_manager_record_config.json");
   input >> record_config;
   service.SetRecordTimeInterval(
-      record_config["record_time_interval_in_minute"]);
+      record_config["record_time_interval_in_seconds"]);
   service.SetLatencyAverageWarning(
       record_config["latency_average_warning_in_milliseconds"]);
 

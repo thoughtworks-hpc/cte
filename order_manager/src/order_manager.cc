@@ -33,7 +33,7 @@ void OrderManagerService::RecordTracker(int &time_interval_in_seconds) {
     while (record_is_start_) {
       auto time_now = std::chrono::system_clock::now();
       if (time_now - start_time > time_interval) {
-        CDCF_LOGGER_INFO("In {} seconds:", time_interval_in_seconds);
+        CDCF_LOGGER_INFO("In last {} seconds:", time_interval_in_seconds);
         auto send_data_now = send_data_amount_ - send_data_amount_before;
         auto receive_data_now =
             receive_data_amount_ - receive_data_amount_before;
@@ -140,7 +140,6 @@ int OrderManagerService::PrintRecordResult() {
     if (record_is_start_) {
       send_data_amount_ += 1;
       send_time = std::chrono::system_clock::now();
-      std::cout << "send data amount: " << send_data_amount_ << std::endl;
     }
 
     match_engine_stub_->Match(order, &reply);
@@ -150,6 +149,7 @@ int OrderManagerService::PrintRecordResult() {
       auto latency = std::chrono::duration_cast<std::chrono::milliseconds>(
           receive_time - send_time);
       latency_sum_ += latency.count();
+      std::cout << "laaatencyyyyyyy: " << latency.count() <<std::endl;
       if (latency.count() < latency_min_) {
         latency_min_ = latency.count();
       }
@@ -203,7 +203,6 @@ void OrderManagerService::HandleMatchResult(
 
   if (record_is_start_) {
     receive_data_amount_ += 1;
-    std::cout << "receive data amount: " << receive_data_amount_ << std::endl;
   }
 
   {
@@ -258,8 +257,8 @@ void OrderManagerService::HandleMatchResult(
     order_store_->PersistOrder(taker_order, taker_status,
                                taker_concluded_amount);
   } else {
-    std::cout << "order in trade doesn't exist for either " << trade.maker_id()
-              << " or " << trade.taker_id() << std::endl;
+//    std::cout << "order in trade doesn't exist for either " << trade.maker_id()
+//              << " or " << trade.taker_id() << std::endl;
   }
 }
 
