@@ -72,6 +72,7 @@ class OrderManagerService final
   std::vector<int> send_data_list_;
   std::vector<int> receive_data_list_;
   int record_time_interval_ = 1;
+  int latency_average_warning_ = 3;
 };
 
 #endif  // ORDER_MANAGER_INCLUDE_ORDER_MANAGER_H_

@@ -34,7 +34,6 @@ void OrderManagerService::RecordTracker(int &time_interval_in_minute) {
     while (record_is_start_) {
       auto time_now = std::chrono::system_clock::now();
       if (time_now - start_time > time_interval) {
-        std::cout << "aaaaaaaaaaaaaaa" << std::endl;
         CDCF_LOGGER_INFO("In {} minute:", time_interval_in_minute);
         auto send_data_now = send_data_amount_ - send_data_amount_before;
         auto receive_data_now =
@@ -48,10 +47,14 @@ void OrderManagerService::RecordTracker(int &time_interval_in_minute) {
         CDCF_LOGGER_INFO("Receive data amount: {}", receive_data_now,
                          time_interval_in_minute);
         if (send_data_amount_ != 0) {
-          CDCF_LOGGER_INFO("Latency average: {} milliseconds",
-                           latency_sum_ / send_data_amount_);
+          auto latency_average = latency_sum_ / send_data_amount_;
+          CDCF_LOGGER_INFO("Latency average: {} milliseconds", latency_average);
           CDCF_LOGGER_INFO("Latency max: {} milliseconds", latency_max_);
           CDCF_LOGGER_INFO("Latency min: {} milliseconds", latency_min_);
+          if (latency_average >= latency_average_warning_) {
+            CDCF_LOGGER_WARN("Latency average is more than {} milliseconds",
+                             latency_average_warning_);
+          }
         }
         start_time = time_now;
       }
@@ -76,10 +79,14 @@ void OrderManagerService::RecordTracker(int &time_interval_in_minute) {
     CDCF_LOGGER_INFO("Order manger record is close.");
     if (record_is_start_) {
       PrintRecordResult();
-      // TODO：更多记录的重置
       record_is_start_ = false;
       send_data_amount_ = 0;
       receive_data_amount_ = 0;
+      latency_sum_ = 0;
+      latency_max_ = 0;
+      latency_min_ = 100000;
+      send_data_list_.clear();
+      receive_data_list_.clear();
     } else {
       CDCF_LOGGER_INFO("Order manger record is already close.");
     }
@@ -99,10 +106,11 @@ int OrderManagerService::PrintRecordResult() {
   outfile << "Manager send," << send_data_amount_ << std::endl;
   outfile << "Manager receive," << receive_data_amount_ << std::endl;
   if (send_data_amount_ != 0) {
-    outfile << "Latency average," << latency_sum_ / send_data_amount_
+    auto latency_average = latency_sum_ / send_data_amount_;
+    outfile << "Latency average," << latency_average << " milliseconds"
             << std::endl;
-    outfile << "Latency max," << latency_max_ << std::endl;
-    outfile << "Latency min," << latency_min_ << std::endl;
+    outfile << "Latency max," << latency_max_ << " milliseconds" << std::endl;
+    outfile << "Latency min," << latency_min_ << " milliseconds" << std::endl;
   }
   outfile << " " << std::endl;
   outfile << "Elapsed time/minute,send amount,receive amount" << std::endl;
@@ -128,14 +136,15 @@ int OrderManagerService::PrintRecordResult() {
 
   std::string message;
   if (match_engine_stub_) {
-    // TODO: 1. 发消息 　3.cte吞
     std::chrono::system_clock::time_point send_time;
     if (record_is_start_) {
       send_data_amount_ += 1;
       send_time = std::chrono::system_clock::now();
       std::cout << "send data amount: " << send_data_amount_ << std::endl;
     }
+
     match_engine_stub_->Match(order, &reply);
+
     if (record_is_start_) {
       auto receive_time = std::chrono::system_clock::now();
       //      std::unique_lock lock(latency_mutex_);
@@ -192,10 +201,12 @@ void OrderManagerService::HandleMatchResult(
   bool if_order_exists = false;
   bool if_maker_concluded = false;
   bool if_taker_concluded = false;
+
   if (record_is_start_) {
     receive_data_amount_ += 1;
     std::cout << "receive data amount: " << receive_data_amount_ << std::endl;
   }
+
   {
     std::lock_guard<std::mutex> lock(mutex_);
 
