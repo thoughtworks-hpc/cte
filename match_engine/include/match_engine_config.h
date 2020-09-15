@@ -112,7 +112,7 @@ class SenderMatchInterface {
   virtual void SendMatchResult(const TradeList& trade_list) = 0;
 };
 
-static const std::string kResultHostRoleName = "merge_result_host";
+static const char kResultHostRoleName[] = "merge_result_host";
 
 class Config : public cdcf::actor_system::Config {
  public:
