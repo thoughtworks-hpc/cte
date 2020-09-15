@@ -24,7 +24,7 @@ COPY influxdb_usa_demo influxdb_usa_demo
 COPY match_engine match_engine
 COPY trade_persistence_tool trade_persistence_tool
 COPY docker docker
-RUN cmake . -DCMAKE_TOOLCHAIN_FILE=conan_paths.cmake -DCMAKE_BUILD_TYPE=Release \
+RUN cmake . -DCMAKE_TOOLCHAIN_FILE=conan_paths.cmake -DCMAKE_BUILD_TYPE=Debug \
     && cmake --build . -j 3 \
     && ctest --output-on-failure
 
@@ -48,7 +48,7 @@ COPY --from=builder /cte/node_keeper /bin/node_keeper
 
 COPY docker/script.sh /bin/script.sh
 COPY docker/request_generator_akka_config.json /bin/request_generator_akka_config.json
-COPY docker/request_generator_cte_config.json /bin/request_generator_cte_config.json
+COPY docker/request_generator_cte_config.json /bin/request_generator_config.json
 COPY docker/order_to_akka.sh /bin/order_to_akka.sh
 COPY docker/order_to_cte.sh /bin/order_to_cte.sh
 COPY docker/request_generator_script.sh /bin/request_generator_script.sh
