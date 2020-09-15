@@ -136,7 +136,8 @@ int OrderManagerService::PrintRecordResult() {
 
   std::string message;
   if (match_engine_stub_) {
-    std::chrono::system_clock::time_point send_time;
+    std::chrono::system_clock::time_point send_time =
+        std::chrono::system_clock::now();
     if (record_is_start_) {
       send_data_amount_ += 1;
       send_time = std::chrono::system_clock::now();
@@ -147,7 +148,6 @@ int OrderManagerService::PrintRecordResult() {
 
     if (record_is_start_) {
       auto receive_time = std::chrono::system_clock::now();
-      //      std::unique_lock lock(latency_mutex_);
       auto latency = std::chrono::duration_cast<std::chrono::milliseconds>(
           receive_time - send_time);
       latency_sum_ += latency.count();
