@@ -7,6 +7,8 @@
 
 #include <cdcf/actor_system.h>
 
+#include <string>
+
 #include <caf/all.hpp>
 
 #include "./match_engine_config.h"
