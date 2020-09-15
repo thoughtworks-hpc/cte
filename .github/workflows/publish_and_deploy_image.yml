@@ -16,3 +16,9 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: latest
+
+      - name: Start containers using new image
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: start_cte_cluster.yml
+          directory: ./deployment/ansible_playbook

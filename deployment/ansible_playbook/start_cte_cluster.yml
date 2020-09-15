@@ -1,0 +1,24 @@
+---
+- name: Run cte cluster container using latest image
+  hosts: database
+  become: true
+  gather_facts: no
+  tasks:
+    - docker_compose:
+        project_name: cte_database
+        state: present
+        pull: yes
+        recreate: always
+        definetion:
+          version: "2.2"
+          services:
+            cte_database:
+              image: highperformancecomputing/cte:latest
+              container_name: cte_database
+              network_mode: host
+              command: /bin/bash cte_database.sh
+              volumes:
+                - /tmp/log:/tmp/log
+    - assert:
+        that:
+          - "cte_database.cte_database.state.running"

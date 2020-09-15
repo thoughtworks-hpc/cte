@@ -53,5 +53,6 @@ COPY docker/order_to_akka.sh /bin/order_to_akka.sh
 COPY docker/order_to_cte.sh /bin/order_to_cte.sh
 COPY docker/request_generator_script.sh /bin/request_generator_script.sh
 COPY docker/trade_reciever_cte.sh /bin/trade_reciever_cte.sh
+COPY docker/cte_database.sh /bin/cte_database.sh
 
 CMD ["/bin/script.sh"]
