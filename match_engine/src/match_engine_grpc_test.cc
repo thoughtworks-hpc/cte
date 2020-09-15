@@ -30,7 +30,8 @@ class MatchEngineGRPCTest : public ::testing::Test {
                match_actor2_);
 
     match_engine_cluster_ptr_ = new match_engine::MatchEngineCluster(
-        system_, k_symbol_router_port, k_match_result_port, router_actor_);
+        system_, k_symbol_router_port, k_match_result_port, router_actor_,
+        "localhost");
 
     match_engine_grpc_ = new match_engine::MatchEngineGRPCImpl(
         k_match_engine_grpc, *match_engine_cluster_ptr_, true);
