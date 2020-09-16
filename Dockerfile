@@ -49,6 +49,7 @@ COPY --from=builder /cte/node_keeper /bin/node_keeper
 COPY docker/script.sh /bin/script.sh
 COPY docker/request_generator_akka_config.json /bin/request_generator_akka_config.json
 COPY docker/request_generator_cte_config.json /bin/request_generator_cte_config.json
+COPY docker/test_env_cte_config.json /bin/test_env_cte_config.json
 COPY docker/order_to_akka.sh /bin/order_to_akka.sh
 COPY docker/order_to_cte.sh /bin/order_to_cte.sh
 COPY docker/request_generator_script.sh /bin/request_generator_script.sh
