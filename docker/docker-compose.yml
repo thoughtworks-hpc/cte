@@ -10,6 +10,8 @@ services:
     image: cte:latest
     networks:
       - cte
+    ports:
+      - 50052:50051
     command: /bin/bash order_to_akka.sh
 
   order_manager_cte:

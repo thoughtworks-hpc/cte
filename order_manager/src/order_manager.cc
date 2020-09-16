@@ -27,7 +27,7 @@ void OrderManagerService::RecordTracker(int &time_interval_in_seconds) {
     auto start_time = std::chrono::system_clock::now();
     send_data_list_.push_back(0);
     receive_data_list_.push_back(0);
-    auto time_interval = std::chrono::seconds (time_interval_in_seconds);
+    auto time_interval = std::chrono::seconds(time_interval_in_seconds);
     auto send_data_amount_before = 0;
     auto receive_data_amount_before = 0;
     while (record_is_start_) {
@@ -149,7 +149,6 @@ int OrderManagerService::PrintRecordResult() {
       auto latency = std::chrono::duration_cast<std::chrono::milliseconds>(
           receive_time - send_time);
       latency_sum_ += latency.count();
-      std::cout << "laaatencyyyyyyy: " << latency.count() <<std::endl;
       if (latency.count() < latency_min_) {
         latency_min_ = latency.count();
       }
@@ -257,8 +256,8 @@ void OrderManagerService::HandleMatchResult(
     order_store_->PersistOrder(taker_order, taker_status,
                                taker_concluded_amount);
   } else {
-//    std::cout << "order in trade doesn't exist for either " << trade.maker_id()
-//              << " or " << trade.taker_id() << std::endl;
+    std::cout << "order in trade doesn't exist for either " << trade.maker_id()
+              << " or " << trade.taker_id() << std::endl;
   }
 }
 
@@ -288,6 +287,7 @@ void OrderManagerService::BuildMatchEngineOrder(
 void OrderManagerService::SetRecordTimeInterval(int interval) {
   record_time_interval_ = interval;
 }
-void OrderManagerService::SetLatencyAverageWarning(int latency_average_warning) {
+void OrderManagerService::SetLatencyAverageWarning(
+    int latency_average_warning) {
   latency_average_warning_ = latency_average_warning;
 }
