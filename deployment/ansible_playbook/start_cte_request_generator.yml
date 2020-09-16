@@ -14,7 +14,7 @@
           services:
             request_generator:
               image: highperformancecomputing/cte:latest
-              container_name: cte_database
+              container_name: request_generator
               network_mode: host
               command: /bin/bash start_request_generator.sh
               volumes:

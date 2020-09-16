@@ -3,6 +3,6 @@
 sleep 10
 cd bin
 /bin/create_initial_prices
-/bin/create_orders 100000
+/bin/create_orders
 
 sleep infinity

@@ -17,8 +17,14 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: latest
 
-      - name: Start containers using new image
+#      - name: Start containers using new image
+#        uses: dawidd6/action-ansible-playbook@v2
+#        with:
+#          playbook: start_cte_cluster.yml
+#          directory: ./deployment/ansible_playbook
+
+      - name: Start request generator
         uses: dawidd6/action-ansible-playbook@v2
         with:
-          playbook: start_cte_cluster.yml
+          playbook: start_cte_request_generator.yml
           directory: ./deployment/ansible_playbook

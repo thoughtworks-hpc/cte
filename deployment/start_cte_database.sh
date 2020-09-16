@@ -1,2 +1,2 @@
 #!/bin/sh
-ansible-playbook ./start_cte_cluster.yml
+ansible-playbook ./ansible_playbook/start_cte_cluster.yml
