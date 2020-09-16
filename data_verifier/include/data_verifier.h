@@ -15,19 +15,22 @@
 class DataVerifier {
  public:
   DataVerifier(std::shared_ptr<DataSource> data_source_a,
-               std::shared_ptr<DataSource> data_source_b)
-      : data_source_a_(data_source_a), data_source_b_(data_source_b) {}
+               std::shared_ptr<DataSource> data_source_b,
+               bool is_ordered_data_sources = true)
+      : data_source_a_(data_source_a),
+        data_source_b_(data_source_b),
+        is_ordered_data_sources_(is_ordered_data_sources) {}
 
   bool VerifyEquality();
 
  private:
-  void VerifyEquality(int limit, int offset);
+  bool VerifyEqualityForOrderedDataSet(int limit, int offset);
+  bool VerifyEqualityForRandomDataSet(int limit, int offset);
 
   std::shared_ptr<DataSource> data_source_a_;
   std::shared_ptr<DataSource> data_source_b_;
-  std::atomic<bool> inconsistency_found_;
+  bool is_ordered_data_sources_;
   int number_of_entries_to_compare_each_turn_ = 10000;
-  std::vector<std::thread> threads_;
 };
 
 #endif  // DATA_VERIFIER_INCLUDE_DATA_VERIFIER_H_

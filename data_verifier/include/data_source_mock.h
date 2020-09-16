@@ -15,13 +15,17 @@
 class DataSourceMock : public DataSource {
  public:
   int GetDataEntryNumber() override;
-  void GetDataEntries(int limit, int offset, std::string& data) override;
-  std::function<bool(const std::string& source, const std::string& target)>
-  GetCompareFunction() override;
+//  void GetDataEntries(int limit, int offset, std::string& data) override;
+  std::vector<std::string> GetDataEntries(int limit, int offset) override;
+  bool CompareDataEntry(const std::string& source,
+                        const std::string& target) override;
+  bool FindIfDataEntryExists(const std::string& entry) override;
+//  std::function<bool(const std::string& source, const std::string& target)>
+//  GetCompareFunction() override;
   bool IfGotAllDataEntries();
 
  private:
-  std::bitset<270> record_;
+  std::bitset<27000> record_;
   mutable std::mutex record_mutex_;
 };
 

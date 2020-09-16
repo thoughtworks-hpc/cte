@@ -19,21 +19,26 @@ class DataSourceInfluxDB : public DataSource {
 
   int GetDataEntryNumber() override;
 
-  void GetDataEntries(int limit, int offset, std::string& data) override;
+
 
   std::vector<std::string> GetDataEntries(int limit, int offset) override;
 
-  std::string GetQueryResult(const std::string& sql) override;
-
-  bool IsEmptyQueryResult(const std::string& result) override;
+  bool CompareDataEntry(const std::string& source,
+                        const std::string& target) override;
 
   bool FindIfDataEntryExists(const std::string& entry) override;
+
+  std::string GetQueryResult(const std::string& sql);
+
+  bool IsEmptyQueryResult(const std::string& result);
+
+
 
   bool FindIfJsonExists(const nlohmann::json& j_source,
                         const std::shared_ptr<DataSource>& data_source);
 
-  std::function<bool(const std::string& source, const std::string& target)>
-  GetCompareFunction() override;
+//  std::function<bool(const std::string& source, const std::string& target)>
+//  GetCompareFunction() override;
 
   struct Algorithm {
     static bool CompareTradeJson(const std::string& source,
@@ -48,6 +53,8 @@ class DataSourceInfluxDB : public DataSource {
   };
 
  private:
+  void GetDataEntries(int limit, int offset, std::string& data);
+
   std::string BuildGetDataEntriesQuery(int limit, int offset);
   std::string BuildGetDataEntryNumberQuery();
 

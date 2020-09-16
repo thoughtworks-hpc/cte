@@ -101,12 +101,12 @@ bool DataSourceInfluxDB::IsEmptyQueryResult(const std::string& result) {
   return result == "{\"results\":[{\"statement_id\":0}]}\n";
 }
 
-std::function<bool(const std::string& source, const std::string& target)>
-DataSourceInfluxDB::GetCompareFunction() {
-  return [](const std::string& source, const std::string& target) {
-    return Algorithm::CompareTradeJson(source, target);
-  };
-}
+//std::function<bool(const std::string& source, const std::string& target)>
+//DataSourceInfluxDB::GetCompareFunction() {
+//  return [](const std::string& source, const std::string& target) {
+//    return Algorithm::CompareTradeJson(source, target);
+//  };
+//}
 
 std::string DataSourceInfluxDB::BuildGetDataEntriesQuery(int limit,
                                                          int offset) {
@@ -235,9 +235,9 @@ bool DataSourceInfluxDB::Algorithm::CompareTradeJson(
     json j_trade_element_target = j_target_values[i].get<json>();
     if (!CompareTradeJsonElement(j_trade_element_source,
                                  j_trade_element_target)) {
-      CDCF_LOGGER_INFO("trade inconsistent between {} and {}",
-                       j_trade_element_source.dump(),
-                       j_trade_element_target.dump());
+//      CDCF_LOGGER_INFO("trade inconsistent between {} and {}",
+//                       j_trade_element_source.dump(),
+//                       j_trade_element_target.dump());
       return false;
     }
   }
@@ -313,4 +313,9 @@ bool DataSourceInfluxDB::FindIfJsonExists(
   std::string resp = GetQueryResult(sql);
 
   return !IsEmptyQueryResult(resp);
+}
+
+bool DataSourceInfluxDB::CompareDataEntry(const std::string& source,
+                                          const std::string& target) {
+  return Algorithm::CompareTradeJson(source, target);
 }

@@ -16,5 +16,7 @@
       "user": "",
       "password": ""
     }
-  ]
+  ],
+  "ordered_data_sources": true,
+  "number_of_entries_to_compare_each_turn_": 10000
 }

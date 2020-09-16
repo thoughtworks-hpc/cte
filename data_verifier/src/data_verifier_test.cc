@@ -34,15 +34,15 @@ using nlohmann::json;
 //
 //}
 
-TEST(DataVerifier, find_if_json_exists) {
-  influxdb_cpp::server_info si("127.0.0.1", 55555, "trade_manager", "", "");
-  DataSourceInfluxDB db(si, "ate_trades11");
-  auto data_source = std::make_shared<DataSourceInfluxDB>(si, "ate_trades11");
-
-  json j = {1599730544766,"216","5","8","175","21","36","6","9fbdd8af-bab9-4205-b558-c8f45f1c458b"};
-
-  EXPECT_TRUE(db.FindIfJsonExists(j, data_source));
-}
+//TEST(DataVerifier, find_if_json_exists) {
+//  influxdb_cpp::server_info si("127.0.0.1", 55555, "trade_manager", "", "");
+//  DataSourceInfluxDB db(si, "ate_trades11");
+//  auto data_source = std::make_shared<DataSourceInfluxDB>(si, "ate_trades11");
+//
+//  json j = {1599730544766,"216","5","8","175","21","36","6","9fbdd8af-bab9-4205-b558-c8f45f1c458b"};
+//
+//  EXPECT_TRUE(db.FindIfJsonExists(j, data_source));
+//}
 
 // TEST(DataVerifier, test_json_parsing) {
 //  influxdb_cpp::server_info si("127.0.0.1", 55555, "trade_manager", "", "");
@@ -69,17 +69,28 @@ TEST(DataVerifier, find_if_json_exists) {
 //  }
 //}
 
-//TEST(DataVerifier,
-//     should_retrieve_all_data_from_data_source_when_verify_equality) {
-//  auto data_source_a = std::make_shared<DataSourceMock>();
-//  auto data_source_b = std::make_shared<DataSourceMock>();
-//
-//  DataVerifier data_verifier(data_source_a, data_source_b);
-//  data_verifier.VerifyEquality();
-//
-//  EXPECT_TRUE(data_source_a->IfGotAllDataEntries());
-//  EXPECT_TRUE(data_source_b->IfGotAllDataEntries());
-//}
+TEST(DataVerifier,
+     should_retrieve_all_data_from_ordered_data_source_when_verify_equality) {
+  auto data_source_a = std::make_shared<DataSourceMock>();
+  auto data_source_b = std::make_shared<DataSourceMock>();
+
+  DataVerifier data_verifier(data_source_a, data_source_b, true);
+  data_verifier.VerifyEquality();
+
+  EXPECT_TRUE(data_source_a->IfGotAllDataEntries());
+  EXPECT_TRUE(data_source_b->IfGotAllDataEntries());
+}
+
+TEST(DataVerifier,
+     should_retrieve_all_data_from_not_orderd_data_source_when_verify_equality) {
+  auto data_source_a = std::make_shared<DataSourceMock>();
+  auto data_source_b = std::make_shared<DataSourceMock>();
+
+  DataVerifier data_verifier(data_source_a, data_source_b, false);
+  data_verifier.VerifyEquality();
+
+  EXPECT_TRUE(data_source_a->IfGotAllDataEntries());
+}
 
 TEST(Algorithm, should_return_correct_vector_when_extracting_from_json_string) {
     std::string json_string =
