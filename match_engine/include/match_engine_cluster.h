@@ -7,6 +7,8 @@
 
 #include <cdcf/actor_system.h>
 
+#include <string>
+
 #include <caf/all.hpp>
 
 #include "./match_engine_config.h"
@@ -15,8 +17,11 @@ class MatchEngineCluster : public cdcf::cluster::Observer {
  public:
   void Update(const cdcf::cluster::Event& event) override;
   MatchEngineCluster(caf::actor_system& system, uint16_t symbolRouterPort,
-                     uint16_t mergeResultPort, caf::actor symbolIdRouter);
+                     uint16_t mergeResultPort, caf::actor symbolIdRouter,
+                     std::string host);
   void Match(RawOrder raw_order);
+
+  void AddNewNode(std::string host, std::string hostname, std::string role);
 
  private:
   caf::actor_system& system_;
@@ -24,6 +29,7 @@ class MatchEngineCluster : public cdcf::cluster::Observer {
   uint16_t merge_result_port_;
   caf::actor symbol_id_router_;
   caf::scoped_actor self_actor_;
+  std::string host_;
 };
 }  // namespace match_engine
 

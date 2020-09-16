@@ -114,13 +114,14 @@ class SenderMatchInterface {
   virtual void SendMatchResult(const TradeList& trade_list) = 0;
 };
 
+static const char kResultHostRoleName[] = "merge_result_host";
+
 class Config : public cdcf::actor_system::Config {
  public:
   uint16_t grpc_server_port = 51001;
   uint16_t match_router_port = 51020;
-  std::string symbol_id_list = "";
-  uint16_t merge_result_port = 0;
-  bool is_merge_result_node = false;
+  std::string symbol_id_list;
+  uint16_t merge_result_port = 51021;
   Config() {
     add_message_type<RawOrder>("RawOrder");
     add_message_type<SymbolActorInfo>("SymbolActorInfo");
@@ -131,8 +132,6 @@ class Config : public cdcf::actor_system::Config {
         .add(symbol_id_list, "symbol_id_list", "symbol list")
         .add(merge_result_port, "merge_result_port",
              "Match result port, if set 0, this node will not merge result")
-        .add(is_merge_result_node, "is_merge_result_node",
-             "set if is a merge result node")
         .add(match_router_port, "match_router_port",
              "match router publish port");
   }
