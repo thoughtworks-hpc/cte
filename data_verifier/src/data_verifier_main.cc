@@ -61,6 +61,7 @@ int main(int argc, char* argv[]) {
   cdcf::CDCFConfig cdcf_config;
   cdcf_config.log_level_ = "info";
   cdcf_config.log_file_ = "/tmp/data_verifier.log";
+  cdcf_config.log_no_display_filename_and_line_number_ = true;
   cdcf::Logger::Init(cdcf_config);
 
   influxdb_cpp::server_info server_info_a("127.0.0.1", 8086);

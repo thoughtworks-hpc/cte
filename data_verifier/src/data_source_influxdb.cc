@@ -4,8 +4,7 @@
 #include "../include/data_source_influxdb.h"
 
 #include <cdcf/logger.h>
-
-#include <iostream>
+#include <fmt/core.h>
 
 using json = nlohmann::json;
 
@@ -50,6 +49,58 @@ void DataSourceInfluxDB::GetDataEntries(int limit, int offset,
   }
 }
 
+std::vector<std::string> DataSourceInfluxDB::GetDataEntries(int limit,
+                                                            int offset) {
+  std::string data;
+  GetDataEntries(limit, offset, data);
+
+  return Algorithm::ExtractValuesElementFromJsonString(data).value_or(
+      std::vector<std::string>());
+}
+
+std::optional<std::vector<std::string>>
+DataSourceInfluxDB::Algorithm::ExtractValuesElementFromJsonString(
+    const std::string& data) {
+  std::vector<std::string> data_entries;
+  std::optional<std::vector<std::string>> element;
+
+  json j_source = json::parse(data);
+  json j_source_values;
+
+  if (Algorithm::ExtractValuesJsonArray(data, j_source_values) != 0) {
+    return std::nullopt;
+  }
+
+  int j_src_size = j_source_values.size();
+  if (j_src_size <= 0) {
+    return std::nullopt;
+  }
+
+  for (int i = 0; i < j_src_size; ++i) {
+    json j_element = j_source_values[i].get<json>();
+
+    data_entries.push_back(j_element.dump());
+  }
+  element = data_entries;
+
+  return element;
+}
+
+std::string DataSourceInfluxDB::GetQueryResult(const std::string& sql) {
+  std::string resp;
+  int ret = influxdb_cpp::query(resp, sql, si_);
+  if (0 == ret) {
+    CDCF_LOGGER_DEBUG("query db success");
+  } else {
+    CDCF_LOGGER_ERROR("query db failed ret: {} and sql: {}", ret, sql);
+  }
+  return resp;
+}
+
+bool DataSourceInfluxDB::IsEmptyQueryResult(const std::string& result) {
+  return result == "{\"results\":[{\"statement_id\":0}]}\n";
+}
+
 std::function<bool(const std::string& source, const std::string& target)>
 DataSourceInfluxDB::GetCompareFunction() {
   return [](const std::string& source, const std::string& target) {
@@ -77,6 +128,26 @@ std::string DataSourceInfluxDB::BuildGetDataEntryNumberQuery() {
   sql += "\"";
 
   CDCF_LOGGER_DEBUG("BuildGetDataEntryNumberQuery SQL: {}", sql);
+  return sql;
+}
+
+std::string DataSourceInfluxDB::BuildFindIfEntryExistsQuery(
+    const std::string& amount, const std::string& buy_order_id,
+    const std::string& buy_user_id, const std::string& price,
+    const std::string& sell_order_id, const std::string& sell_user_id,
+    const std::string& symbol_id) {
+  std::string sql =
+      fmt::format(R"(select "symbol_id" from "{}" where "amount" = '{}'
+and "buy_order_id" = '{}'
+and "buy_user_id" = '{}'
+and "price" = '{}'
+and "sell_order_id" = '{}'
+and "sell_user_id" = '{}'
+and "symbol_id" = '{}')",
+                  measurement_, amount, buy_order_id, buy_user_id, price,
+                  sell_order_id, sell_user_id, symbol_id);
+
+  CDCF_LOGGER_DEBUG("BuildFindIfEntryExistsQuery SQL: {}", sql);
   return sql;
 }
 
@@ -172,4 +243,74 @@ bool DataSourceInfluxDB::Algorithm::CompareTradeJson(
   }
 
   return true;
+}
+
+bool DataSourceInfluxDB::FindIfDataEntryExists(const std::string& entry) {
+  j_entry_ = json::parse(entry);
+
+  //  std::string amount;
+  //  std::string buy_order_id;
+  //  std::string buy_user_id;
+  //  std::string price;
+  //  std::string sell_order_id;
+  //  std::string sell_user_id;
+  //  std::string symbol_id;
+
+  try {
+    amount_ = j_entry_[1].get<std::string>();
+    buy_order_id_ = j_entry_[2].get<std::string>();
+    buy_user_id_ = j_entry_[3].get<std::string>();
+    price_ = j_entry_[4].get<std::string>();
+    sell_order_id_ = j_entry_[5].get<std::string>();
+    sell_user_id_ = j_entry_[6].get<std::string>();
+    symbol_id_ = j_entry_[7].get<std::string>();
+  } catch (const std::exception& e) {
+    CDCF_LOGGER_ERROR("FindIfJsonExists error:  {}", e.what());
+    return false;
+  }
+
+  std::string sql(std::move(
+      BuildFindIfEntryExistsQuery(amount_, buy_order_id_, buy_user_id_, price_,
+                                  sell_order_id_, sell_user_id_, symbol_id_)));
+
+  std::string resp(std::move(GetQueryResult(sql)));
+
+  if (IsEmptyQueryResult(resp)) {
+    CDCF_LOGGER_ERROR("QueryResult :  {}", resp);
+    return false;
+  } else {
+    return true;
+  }
+}
+
+bool DataSourceInfluxDB::FindIfJsonExists(
+    const json& j_source, const std::shared_ptr<DataSource>& data_source) {
+  std::string amount;
+  std::string buy_order_id;
+  std::string buy_user_id;
+  std::string price;
+  std::string sell_order_id;
+  std::string sell_user_id;
+  std::string symbol_id;
+
+  try {
+    amount = j_source[1].get<std::string>();
+    buy_order_id = j_source[2].get<std::string>();
+    buy_user_id = j_source[3].get<std::string>();
+    price = j_source[4].get<std::string>();
+    sell_order_id = j_source[5].get<std::string>();
+    sell_user_id = j_source[6].get<std::string>();
+    symbol_id = j_source[7].get<std::string>();
+  } catch (const std::exception& e) {
+    CDCF_LOGGER_ERROR("FindIfJsonExists error:  {}", e.what());
+    return false;
+  }
+
+  std::string sql =
+      BuildFindIfEntryExistsQuery(amount, buy_order_id, buy_user_id, price,
+                                  sell_order_id, sell_user_id, symbol_id);
+
+  std::string resp = GetQueryResult(sql);
+
+  return !IsEmptyQueryResult(resp);
 }

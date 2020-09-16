@@ -5,7 +5,10 @@
 #ifndef DATA_VERIFIER_INCLUDE_DATA_VERIFIER_H_
 #define DATA_VERIFIER_INCLUDE_DATA_VERIFIER_H_
 
+#include <atomic>
 #include <memory>
+#include <thread>
+#include <vector>
 
 #include "./data_source.h"
 
@@ -18,8 +21,13 @@ class DataVerifier {
   bool VerifyEquality();
 
  private:
+  void VerifyEquality(int limit, int offset);
+
   std::shared_ptr<DataSource> data_source_a_;
   std::shared_ptr<DataSource> data_source_b_;
+  std::atomic<bool> inconsistency_found_;
+  int number_of_entries_to_compare_each_turn_ = 10000;
+  std::vector<std::thread> threads_;
 };
 
 #endif  // DATA_VERIFIER_INCLUDE_DATA_VERIFIER_H_
