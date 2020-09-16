@@ -30,10 +30,7 @@ bool TransformGrpcOrder(const ::match_engine_proto::Order &grpc_order,
   raw_order.price = grpc_order.price();
   raw_order.amount = grpc_order.amount();
   raw_order.user_id = grpc_order.user_id();
-  raw_order.submit_time =
-      ::google::protobuf::util::TimeUtil::TimestampToMilliseconds(
-          grpc_order.submit_time()) /
-      1000000;
+  raw_order.submit_time = grpc_order.submit_time();
 
   return true;
 }
@@ -66,7 +63,7 @@ grpc::Status match_engine::MatchEngineGRPCImpl::Match(
       "price:{}, "
       "amount:{}, commit time:{}",
       request->order_id(), request->symbol_id(), request->user_id(),
-      request->price(), request->amount(), request->submit_time().seconds());
+      request->price(), request->amount(), request->submit_time());
 
   RawOrder raw_order{};
   bool can_transform = TransformGrpcOrder(*request, raw_order);
@@ -129,16 +126,13 @@ void TransformGrpcTrade(const MatchedTrade &trade,
   grpc_trade.set_price(trade.price);
   grpc_trade.set_symbol_id(trade.symbol_id);
   grpc_trade.set_maker_id(trade.maker_id);
+  grpc_trade.set_submit_time(trade.submit_time);
 
   if (TRADING_SITE_BUY == trade.trading_side) {
     grpc_trade.set_trading_side(::match_engine_proto::TRADING_BUY);
   } else {
     grpc_trade.set_trading_side(::match_engine_proto::TRADING_SELL);
   }
-
-  auto grpc_timestamp =
-      ::google::protobuf::util::TimeUtil::SecondsToTimestamp(trade.submit_time);
-  grpc_trade.set_allocated_deal_time(&grpc_timestamp);
 }
 
 void MatchEngineGRPCImpl::SendMatchResult(const TradeList &trade_list) {
@@ -160,6 +154,7 @@ void MatchEngineGRPCImpl::SendMatchResult(const TradeList &trade_list) {
       grpc_trade.set_price(trade.price);
       grpc_trade.set_symbol_id(trade.symbol_id);
       grpc_trade.set_maker_id(trade.maker_id);
+      grpc_trade.set_submit_time(trade.submit_time);
 
       if (TRADING_SITE_BUY == trade.trading_side) {
         grpc_trade.set_trading_side(::match_engine_proto::TRADING_BUY);

@@ -13,14 +13,17 @@ namespace match_engine {
 void MakeTrade(RawOrder& maker_order, RawOrder& taker_order,
                std::vector<MatchedTrade>& trade_list) {
   int32_t trade_amount = 0;
+  int64_t submit_time;
   if (maker_order.amount < taker_order.amount) {
     trade_amount = maker_order.amount;
     maker_order.amount = 0;
     taker_order.amount -= trade_amount;
+    submit_time = maker_order.submit_time;
   } else {
     trade_amount = taker_order.amount;
     taker_order.amount = 0;
     maker_order.amount -= trade_amount;
+    submit_time = taker_order.submit_time;
   }
 
   int32_t seller_user_id = 0;
@@ -40,7 +43,7 @@ void MakeTrade(RawOrder& maker_order, RawOrder& taker_order,
   trade_list.emplace_back(maker_order.order_id, taker_order.order_id,
                           taker_order.trading_side, trade_amount,
                           maker_order.price, seller_user_id, buyer_user_id,
-                          taker_order.symbol_id, deal_time);
+                          taker_order.symbol_id, submit_time, deal_time);
 }
 
 bool MatchOrderFromList(RawOrderList& order_list, RawOrder& order,
@@ -133,11 +136,11 @@ void SendMatchResult(caf::stateful_actor<OrderBook>* sender,
       CDCF_LOGGER_INFO(
           "Match actor send match result, symbol id:{}, price: {}, amount:{}, "
           "taker id:{}, maker id:{}, trade side:{}, seller id:{}, buyer id:{}, "
-          "match time:{}",
+          "match time:{}, submit time: {}",
           one_match.symbol_id, one_match.price, one_match.amount,
           one_match.taker_id, one_match.maker_id, one_match.trading_side,
           one_match.seller_user_id, one_match.buyer_user_id,
-          one_match.submit_time);
+          one_match.deal_time, one_match.submit_time);
     }
 
     sender
