@@ -2,18 +2,24 @@ version: "3.7"
 services:
   request_generator:
     image: cte:latest
+    ports:
+      - "55556:8086"
     networks:
       - cte
     command: /bin/bash request_generator_script.sh
 
   order_manager_akka:
     image: cte:latest
+    ports:
+      - "55557:8086"
     networks:
       - cte
     command: /bin/bash order_to_akka.sh
 
   order_manager_cte:
     image: cte:latest
+    ports:
+      - "55558:8086"
     networks:
       - cte
     command: /bin/bash order_to_cte.sh
@@ -47,8 +53,13 @@ services:
 
   trade_reciever:
     image: cte:latest
+    ports:
+      - "55555:8086"
     networks:
       - cte
+    environment:
+      CTE_MEASUREMENT_NAME: "cte_trades"
+      AKKA_TE_MEASUREMENT_NAME: "akka_te_trades"
     command: /bin/bash trade_reciever_cte.sh
 
 networks:
