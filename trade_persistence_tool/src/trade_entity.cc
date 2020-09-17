@@ -12,8 +12,7 @@ TradeEntity::TradeEntity(const match_engine_proto::Trade& trade) {
   price_ = std::to_string(trade.price());
   amount_ = std::to_string(trade.amount());
   trade_id_ = uuid::generate_uuid_v4();
-  submit_time =
-      trade.submit_time();
+  submit_time = trade.submit_time();
 
   if (trade.trading_side() == ::match_engine_proto::TRADING_BUY) {
     buy_order_id_ = std::to_string(trade.taker_id());

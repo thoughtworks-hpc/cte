@@ -61,11 +61,12 @@ struct MatchedTrade {
   int32_t buyer_user_id;
   int32_t symbol_id;
   int64_t submit_time;
-  int64_t deal_time; // 成交时间
+  int64_t deal_time;  // 成交时间
   MatchedTrade() {}
   MatchedTrade(int64_t makerId, int64_t takerId, TRADING_SITE_E tradingSide,
                int32_t amount, int32_t price, int32_t sellerUserId,
-               int32_t buyerUserId, int32_t symbolId, int64_t submitTime, int64_t dealTime)
+               int32_t buyerUserId, int32_t symbolId, int64_t submitTime,
+               int64_t dealTime)
       : maker_id(makerId),
         taker_id(takerId),
         trading_side(tradingSide),
