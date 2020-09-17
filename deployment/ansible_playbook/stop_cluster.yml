@@ -21,7 +21,10 @@
   gather_facts: no
   tasks:
     - docker_container:
-        name: order_manager
+        name: cte_order_manager
+        state: absent
+    - docker_container:
+        name: akka_order_manager
         state: absent
 - name: Stop cte_match_engine
   hosts: cte_match_engine
