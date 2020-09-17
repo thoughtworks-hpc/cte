@@ -1,0 +1,36 @@
+---
+- name: Copy filebeat_config to remote nodes
+  hosts:
+    - trade_manager
+    - cte_match_engine
+    - akka_te_match_engine
+  tasks:
+    - name: Copy filebeat_config to remote nodes
+      copy:
+        src: ./filebeat_config.yml
+        dest: /tmp/filebeat_config.yml
+        mode: u=rw,g=r,o=r
+
+- name: Run filebeat container
+  hosts:
+    - trade_manager
+    - cte_match_engine
+    - akka_te_match_engine
+  #  become: true
+  gather_facts: no
+  tasks:
+    - docker_compose:
+        project_name: filebeat
+        state: present
+        definition:
+          version: "2"
+          services:
+            filebeat:
+              image: docker.elastic.co/beats/filebeat:7.8.1
+              container_name: filebeat
+              volumes:
+                - /tmp/log:/tmp/log:ro
+                - /tmp/filebeat_config.yml:/usr/share/filebeat/filebeat.yml:ro
+                - /var/run/docker.sock:/var/run/docker.sock
+                - /var/lib/docker/containers/:/var/lib/docker/containers/:ro
+              network_mode: host
