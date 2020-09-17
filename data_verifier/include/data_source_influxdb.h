@@ -7,6 +7,7 @@
 
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "../../common/include/influxdb.hpp"
 #include "../../common/include/json.hpp"
