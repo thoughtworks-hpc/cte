@@ -49,7 +49,7 @@ COPY --from=builder /cte/bin/order_manager_record_config.json /order_manager_rec
 
 COPY docker/script.sh /bin/script.sh
 COPY docker/request_generator_akka_config.json /bin/request_generator_akka_config.json
-COPY docker/request_generator_cte_config.json /bin/request_generator_config.json
+COPY docker/request_generator_cte_config.json /bin/request_generator_cte_config.json
 COPY docker/order_to_akka.sh /bin/order_to_akka.sh
 COPY docker/order_to_cte.sh /bin/order_to_cte.sh
 COPY docker/request_generator_script.sh /bin/request_generator_script.sh

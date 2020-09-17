@@ -67,16 +67,16 @@ void OrderManagerService::RecordTracker(int &time_interval_in_seconds) {
     const ::order_manager_proto::ManagerStatus *status,
     ::order_manager_proto::Reply *response) {
   if (::order_manager_proto::MANAGER_START == status->status()) {
-    CDCF_LOGGER_INFO("Order manger record is open.");
     if (!record_is_start_) {
+      CDCF_LOGGER_INFO("Order manger record is open.");
       record_is_start_ = true;
       RecordTracker(record_time_interval_);
     } else {
       CDCF_LOGGER_INFO("Order manger record is already open.");
     }
   } else if (::order_manager_proto::MANAGER_END == status->status()) {
-    CDCF_LOGGER_INFO("Order manger record is close.");
     if (record_is_start_) {
+      CDCF_LOGGER_INFO("Order manger record is close.");
       PrintRecordResult();
       record_is_start_ = false;
       send_data_amount_ = 0;
@@ -131,7 +131,9 @@ int OrderManagerService::PrintRecordResult() {
   BuildMatchEngineOrder(*request, order);
 
   SaveOrderStatus(order);
-  order_store_->PersistOrder(order, "unsubmitted", 0);
+  if (!record_is_start_){
+    order_store_->PersistOrder(order, "unsubmitted", 0);
+  }
 
   std::string message;
   if (match_engine_stub_) {
@@ -149,12 +151,13 @@ int OrderManagerService::PrintRecordResult() {
       auto latency = std::chrono::duration_cast<std::chrono::milliseconds>(
           receive_time - send_time);
       latency_sum_ += latency.count();
-      if (latency.count() < latency_min_) {
+      if (latency.count() < latency_min_ && latency.count() >= 0) {
         latency_min_ = latency.count();
       }
       if (latency.count() > latency_max_) {
         latency_max_ = latency.count();
       }
+      return grpc::Status::OK;
     }
 
     int ret;
@@ -192,6 +195,10 @@ void OrderManagerService::SaveOrderStatus(
 
 void OrderManagerService::HandleMatchResult(
     const ::match_engine_proto::Trade &trade) {
+  if (record_is_start_) {
+    receive_data_amount_ += 1;
+    return;
+  }
   int32_t maker_concluded_amount = 0;
   int32_t taker_concluded_amount = 0;
   match_engine_proto::Order maker_order;
@@ -199,11 +206,6 @@ void OrderManagerService::HandleMatchResult(
   bool if_order_exists = false;
   bool if_maker_concluded = false;
   bool if_taker_concluded = false;
-
-  if (record_is_start_) {
-    receive_data_amount_ += 1;
-  }
-
   {
     std::lock_guard<std::mutex> lock(mutex_);
 
