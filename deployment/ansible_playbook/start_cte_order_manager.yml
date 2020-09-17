@@ -12,16 +12,32 @@
         definition:
           version: "2.2"
           services:
-            order_manager:
+            cte_order_manager:
               image: highperformancecomputing/cte:latest
-              container_name: order_manager
+              container_name: cte_order_manager
               environment:
                 DB_HOST: 172.30.28.18
-                CTE_MATCH_ENGIN: 172.30.28.10
-              command: /bin/bash start_cte_order_manager.sh
+                MATCH_ENGIN: 172.30.28.10
+                MATCH_ENGIN_PORT: 51001
+                ORDER_MANAGER_PORT: 50051
+              command: /bin/bash start_order_manager.sh
+              network_mode: host
+              volumes:
+                - /tmp/log:/tmp/log
+
+            akka_order_manager:
+              image: highperformancecomputing/cte:latest
+              container_name: akka_order_manager
+              environment:
+                DB_HOST: 172.30.28.18
+                MATCH_ENGIN: 172.30.28.12
+                MATCH_ENGIN_PORT: 50051
+                ORDER_MANAGER_PORT: 50052
+              command: /bin/bash start_order_manager.sh
               network_mode: host
               volumes:
                 - /tmp/log:/tmp/log
     - assert:
         that:
-          - "order_manager.order_manager.state.running"
+          - "cte_order_manager.cte_order_manager.state.running"
+          - "akka_order_manager.akka_order_manager.state.running"

@@ -18,6 +18,7 @@
               environment:
                 DB_HOST: 172.30.28.18
                 CTE_MATCH_ENGIN: 172.30.28.10
+                AKKA_MATCH_ENGIN: 172.30.28.12
               command: /bin/bash start_trade_manager.sh
               network_mode: host
               volumes:
