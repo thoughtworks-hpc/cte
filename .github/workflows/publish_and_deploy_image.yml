@@ -22,7 +22,7 @@ jobs:
 #        with:
 #          playbook: start_database.yml
 #          directory: ./deployment/ansible_playbook
-      -
+
       - name: Start cte match engin
         uses: dawidd6/action-ansible-playbook@v2
         with:
