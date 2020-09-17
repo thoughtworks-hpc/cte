@@ -18,6 +18,8 @@
               environment:
                 APP_CONFIG_FILE: "./gateway.conf"
               network_mode: host
+              extra_hosts:
+                - "akkagateway:127.0.0.1"
               volumes:
                 - /tmp/log:/tmp/log
     - assert:
