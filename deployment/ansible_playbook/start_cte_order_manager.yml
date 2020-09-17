@@ -15,6 +15,9 @@
             order_manager:
               image: highperformancecomputing/cte:latest
               container_name: order_manager
+              environment:
+                DB_HOST: 172.30.28.18
+                CTE_MATCH_ENGIN: 172.30.28.10
               command: /bin/bash start_cte_order_manager.sh
               network_mode: host
               volumes:

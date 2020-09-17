@@ -49,14 +49,15 @@ COPY --from=builder /cte/node_keeper /bin/node_keeper
 COPY docker/script.sh /bin/script.sh
 COPY docker/request_generator_akka_config.json /bin/request_generator_akka_config.json
 COPY docker/request_generator_cte_config.json /bin/request_generator_cte_config.json
-COPY docker/test_env_cte_config.json /bin/test_env_cte_config.json
 COPY docker/order_to_akka.sh /bin/order_to_akka.sh
 COPY docker/order_to_cte.sh /bin/order_to_cte.sh
 COPY docker/request_generator_script.sh /bin/request_generator_script.sh
 COPY docker/trade_reciever_cte.sh /bin/trade_reciever_cte.sh
-COPY docker/cte_database.sh /bin/cte_database.sh
-COPY docker/start_request_generator.sh /bin/start_request_generator.sh
-COPY docker/start_cte_order_manager.sh /bin/start_cte_order_manager.sh
-COPY docker/start_trade_manager.sh /bin/start_trade_manager.sh
+
+COPY deployment/test_env_cte_config.json /bin/test_env_cte_config.json
+COPY deployment/start_test_env_database.sh /bin/start_test_env_database.sh
+COPY deployment/start_request_generator.sh /bin/start_request_generator.sh
+COPY deployment/start_cte_order_manager.sh /bin/start_cte_order_manager.sh
+COPY deployment/start_trade_manager.sh /bin/start_trade_manager.sh
 
 CMD ["/bin/script.sh"]

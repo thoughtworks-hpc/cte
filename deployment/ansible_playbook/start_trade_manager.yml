@@ -15,8 +15,11 @@
             trade_manager:
               image: highperformancecomputing/cte:latest
               container_name: trade_manager
-              network_mode: host
+              environment:
+                DB_HOST: 172.30.28.18
+                CTE_MATCH_ENGIN: 172.30.28.10
               command: /bin/bash start_trade_manager.sh
+              network_mode: host
               volumes:
                 - /tmp/log:/tmp/log
     - assert:

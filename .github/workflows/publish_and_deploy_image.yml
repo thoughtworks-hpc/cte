@@ -17,11 +17,29 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: latest
 
-#      - name: Start containers using new image
+#      - name: Start database
 #        uses: dawidd6/action-ansible-playbook@v2
 #        with:
-#          playbook: start_cte_cluster.yml
+#          playbook: start_database.yml
 #          directory: ./deployment/ansible_playbook
+      -
+      - name: Start cte match engin
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: start_cte_match_engine.yml
+          directory: ./deployment/ansible_playbook
+
+      - name: Start trade manager
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: start_trade_manager.yml
+          directory: ./deployment/ansible_playbook
+
+      - name: Start cte order manager
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: start_cte_order_manager.yml
+          directory: ./deployment/ansible_playbook
 
       - name: Start request generator
         uses: dawidd6/action-ansible-playbook@v2

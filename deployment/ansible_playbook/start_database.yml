@@ -16,7 +16,7 @@
               image: highperformancecomputing/cte:latest
               container_name: cte_database
               network_mode: host
-              command: /bin/bash cte_database.sh
+              command: /bin/bash start_test_env_database.sh
               volumes:
                 - /tmp/log:/tmp/log
     - assert:
