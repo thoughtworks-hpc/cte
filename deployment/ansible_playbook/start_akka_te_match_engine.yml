@@ -1,27 +1,25 @@
 ---
 - name: Run cte cluster container using latest image
-  hosts: order_manager
+  hosts: akka_te_match_engine
   become: true
   gather_facts: no
   tasks:
     - docker_compose:
-        project_name: order_manager
+        project_name: akka_te_match_engine
         state: present
         pull: yes
         recreate: always
         definition:
           version: "2.2"
           services:
-            order_manager:
-              image: highperformancecomputing/cte:latest
-              container_name: order_manager
+            akka_te_match_engine:
+              image: highperformancecomputing/akka-te:latest
+              container_name: akka_te_match_engine
               environment:
-                DB_HOST: 172.30.28.18
-                CTE_MATCH_ENGIN: 172.30.28.10
-              command: /bin/bash start_cte_order_manager.sh
+                APP_CONFIG_FILE: "./gateway.conf"
               network_mode: host
               volumes:
                 - /tmp/log:/tmp/log
     - assert:
         that:
-          - "order_manager.order_manager.state.running"
+          - "akka_te_match_engine.akka_te_match_engine.state.running"
