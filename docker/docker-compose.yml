@@ -2,8 +2,13 @@ version: "3.7"
 services:
   request_generator:
     image: cte:latest
+    environment:
+      INFLUXDB_BIND_ADDRESS: 127.0.0.1:8088
     ports:
       - "55556:8086"
+      - "55557:8088"
+    volumes:
+      - /tmp/:/tmp/
     networks:
       - cte
     command: /bin/bash request_generator_script.sh
@@ -11,7 +16,7 @@ services:
   order_manager_akka:
     image: cte:latest
     ports:
-      - "55557:8086"
+      - "55558:8086"
     networks:
       - cte
     command: /bin/bash order_to_akka.sh
@@ -19,7 +24,7 @@ services:
   order_manager_cte:
     image: cte:latest
     ports:
-      - "55558:8086"
+      - "55559:8086"
     networks:
       - cte
     command: /bin/bash order_to_cte.sh
