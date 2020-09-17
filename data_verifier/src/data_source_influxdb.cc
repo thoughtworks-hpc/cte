@@ -101,13 +101,6 @@ bool DataSourceInfluxDB::IsEmptyQueryResult(const std::string& result) {
   return result == "{\"results\":[{\"statement_id\":0}]}\n";
 }
 
-// std::function<bool(const std::string& source, const std::string& target)>
-// DataSourceInfluxDB::GetCompareFunction() {
-//  return [](const std::string& source, const std::string& target) {
-//    return Algorithm::CompareTradeJson(source, target);
-//  };
-//}
-
 std::string DataSourceInfluxDB::BuildGetDataEntriesQuery(int limit,
                                                          int offset) {
   std::string sql = "select * from ";
@@ -248,14 +241,6 @@ bool DataSourceInfluxDB::Algorithm::CompareTradeJson(
 bool DataSourceInfluxDB::FindIfDataEntryExists(const std::string& entry) {
   j_entry_ = json::parse(entry);
 
-  //  std::string amount;
-  //  std::string buy_order_id;
-  //  std::string buy_user_id;
-  //  std::string price;
-  //  std::string sell_order_id;
-  //  std::string sell_user_id;
-  //  std::string symbol_id;
-
   try {
     amount_ = j_entry_[1].get<std::string>();
     buy_order_id_ = j_entry_[2].get<std::string>();
@@ -281,38 +266,6 @@ bool DataSourceInfluxDB::FindIfDataEntryExists(const std::string& entry) {
   } else {
     return true;
   }
-}
-
-bool DataSourceInfluxDB::FindIfJsonExists(
-    const json& j_source, const std::shared_ptr<DataSource>& data_source) {
-  std::string amount;
-  std::string buy_order_id;
-  std::string buy_user_id;
-  std::string price;
-  std::string sell_order_id;
-  std::string sell_user_id;
-  std::string symbol_id;
-
-  try {
-    amount = j_source[1].get<std::string>();
-    buy_order_id = j_source[2].get<std::string>();
-    buy_user_id = j_source[3].get<std::string>();
-    price = j_source[4].get<std::string>();
-    sell_order_id = j_source[5].get<std::string>();
-    sell_user_id = j_source[6].get<std::string>();
-    symbol_id = j_source[7].get<std::string>();
-  } catch (const std::exception& e) {
-    CDCF_LOGGER_ERROR("FindIfJsonExists error:  {}", e.what());
-    return false;
-  }
-
-  std::string sql =
-      BuildFindIfEntryExistsQuery(amount, buy_order_id, buy_user_id, price,
-                                  sell_order_id, sell_user_id, symbol_id);
-
-  std::string resp = GetQueryResult(sql);
-
-  return !IsEmptyQueryResult(resp);
 }
 
 bool DataSourceInfluxDB::CompareDataEntry(const std::string& source,
