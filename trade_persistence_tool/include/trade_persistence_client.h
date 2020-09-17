@@ -14,11 +14,11 @@
 class TradePersistenceClient {
  public:
   TradePersistenceClient(DatabaseWriteInterface* database,
-                         const std::string& tradeEngineAddress,
-                         const std::string& databaseTableName)
+                         std::string tradeEngineAddress,
+                         std::string databaseTableName)
       : database(database),
-        trade_engine_address_(tradeEngineAddress),
-        database_table_name_(databaseTableName) {}
+        trade_engine_address_(std::move(tradeEngineAddress)),
+        database_table_name_(std::move(databaseTableName)) {}
 
   bool PersistTrades();
 

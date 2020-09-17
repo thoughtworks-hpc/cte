@@ -37,7 +37,8 @@ bool TradePersistenceClient::PersistTrades() {
     if (!database->PersistTrade(trade_entity)) {
       return false;
     } else {
-      CDCF_LOGGER_INFO("Write #{} trade to database: {} success", count, database_table_name_);
+      CDCF_LOGGER_INFO("Write #{} trade to database: {} success", count,
+                       database_table_name_);
     }
   }
   CDCF_LOGGER_INFO("GRPC Reader finished");
