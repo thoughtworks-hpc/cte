@@ -43,6 +43,24 @@ int ParserConfigJsonForDatabaseServerInfo(
   return 0;
 }
 
+int ParserConfigJsonForMiscOptions(
+    const json& config, std::string& log_level, bool& ordered_data_sources,
+    bool& compare_entire_data_source_in_one_turn,
+    int& number_of_entries_to_compare_each_turn) {
+  try {
+    log_level = config["level_log"].get<std::string>();
+    ordered_data_sources = config["ordered_data_sources"].get<bool>();
+    compare_entire_data_source_in_one_turn =
+        config["compare_entire_data_source_in_one_turn"].get<bool>();
+    number_of_entries_to_compare_each_turn =
+        config["number_of_entries_to_compare_each_turn"].get<int>();
+  } catch (const std::exception& e) {
+    std::cout << "ParserConfigJsonForMiscOptions error: " << e.what()
+              << std::endl;
+  }
+  return 0;
+}
+
 int main(int argc, char* argv[]) {
   nlohmann::json config;
 
@@ -58,12 +76,6 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  cdcf::CDCFConfig cdcf_config;
-  cdcf_config.log_level_ = "info";
-  cdcf_config.log_file_ = "/tmp/data_verifier.log";
-  cdcf_config.log_no_display_filename_and_line_number_ = true;
-  cdcf::Logger::Init(cdcf_config);
-
   influxdb_cpp::server_info server_info_a("127.0.0.1", 8086);
   influxdb_cpp::server_info server_info_b("127.0.0.1", 8086);
   std::string measurement_a;
@@ -75,12 +87,39 @@ int main(int argc, char* argv[]) {
     std::cout << "parse config json failed" << std::endl;
   }
 
+  std::string log_level = "info";
+  bool is_ordered_data_sources = true;
+  bool compare_entire_data_source_in_one_turn = true;
+  int number_of_entries_to_compare_each_turn = 10000;
+
+  ret =
+      ParserConfigJsonForMiscOptions(config, log_level, is_ordered_data_sources,
+                                     compare_entire_data_source_in_one_turn,
+                                     number_of_entries_to_compare_each_turn);
+  if (ret != 0) {
+    std::cout << "parse config json failed" << std::endl;
+  }
+
+  cdcf::CDCFConfig cdcf_config;
+  cdcf_config.log_level_ = log_level;
+  cdcf_config.log_file_ = "/tmp/data_verifier.log";
+  if (log_level != "debug") {
+    cdcf_config.log_no_display_filename_and_line_number_ = true;
+  }
+  cdcf::Logger::Init(cdcf_config);
+
   auto data_source_a =
       std::make_shared<DataSourceInfluxDB>(server_info_a, measurement_a);
   auto data_source_b =
       std::make_shared<DataSourceInfluxDB>(server_info_b, measurement_b);
 
-  DataVerifier data_verifier(data_source_a, data_source_b);
+  DataVerifier data_verifier(data_source_a, data_source_b,
+                             is_ordered_data_sources);
+  data_verifier.SetNumberOfEntriesToCompareEachTurn(
+      number_of_entries_to_compare_each_turn);
+  if (!compare_entire_data_source_in_one_turn) {
+    data_verifier.DisableCompareEntireDataSourceInOneTurn();
+  }
 
   if (data_verifier.VerifyEquality()) {
     CDCF_LOGGER_INFO("trade data matches between 2 data sources");

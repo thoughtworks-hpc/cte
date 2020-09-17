@@ -17,6 +17,8 @@
       "password": ""
     }
   ],
+  "log_level": "info",
   "ordered_data_sources": true,
+  "compare_entire_data_source_in_one_turn": true,
   "number_of_entries_to_compare_each_turn_": 10000
 }

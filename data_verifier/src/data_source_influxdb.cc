@@ -101,8 +101,8 @@ bool DataSourceInfluxDB::IsEmptyQueryResult(const std::string& result) {
   return result == "{\"results\":[{\"statement_id\":0}]}\n";
 }
 
-//std::function<bool(const std::string& source, const std::string& target)>
-//DataSourceInfluxDB::GetCompareFunction() {
+// std::function<bool(const std::string& source, const std::string& target)>
+// DataSourceInfluxDB::GetCompareFunction() {
 //  return [](const std::string& source, const std::string& target) {
 //    return Algorithm::CompareTradeJson(source, target);
 //  };
@@ -173,19 +173,19 @@ bool DataSourceInfluxDB::Algorithm::CompareTradeJsonElement(
       return false;
     }
     // price
-    if (j_source[4].get<std::string>() != j_target[4].get<std::string>()) {
-      return false;
-    }
-    // sell_trade_id
     if (j_source[5].get<std::string>() != j_target[5].get<std::string>()) {
       return false;
     }
-    // sell_user_id
+    // sell_trade_id
     if (j_source[6].get<std::string>() != j_target[6].get<std::string>()) {
       return false;
     }
-    // symbol_id
+    // sell_user_id
     if (j_source[7].get<std::string>() != j_target[7].get<std::string>()) {
+      return false;
+    }
+    // symbol_id
+    if (j_source[8].get<std::string>() != j_target[8].get<std::string>()) {
       return false;
     }
   } catch (const std::exception& e) {
@@ -235,9 +235,9 @@ bool DataSourceInfluxDB::Algorithm::CompareTradeJson(
     json j_trade_element_target = j_target_values[i].get<json>();
     if (!CompareTradeJsonElement(j_trade_element_source,
                                  j_trade_element_target)) {
-//      CDCF_LOGGER_INFO("trade inconsistent between {} and {}",
-//                       j_trade_element_source.dump(),
-//                       j_trade_element_target.dump());
+      //      CDCF_LOGGER_INFO("trade inconsistent between {} and {}",
+      //                       j_trade_element_source.dump(),
+      //                       j_trade_element_target.dump());
       return false;
     }
   }
@@ -260,10 +260,10 @@ bool DataSourceInfluxDB::FindIfDataEntryExists(const std::string& entry) {
     amount_ = j_entry_[1].get<std::string>();
     buy_order_id_ = j_entry_[2].get<std::string>();
     buy_user_id_ = j_entry_[3].get<std::string>();
-    price_ = j_entry_[4].get<std::string>();
-    sell_order_id_ = j_entry_[5].get<std::string>();
-    sell_user_id_ = j_entry_[6].get<std::string>();
-    symbol_id_ = j_entry_[7].get<std::string>();
+    price_ = j_entry_[5].get<std::string>();
+    sell_order_id_ = j_entry_[6].get<std::string>();
+    sell_user_id_ = j_entry_[7].get<std::string>();
+    symbol_id_ = j_entry_[8].get<std::string>();
   } catch (const std::exception& e) {
     CDCF_LOGGER_ERROR("FindIfJsonExists error:  {}", e.what());
     return false;
@@ -317,5 +317,7 @@ bool DataSourceInfluxDB::FindIfJsonExists(
 
 bool DataSourceInfluxDB::CompareDataEntry(const std::string& source,
                                           const std::string& target) {
-  return Algorithm::CompareTradeJson(source, target);
+  json j_source = json::parse(source);
+  json j_target = json::parse(target);
+  return Algorithm::CompareTradeJsonElement(j_source, j_target);
 }
