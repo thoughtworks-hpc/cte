@@ -1,24 +1,24 @@
 ---
 - name: Run cte cluster container using latest image
-  hosts: cte_match_engine
+  hosts: trade_manager
   become: true
   gather_facts: no
   tasks:
     - docker_compose:
-        project_name: order_manager
+        project_name: trade_manager
         state: present
         pull: yes
         recreate: always
         definition:
           version: "2.2"
           services:
-            order_manager:
+            trade_manager:
               image: highperformancecomputing/cte:latest
-              container_name: order_manager
-              command: /bin/bash start_cte_order_manager.sh
+              container_name: trade_manager
               network_mode: host
+              command: /bin/bash start_trade_manager.sh
               volumes:
                 - /tmp/log:/tmp/log
     - assert:
         that:
-          - "order_manager.order_manager.state.running"
+          - "trade_manager.trade_manager.state.running"

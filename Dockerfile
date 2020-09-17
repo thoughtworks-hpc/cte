@@ -57,5 +57,6 @@ COPY docker/trade_reciever_cte.sh /bin/trade_reciever_cte.sh
 COPY docker/cte_database.sh /bin/cte_database.sh
 COPY docker/start_request_generator.sh /bin/start_request_generator.sh
 COPY docker/start_cte_order_manager.sh /bin/start_cte_order_manager.sh
+COPY docker/start_trade_manager.sh /bin/start_trade_manager.sh
 
 CMD ["/bin/script.sh"]
