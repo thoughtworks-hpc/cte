@@ -8,7 +8,7 @@
   "database_password": "",
   "grpc_server": [
     {
-      "ip": "172.30.28.10",
+      "ip": "172.30.28.4",
       "port": "50051"
     }
   ]
