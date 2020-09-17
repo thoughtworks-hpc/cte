@@ -29,7 +29,7 @@
               image: highperformancecomputing/cte:latest
               container_name: akka_order_manager
               environment:
-                DB_HOST: 172.30.28.18
+                DB_HOST: 172.30.28.8
                 MATCH_ENGIN: 172.30.28.12
                 MATCH_ENGIN_PORT: 50051
                 ORDER_MANAGER_PORT: 50052

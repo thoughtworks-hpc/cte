@@ -16,7 +16,7 @@
               image: highperformancecomputing/cte:latest
               container_name: trade_manager
               environment:
-                DB_HOST: 172.30.28.18
+                DB_HOST: 172.30.28.8
                 CTE_MATCH_ENGIN: 172.30.28.10
                 AKKA_MATCH_ENGIN: 172.30.28.12
               command: /bin/bash start_trade_manager.sh

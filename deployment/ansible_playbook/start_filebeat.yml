@@ -16,7 +16,7 @@
     - trade_manager
     - cte_match_engine
     - akka_te_match_engine
-  #  become: true
+  become: true
   gather_facts: no
   tasks:
     - docker_compose:
