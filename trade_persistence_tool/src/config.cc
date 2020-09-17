@@ -30,7 +30,7 @@ std::vector<std::string> trade_persistence_tool::ParseIpAddress(
 trade_persistence_tool::Config::Config(int argc, char* argv[]) {
   database_name = "trade_manager";
   database_table_name = "trades";
-  cdcf_config.log_file_ = "/tmp/trade_persistence_tool.log";
+  cdcf_config.log_file_ = "/tmp/log/trade_persistence_tool.log";
   int option;
   while ((option = getopt(argc, argv, "m:d:n:l:u:p:f:t:")) != -1) {
     switch (option) {
