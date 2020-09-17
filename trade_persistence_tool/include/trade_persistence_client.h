@@ -14,14 +14,18 @@
 class TradePersistenceClient {
  public:
   TradePersistenceClient(DatabaseWriteInterface* database,
-                         const std::string& tradeEngineAddress)
-      : database(database), trade_engine_address_(tradeEngineAddress) {}
+                         const std::string& tradeEngineAddress,
+                         const std::string& databaseTableName)
+      : database(database),
+        trade_engine_address_(tradeEngineAddress),
+        database_table_name_(databaseTableName) {}
 
   bool PersistTrades();
 
  private:
   DatabaseWriteInterface* database;
   std::string trade_engine_address_;
+  std::string database_table_name_;
 };
 
 std::vector<std::string> ParseIpAddress(std::string address);
