@@ -1,4 +1,4 @@
 {
-  "record_time_interval_in_seconds": 60,
-  "latency_average_warning_in_milliseconds": 3
+  "record_time_interval_in_seconds": 20,
+  "latency_average_warning_in_milliseconds": 5
 }

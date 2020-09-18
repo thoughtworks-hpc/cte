@@ -71,12 +71,15 @@ class OrderManagerService final
   std::atomic_int latency_min_ = 100000;
   std::vector<int> send_data_list_;
   std::vector<int> receive_data_list_;
+  std::vector<int> latency_list_;
   int record_time_interval_ = 0;
   int latency_average_warning_ = 0;
+  std::atomic_bool test_mode_is_open_ = false;
 
  public:
   void SetRecordTimeInterval(int interval);
   void SetLatencyAverageWarning(int latency_average_warning);
+  void SetTestModeIsOpen(bool test_mode_is_open);
 };
 
 #endif  // ORDER_MANAGER_INCLUDE_ORDER_MANAGER_H_

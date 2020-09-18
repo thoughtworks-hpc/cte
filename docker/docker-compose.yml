@@ -59,11 +59,11 @@ services:
     networks:
       - cte
 
-  trade_reciever:
-    image: cte:latest
-    networks:
-      - cte
-    command: /bin/bash trade_reciever_cte.sh
+#  trade_reciever:
+#    image: cte:latest
+#    networks:
+#      - cte
+#    command: /bin/bash trade_reciever_cte.sh
 
 networks:
   cte:

@@ -38,7 +38,8 @@ void split(const std::string& s, char delimiter, Out result) {
 void RunServer(const std::string& order_manager_address,
                std::pair<std::string, int> store_address,
                const std::string& match_engine_main_address,
-               const std::vector<std::string>& match_engine_request_addresses) {
+               const std::vector<std::string>& match_engine_request_addresses,
+               const std::string& test_mode_is_open) {
   assert(!order_manager_address.empty());
   assert(!match_engine_main_address.empty());
 
@@ -69,6 +70,9 @@ void RunServer(const std::string& order_manager_address,
       record_config["record_time_interval_in_seconds"]);
   service.SetLatencyAverageWarning(
       record_config["latency_average_warning_in_milliseconds"]);
+  if (test_mode_is_open != "0"){
+    service.SetTestModeIsOpen(true);
+  }
 
   ServerBuilder builder;
   builder.AddListeningPort(order_manager_address,
@@ -89,7 +93,9 @@ int main(int argc, char* argv[]) {
                                      "Match engine main address",
                                      cxxopts::value<std::string>())(
       "r,match_engine_request_addresses", "Match engine request only addresses",
-      cxxopts::value<std::string>())("h,help", "print usage");
+      cxxopts::value<std::string>())("h,help", "print usage")(
+      "t,test_mode_is_open", "Open test mode or not",
+      cxxopts::value<std::string>());
 
   auto result = options.parse(argc, argv);
   if (result.count("help")) {
@@ -110,6 +116,7 @@ int main(int argc, char* argv[]) {
   std::string match_engine_main_address =
       result["match_engine_main_address"].as<std::string>();
   std::vector<std::string> match_engine_request_addresses;
+  std::string test_mode_is_open = result["test_mode_is_open"].as<std::string>();
 
   split(result["database_address"].as<std::string>(), ':',
         std::back_inserter(influxdb_address_in_string));
@@ -122,7 +129,7 @@ int main(int argc, char* argv[]) {
   }
 
   RunServer(order_manager_address, influxdb_address, match_engine_main_address,
-            match_engine_request_addresses);
+            match_engine_request_addresses, test_mode_is_open);
 
   return 0;
 }

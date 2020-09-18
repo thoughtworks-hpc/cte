@@ -27,9 +27,12 @@ void OrderManagerService::RecordTracker(int &time_interval_in_seconds) {
     auto start_time = std::chrono::system_clock::now();
     send_data_list_.push_back(0);
     receive_data_list_.push_back(0);
+    latency_list_.push_back(0);
+
     auto time_interval = std::chrono::seconds(time_interval_in_seconds);
-    auto send_data_amount_before = 0;
-    auto receive_data_amount_before = 0;
+    int send_data_amount_before = 0;
+    int receive_data_amount_before = 0;
+    int latency_sum_before = 0;
     while (record_is_start_) {
       auto time_now = std::chrono::system_clock::now();
       if (time_now - start_time > time_interval) {
@@ -37,10 +40,21 @@ void OrderManagerService::RecordTracker(int &time_interval_in_seconds) {
         auto send_data_now = send_data_amount_ - send_data_amount_before;
         auto receive_data_now =
             receive_data_amount_ - receive_data_amount_before;
-        send_data_amount_before += send_data_now;
-        receive_data_amount_before += receive_data_now;
+        auto latency_sum_now = latency_sum_ - latency_sum_before;
+
         send_data_list_.push_back(send_data_now);
         receive_data_list_.push_back(receive_data_now);
+        if(send_data_now != 0){
+          latency_list_.push_back(latency_sum_now / send_data_now);
+        }
+        else{
+          latency_list_.push_back(0);
+        }
+
+        send_data_amount_before += send_data_now;
+        receive_data_amount_before += receive_data_now;
+        latency_sum_before += latency_sum_now;
+
         CDCF_LOGGER_INFO("Send data amount: {}", send_data_now,
                          time_interval_in_seconds);
         CDCF_LOGGER_INFO("Receive data amount: {}", receive_data_now,
@@ -70,6 +84,7 @@ void OrderManagerService::RecordTracker(int &time_interval_in_seconds) {
     if (!record_is_start_) {
       CDCF_LOGGER_INFO("Order manger record is open.");
       record_is_start_ = true;
+//      test_mode_is_open_ = true;
       RecordTracker(record_time_interval_);
     } else {
       CDCF_LOGGER_INFO("Order manger record is already open.");
@@ -112,11 +127,12 @@ int OrderManagerService::PrintRecordResult() {
     outfile << "Latency min," << latency_min_ << " milliseconds" << std::endl;
   }
   outfile << " " << std::endl;
-  outfile << "Elapsed time(seconds),send amount,receive amount" << std::endl;
+  outfile << "Elapsed time(seconds),send amount,receive amount,latency average" << std::endl;
   for (int i = 0; i < send_data_list_.size(); i++) {
     outfile << i * record_time_interval_ << ",";
     outfile << send_data_list_[i] << ",";
-    outfile << receive_data_list_[i] << "," << std::endl;
+    outfile << receive_data_list_[i] << ",";
+    outfile << latency_list_[i] << "," << std::endl;
   }
 
   return 0;
@@ -131,7 +147,7 @@ int OrderManagerService::PrintRecordResult() {
   BuildMatchEngineOrder(*request, order);
 
   SaveOrderStatus(order);
-  if (!record_is_start_){
+  if (!test_mode_is_open_) {
     order_store_->PersistOrder(order, "unsubmitted", 0);
   }
 
@@ -157,7 +173,9 @@ int OrderManagerService::PrintRecordResult() {
       if (latency.count() > latency_max_) {
         latency_max_ = latency.count();
       }
-      return grpc::Status::OK;
+      if (test_mode_is_open_) {
+        return grpc::Status::OK;
+      }
     }
 
     int ret;
@@ -197,7 +215,9 @@ void OrderManagerService::HandleMatchResult(
     const ::match_engine_proto::Trade &trade) {
   if (record_is_start_) {
     receive_data_amount_ += 1;
-    return;
+    if (test_mode_is_open_) {
+      return;
+    }
   }
   int32_t maker_concluded_amount = 0;
   int32_t taker_concluded_amount = 0;
@@ -292,4 +312,7 @@ void OrderManagerService::SetRecordTimeInterval(int interval) {
 void OrderManagerService::SetLatencyAverageWarning(
     int latency_average_warning) {
   latency_average_warning_ = latency_average_warning;
+}
+void OrderManagerService::SetTestModeIsOpen(bool test_mode_is_open) {
+  test_mode_is_open_ = test_mode_is_open;
 }
