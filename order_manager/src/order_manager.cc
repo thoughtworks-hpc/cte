@@ -44,10 +44,9 @@ void OrderManagerService::RecordTracker(int &time_interval_in_seconds) {
 
         send_data_list_.push_back(send_data_now);
         receive_data_list_.push_back(receive_data_now);
-        if(send_data_now != 0){
+        if (send_data_now != 0) {
           latency_list_.push_back(latency_sum_now / send_data_now);
-        }
-        else{
+        } else {
           latency_list_.push_back(0);
         }
 
@@ -84,7 +83,7 @@ void OrderManagerService::RecordTracker(int &time_interval_in_seconds) {
     if (!record_is_start_) {
       CDCF_LOGGER_INFO("Order manger record is open.");
       record_is_start_ = true;
-//      test_mode_is_open_ = true;
+      //      test_mode_is_open_ = true;
       RecordTracker(record_time_interval_);
     } else {
       CDCF_LOGGER_INFO("Order manger record is already open.");
@@ -127,7 +126,8 @@ int OrderManagerService::PrintRecordResult() {
     outfile << "Latency min," << latency_min_ << " milliseconds" << std::endl;
   }
   outfile << " " << std::endl;
-  outfile << "Elapsed time(seconds),send amount,receive amount,latency average" << std::endl;
+  outfile << "Elapsed time(seconds),send amount,receive amount,latency average"
+          << std::endl;
   for (int i = 0; i < send_data_list_.size(); i++) {
     outfile << i * record_time_interval_ << ",";
     outfile << send_data_list_[i] << ",";

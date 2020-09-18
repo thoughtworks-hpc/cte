@@ -16,9 +16,9 @@
 #include <mutex>
 #include <shared_mutex>
 #include <string>
+#include <thread>
 #include <unordered_map>
 #include <vector>
-#include <thread>
 
 #include "../../common/protobuf_gen/match_engine.grpc.pb.h"
 #include "../../common/protobuf_gen/order_manager.grpc.pb.h"
@@ -42,6 +42,7 @@ class OrderManagerService final
       ::order_manager_proto::Reply* response) override;
 
   void RecordTracker(int& time_interval_in_seconds);
+
  private:
   class OrderStatus {
    public:

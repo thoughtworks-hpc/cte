@@ -70,7 +70,7 @@ void RunServer(const std::string& order_manager_address,
       record_config["record_time_interval_in_seconds"]);
   service.SetLatencyAverageWarning(
       record_config["latency_average_warning_in_milliseconds"]);
-  if (test_mode_is_open != "0"){
+  if (test_mode_is_open != "0") {
     service.SetTestModeIsOpen(true);
   }
 
