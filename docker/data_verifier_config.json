@@ -2,7 +2,7 @@
   "server": [
     {
       "host": "127.0.0.1",
-      "port": 55555,
+      "port": 8086,
       "database": "trade_manager",
       "measurement": "cte_trades",
       "user": "",
@@ -10,7 +10,7 @@
     },
     {
       "host": "127.0.0.1",
-      "port": 55555,
+      "port": 8086,
       "database": "trade_manager",
       "measurement": "cte_trades",
       "user": "",
