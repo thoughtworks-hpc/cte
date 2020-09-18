@@ -20,7 +20,8 @@ bool DataVerifier::VerifyEquality() {
         "sources",
         data_source_a_number, data_source_b_number);
   }
-  int data_source_entry_number = data_source_a_number;
+  int data_source_entry_number =
+      std::min(data_source_a_number, data_source_b_number);
 
   if (compare_entire_data_source_in_one_turn) {
     number_of_entries_to_compare_each_turn_ = data_source_entry_number;
@@ -46,6 +47,7 @@ bool DataVerifier::VerifyEqualityForOrderedDataSource(int limit, int offset) {
           : limit;
 
   CDCF_LOGGER_INFO("{} entries to compare", limit);
+  bool inconsistency_found = false;
 
   while (data_source_number_remaining > 0) {
     auto data_entries_a =
@@ -59,7 +61,7 @@ bool DataVerifier::VerifyEqualityForOrderedDataSource(int limit, int offset) {
         CDCF_LOGGER_ERROR(
             "trade data inconsistent between {} and {} from 2 data sources",
             data_entries_a[i], data_entries_b[i]);
-        return false;
+        inconsistency_found = true;
       }
     }
 
@@ -69,7 +71,7 @@ bool DataVerifier::VerifyEqualityForOrderedDataSource(int limit, int offset) {
         "{} entries compared with {} remaining", data_source_number_to_retrieve,
         data_source_number_remaining > 0 ? data_source_number_remaining : 0);
   }
-  return true;
+  return !inconsistency_found;
 }
 
 bool DataVerifier::VerifyEqualityForUnorderedDataSource(int limit, int offset) {
@@ -80,6 +82,7 @@ bool DataVerifier::VerifyEqualityForUnorderedDataSource(int limit, int offset) {
           : limit;
 
   CDCF_LOGGER_INFO("{} entries to compare", limit);
+  bool inconsistency_found = false;
 
   while (data_source_number_remaining > 0) {
     auto data_entries =
@@ -90,7 +93,7 @@ bool DataVerifier::VerifyEqualityForUnorderedDataSource(int limit, int offset) {
         CDCF_LOGGER_ERROR(
             "cannot find corresponding data entry {} from second data source",
             data_entry);
-        return false;
+        inconsistency_found = true;
       }
     }
 
@@ -100,5 +103,5 @@ bool DataVerifier::VerifyEqualityForUnorderedDataSource(int limit, int offset) {
         "{} entries compared with {} remaining", data_source_number_to_retrieve,
         data_source_number_remaining > 0 ? data_source_number_remaining : 0);
   }
-  return true;
+  return !inconsistency_found;
 }
