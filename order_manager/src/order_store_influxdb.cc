@@ -47,8 +47,7 @@ int OrderStoreInfluxDB::PersistOrder(const match_engine_proto::Order& order,
                 .field("trading_side", trading_side)
                 .field("status", std::string(status))
                 .field("concluded amount", concluded_amount)
-                .timestamp(order.submit_time().seconds() * 1000000000 +
-                           order.submit_time().nanos())
+                .timestamp(order.submit_time())
                 .post_http(si, &resp);
 
   if (0 == ret && resp.empty()) {

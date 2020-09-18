@@ -20,6 +20,7 @@ class TradeEntity {
   std::string amount_;
   std::string sell_user_id_;
   std::string buy_user_id_;
+  uint64_t submit_time;
 
   explicit TradeEntity(const match_engine_proto::Trade& trade);
 };

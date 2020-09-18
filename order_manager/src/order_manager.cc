@@ -301,10 +301,7 @@ void OrderManagerService::BuildMatchEngineOrder(
   order.set_amount(request.amount());
   order.set_trading_side(static_cast<match_engine_proto::TradingSide>(
       static_cast<int>(request.trading_side())));
-  auto submit_time = new google::protobuf::Timestamp{};
-  submit_time->set_seconds(nanoseconds_since_epoch / 1000000000);
-  submit_time->set_nanos(nanoseconds_since_epoch % 1000000000);
-  order.set_allocated_submit_time(submit_time);
+  order.set_submit_time(nanoseconds_since_epoch);
 }
 void OrderManagerService::SetRecordTimeInterval(int interval) {
   record_time_interval_ = interval;

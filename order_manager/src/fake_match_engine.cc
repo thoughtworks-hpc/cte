@@ -12,7 +12,7 @@
   std::cout << "receive order:" << std::endl;
   std::cout << "order id: " << request->order_id() << std::endl;
   std::cout << "symbol: " << request->symbol_id() << std::endl;
-  std::cout << "submit_time: " << request->submit_time().DebugString();
+  std::cout << "submit_time: " << request->submit_time();
   std::cout << "price: " << request->price() << std::endl;
   std::cout << "amount: " << request->amount() << std::endl;
   std::cout << "trading_side: " << request->trading_side() << std::endl;
