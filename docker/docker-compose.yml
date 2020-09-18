@@ -2,21 +2,12 @@ version: "3.7"
 services:
   request_generator:
     image: cte:latest
-    environment:
-      INFLUXDB_BIND_ADDRESS: 127.0.0.1:8088
-    ports:
-      - "55556:8086"
-      - "55557:8088"
-    volumes:
-      - /tmp/:/tmp/
     networks:
       - cte
     command: /bin/bash request_generator_script.sh
 
   order_manager_akka:
     image: cte:latest
-    ports:
-      - "55558:8086"
     networks:
       - cte
     ports:
@@ -25,8 +16,6 @@ services:
 
   order_manager_cte:
     image: cte:latest
-    ports:
-      - "55559:8086"
     networks:
       - cte
     ports:
@@ -42,7 +31,7 @@ services:
       APP: /bin/match_engine_server
       APP_ARGS: --symbol_id_list="1,2,3,4"
     ports:
-      - 50053:50051
+      - 51001:51001
     networks:
       - cte
 
@@ -55,7 +44,7 @@ services:
       APP: /bin/match_engine_server
       APP_ARGS: --symbol_id_list="5,6,7,8"
     ports:
-      - 50054:50051
+      - 51002:51001
     networks:
       - cte
 
@@ -76,13 +65,8 @@ services:
 
   trade_reciever:
     image: cte:latest
-    ports:
-      - "55555:8086"
     networks:
       - cte
-    environment:
-      CTE_MEASUREMENT_NAME: "cte_trades"
-      AKKA_TE_MEASUREMENT_NAME: "akka_te_trades"
     command: /bin/bash trade_reciever_cte.sh
 
 networks:
