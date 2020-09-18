@@ -47,6 +47,7 @@ COPY --from=builder /cte/bin/create_orders_config.json /bin/create_orders_config
 COPY --from=builder /cte/bin/data_verifier /bin/data_verifier
 #COPY --from=builder /cte/bin/request_generator_config.json /bin/request_generator_config.json
 COPY --from=builder /cte/node_keeper /bin/node_keeper
+COPY --from=builder /cte/bin/order_manager_record_config.json /order_manager_record_config.json
 
 COPY docker/script.sh /bin/script.sh
 COPY docker/request_generator_akka_config.json /bin/request_generator_akka_config.json

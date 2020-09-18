@@ -17,6 +17,7 @@ services:
     image: cte:latest
     ports:
       - "55558:8086"
+      - 50052:50051
     networks:
       - cte
     command: /bin/bash order_to_akka.sh
@@ -25,6 +26,7 @@ services:
     image: cte:latest
     ports:
       - "55559:8086"
+      - 50051:50051
     networks:
       - cte
     command: /bin/bash order_to_cte.sh
@@ -37,6 +39,8 @@ services:
       SEEDS: cte_match_engin_result_host:4445
       APP: /bin/match_engine_server
       APP_ARGS: --symbol_id_list="1,2,3,4"
+    ports:
+      - 51001:51001
     networks:
       - cte
 
@@ -48,6 +52,8 @@ services:
       SEEDS: cte_match_engin_result_host:4445
       APP: /bin/match_engine_server
       APP_ARGS: --symbol_id_list="5,6,7,8"
+    ports:
+      - 51002:51001
     networks:
       - cte
 

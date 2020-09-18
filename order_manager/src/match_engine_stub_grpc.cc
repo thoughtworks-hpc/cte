@@ -62,6 +62,7 @@ void MatchEngineStubGrpc::SubscribeMatchResult(
 
 std::shared_ptr<::match_engine_proto::TradingEngine::Stub>
 MatchEngineStubGrpc::GetNextRequestStub() {
+  std::lock_guard<std::mutex> lock(request_stubs_mutex_);
   assert(!request_stubs_.empty());
 
   if (request_stub_index_ != 0 &&
