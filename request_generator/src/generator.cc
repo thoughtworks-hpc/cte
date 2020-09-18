@@ -68,7 +68,8 @@ void Generator::Start() {
       }
     }
 
-    orders_for_thread_[symbol_to_thread_[orders_.front().symbol()]].push(orders_.front());
+    orders_for_thread_[symbol_to_thread_[orders_.front().symbol()]].push(
+        orders_.front());
     orders_.pop();
   }
 

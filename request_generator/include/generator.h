@@ -6,6 +6,7 @@
 #define REQUEST_GENERATOR_INCLUDE_GENERATOR_H_
 #include <grpcpp/channel_impl.h>
 
+#include <algorithm>
 #include <memory>
 #include <mutex>
 #include <queue>
@@ -13,7 +14,6 @@
 #include <thread>
 #include <utility>
 #include <vector>
-#include <algorithm>
 
 #include "../../common/protobuf_gen/order_manager.grpc.pb.h"
 #include "../../common/protobuf_gen/order_manager.pb.h"
