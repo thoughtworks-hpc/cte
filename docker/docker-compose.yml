@@ -30,6 +30,8 @@ services:
       SEEDS: cte_match_engin_result_host:4445
       APP: /bin/match_engine_server
       APP_ARGS: --symbol_id_list="1,2,3,4"
+    ports:
+      - 50053:50051
     networks:
       - cte
 
@@ -41,6 +43,8 @@ services:
       SEEDS: cte_match_engin_result_host:4445
       APP: /bin/match_engine_server
       APP_ARGS: --symbol_id_list="5,6,7,8"
+    ports:
+      - 50054:50051
     networks:
       - cte
 
@@ -59,11 +63,11 @@ services:
     networks:
       - cte
 
-#  trade_reciever:
-#    image: cte:latest
-#    networks:
-#      - cte
-#    command: /bin/bash trade_reciever_cte.sh
+  trade_reciever:
+    image: cte:latest
+    networks:
+      - cte
+    command: /bin/bash trade_reciever_cte.sh
 
 networks:
   cte:
