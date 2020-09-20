@@ -56,8 +56,20 @@ void Generator::Start() {
   }
 
   int order_size = orders_.size();
+  int thread_num_now = 0;
   for (int i = 0; i < order_size; i++) {
-    orders_for_thread_[i % num_of_threads_].push(orders_.front());
+    if (symbol_to_thread_.find(orders_.front().symbol()) ==
+        symbol_to_thread_.end()) {
+      symbol_to_thread_[orders_.front().symbol()] = thread_num_now;
+      if (thread_num_now == num_of_threads_ - 1) {
+        thread_num_now = 0;
+      } else {
+        thread_num_now++;
+      }
+    }
+
+    orders_for_thread_[symbol_to_thread_[orders_.front().symbol()]].push(
+        orders_.front());
     orders_.pop();
   }
 

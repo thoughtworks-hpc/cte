@@ -8,11 +8,14 @@
 > -r, --match_engine_request_addresses: Specify match engine request only addresses, request only address supports only order matching request
 
 > -h, --help: Print Usage
+
+> -t, --test_mode_is_open: '0' means not open, in this mode, order manager will not write database, '1' or other number means open
+
 >
 # Example
 
 ```shell script
-./order_manager -a localhost:50051 -d localhost:8086 -m localhost:50052 -r localhost:50053,localhost:50054
+./order_manager -a localhost:50051 -d localhost:8086 -m localhost:50052 -r localhost:50053,localhost:50054 -t 0
 ```
 # Order Storage Location
 Orders will be persisted to the specified influxdb in database "order_manager" with measurement of "order'.
