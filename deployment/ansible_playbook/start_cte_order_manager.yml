@@ -1,6 +1,6 @@
 ---
 - name: Run cte cluster container using latest image
-  hosts: order_manager
+  hosts: cte_order_manager
   become: true
   gather_facts: no
   tasks:
@@ -25,19 +25,6 @@
               volumes:
                 - /tmp/log:/tmp/log
 
-            akka_order_manager:
-              image: highperformancecomputing/cte:latest
-              container_name: akka_order_manager
-              environment:
-                DB_HOST: 172.30.28.8
-                MATCH_ENGIN: 172.30.28.12
-                MATCH_ENGIN_PORT: 50051
-                ORDER_MANAGER_PORT: 50052
-              command: /bin/bash start_order_manager.sh
-              network_mode: host
-              volumes:
-                - /tmp/log:/tmp/log
     - assert:
         that:
           - "cte_order_manager.cte_order_manager.state.running"
-          - "akka_order_manager.akka_order_manager.state.running"

@@ -4,6 +4,7 @@
     - trade_manager
     - cte_match_engine
     - akka_te_match_engine
+    - request_generator
   tasks:
     - name: Copy filebeat_config to remote nodes
       copy:

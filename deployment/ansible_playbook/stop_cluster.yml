@@ -15,17 +15,24 @@
     - docker_container:
         name: request_generator
         state: absent
-- name: Stop order_manager
-  hosts: order_manager
+- name: Stop cte_order_manager
+  hosts: cte_order_manager
   become: true
   gather_facts: no
   tasks:
     - docker_container:
         name: cte_order_manager
         state: absent
+
+- name: Stop akka_order_manager
+  hosts: akka_order_manager
+  become: true
+  gather_facts: no
+  tasks:
     - docker_container:
         name: akka_order_manager
         state: absent
+
 - name: Stop cte_match_engine
   hosts: cte_match_engine
   become: true
