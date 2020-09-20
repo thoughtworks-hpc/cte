@@ -20,6 +20,7 @@
                 MATCH_ENGIN: 172.30.28.10
                 MATCH_ENGIN_PORT: 51001
                 ORDER_MANAGER_PORT: 50051
+                DEBUG: 0
               command: /bin/bash start_order_manager.sh
               network_mode: host
               volumes:
