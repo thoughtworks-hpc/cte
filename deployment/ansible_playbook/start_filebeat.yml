@@ -1,7 +1,6 @@
 ---
 - name: Copy filebeat_config to remote nodes
   hosts:
-    - trade_manager
     - cte_match_engine
     - akka_te_match_engine
     - request_generator
@@ -14,7 +13,7 @@
 
 - name: Run filebeat container
   hosts:
-    - trade_manager
+    - request_generator
     - cte_match_engine
     - akka_te_match_engine
   become: true
