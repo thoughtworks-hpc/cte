@@ -4,6 +4,8 @@
 
 #include "../include/order_manager.h"
 
+#include <cdcf/logger.h>
+
 #include <thread>
 #include <utility>
 
@@ -44,13 +46,11 @@ OrderManagerService::OrderManagerService(
       ret = order_store_->PersistOrder(order, "submission error", 0);
     }
     if (0 == ret) {
-      std::cout << "submitted and saved order " << order.order_id()
-                << std::endl;
+      CDCF_LOGGER_INFO("submitted and saved order {}", order.order_id());
       message = "order submitted";
       response->set_error_code(order_manager_proto::SUCCESS);
     } else {
-      std::cout << "submission error for order " << order.order_id()
-                << std::endl;
+      CDCF_LOGGER_INFO("submission error for order {}", order.order_id());
       message = "order submission error";
       response->set_error_code(order_manager_proto::FAILURE);
     }
@@ -110,8 +110,9 @@ void OrderManagerService::HandleMatchResult(
   }
 
   if (if_order_exists) {
-    std::cout << "receive trade for order " << trade.maker_id() << " as maker"
-              << " and order " << trade.taker_id() << " as taker" << std::endl;
+    CDCF_LOGGER_INFO(
+        "receive trade for order {} as maker and order {} as taker",
+        trade.maker_id(), trade.taker_id());
     std::string maker_status;
     std::string taker_status;
     if (if_maker_concluded) {
@@ -131,8 +132,8 @@ void OrderManagerService::HandleMatchResult(
     order_store_->PersistOrder(taker_order, taker_status,
                                taker_concluded_amount);
   } else {
-    std::cout << "order in trade doesn't exist for either " << trade.maker_id()
-              << " or " << trade.taker_id() << std::endl;
+    CDCF_LOGGER_ERROR("order in trade doesn't exist for either {} or {}",
+                      trade.maker_id(), trade.taker_id());
   }
 }
 
