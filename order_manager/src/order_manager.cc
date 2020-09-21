@@ -162,7 +162,7 @@ int OrderManagerService::PrintRecordResult() {
       send_time = std::chrono::system_clock::now();
     }
 
-    match_engine_stub_->Match(order, &reply);
+    ::grpc::Status status = match_engine_stub_->Match(order, &reply);
 
     if (record_is_start_) {
       auto receive_time = std::chrono::system_clock::now();
@@ -181,11 +181,10 @@ int OrderManagerService::PrintRecordResult() {
     }
 
     int ret;
-
-    if (reply.status() == match_engine_proto::STATUS_SUCCESS) {
-      ret = order_store_->PersistOrder(order, "submitted", 0);
-    } else {
+    if (reply.status() != match_engine_proto::STATUS_SUCCESS || !status.ok()) {
       ret = order_store_->PersistOrder(order, "submission error", 0);
+    } else {
+      ret = order_store_->PersistOrder(order, "submitted", 0);
     }
     if (0 == ret) {
       CDCF_LOGGER_INFO("submitted and saved order {}", order.order_id());

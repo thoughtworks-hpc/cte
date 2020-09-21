@@ -22,8 +22,8 @@ class MatchEngineStubGrpc : public MatchEngineStub {
       const std::shared_ptr<grpc::Channel>& main_channel,
       const std::vector<std::shared_ptr<grpc::Channel>>& request_channel);
 
-  int Match(const ::match_engine_proto::Order& request,
-            ::match_engine_proto::Reply* response) override;
+  ::grpc::Status Match(const ::match_engine_proto::Order& request,
+                       ::match_engine_proto::Reply* response) override;
   void SubscribeMatchResult(
       std::function<void(::match_engine_proto::Trade)> handler) override;
 

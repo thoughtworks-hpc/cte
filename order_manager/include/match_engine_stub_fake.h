@@ -9,9 +9,9 @@
 
 class MatchEngineStubFake : public MatchEngineStub {
  public:
-  int Match(const ::match_engine_proto::Order& request,
-            ::match_engine_proto::Reply* response) override {
-    return 0;
+  ::grpc::Status Match(const ::match_engine_proto::Order& request,
+                       ::match_engine_proto::Reply* response) override {
+    return ::grpc::Status::OK;
   }
 
   void SubscribeMatchResult(

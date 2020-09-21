@@ -30,8 +30,9 @@ MatchEngineStubGrpc::MatchEngineStubGrpc(
   }
 }
 
-int MatchEngineStubGrpc::Match(const match_engine_proto::Order &request,
-                               ::match_engine_proto::Reply *response) {
+::grpc::Status MatchEngineStubGrpc::Match(
+    const match_engine_proto::Order &request,
+    ::match_engine_proto::Reply *response) {
   grpc::Status status;
 
   if (!request_stubs_.empty()) {
@@ -40,7 +41,7 @@ int MatchEngineStubGrpc::Match(const match_engine_proto::Order &request,
     CDCF_LOGGER_DEBUG("send match request for order {}", request.order_id());
   }
 
-  return status.error_code();
+  return status;
 }
 
 void MatchEngineStubGrpc::SubscribeMatchResult(

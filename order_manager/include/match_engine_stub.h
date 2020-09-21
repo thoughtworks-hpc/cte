@@ -9,8 +9,8 @@
 
 class MatchEngineStub {
  public:
-  virtual int Match(const ::match_engine_proto::Order& request,
-                    ::match_engine_proto::Reply* response) = 0;
+  virtual ::grpc::Status Match(const ::match_engine_proto::Order& request,
+                               ::match_engine_proto::Reply* response) = 0;
   virtual void SubscribeMatchResult(
       std::function<void(::match_engine_proto::Trade)> handler) = 0;
 };
