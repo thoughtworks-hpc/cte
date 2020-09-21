@@ -20,7 +20,7 @@
                 ROLE: merge_result_host
                 SEEDS: 172.30.28.10:4445
                 APP: /bin/match_engine_server
-                APP_ARGS: --symbol_id_list="1,2,3,4,5,6,7,8" --log_file=/tmp/log/cte_match_engine.log --log_level=debug --is_merge_result_node
+                APP_ARGS: --symbol_id_list="1,2,3,4,5,6,7,8"
               network_mode: host
               volumes:
                 - /tmp/log:/tmp/log
