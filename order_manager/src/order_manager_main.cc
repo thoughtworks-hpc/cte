@@ -4,7 +4,6 @@
 
 #include <grpcpp/server.h>
 #include <grpcpp/server_builder.h>
-#include <grpcpp/server_context.h>
 
 #include <iterator>
 #include <sstream>
@@ -36,7 +35,7 @@ void split(const std::string& s, char delimiter, Out result) {
 }
 
 void RunServer(const std::string& order_manager_address,
-               std::pair<std::string, int> store_address,
+               const DatabaseConfig& database_config,
                const std::string& match_engine_main_address,
                const std::vector<std::string>& match_engine_request_addresses,
                const std::string& test_mode_is_open) {
@@ -56,8 +55,7 @@ void RunServer(const std::string& order_manager_address,
     }
   }
 
-  auto order_store = std::make_shared<OrderStoreInfluxDB>(store_address.first,
-                                                          store_address.second);
+  auto order_store = std::make_shared<OrderStoreInfluxDB>(database_config);
 
   auto match_engine_stub =
       std::make_shared<MatchEngineStubGrpc>(main_channel, request_channels);
@@ -95,6 +93,12 @@ int main(int argc, char* argv[]) {
       "r,match_engine_request_addresses", "Match engine request only addresses",
       cxxopts::value<std::string>())("h,help", "print usage")(
       "t,test_mode_is_open", "Open test mode or not",
+      cxxopts::value<std::string>())("db_user", "InfluxDB username",
+                                     cxxopts::value<std::string>())(
+      "db_password", "InfluxDB password", cxxopts::value<std::string>())(
+      "db_name", "Intended InfluxDB database name to use",
+      cxxopts::value<std::string>())(
+      "db_measurement", "Intended InfluxDB measurement name to use",
       cxxopts::value<std::string>());
 
   auto result = options.parse(argc, argv);
@@ -109,10 +113,10 @@ int main(int argc, char* argv[]) {
     return 0;
   }
 
+  DatabaseConfig database_config;
   std::string order_manager_address =
       result["service_address"].as<std::string>();
   std::vector<std::string> influxdb_address_in_string;
-  std::pair<std::string, int> influxdb_address;
   std::string match_engine_main_address =
       result["match_engine_main_address"].as<std::string>();
   std::vector<std::string> match_engine_request_addresses;
@@ -120,15 +124,29 @@ int main(int argc, char* argv[]) {
 
   split(result["database_address"].as<std::string>(), ':',
         std::back_inserter(influxdb_address_in_string));
-  influxdb_address.first = influxdb_address_in_string[0];
-  influxdb_address.second = std::stoi(influxdb_address_in_string[1]);
+  database_config.db_address = influxdb_address_in_string[0];
+  database_config.db_port = std::stoi(influxdb_address_in_string[1]);
+
+  if (result.count("db_user")) {
+    database_config.db_user = result["db_user"].as<std::string>();
+  }
+  if (result.count("db_password")) {
+    database_config.db_password = result["db_password"].as<std::string>();
+  }
+
+  if (result.count("db_name")) {
+    database_config.db_name = result["db_name"].as<std::string>();
+  }
+  if (result.count("db_measurement")) {
+    database_config.db_measurement = result["db_measurement"].as<std::string>();
+  }
 
   if (result.count("match_engine_request_addresses")) {
     split(result["match_engine_request_addresses"].as<std::string>(), ',',
           std::back_inserter(match_engine_request_addresses));
   }
 
-  RunServer(order_manager_address, influxdb_address, match_engine_main_address,
+  RunServer(order_manager_address, database_config, match_engine_main_address,
             match_engine_request_addresses, test_mode_is_open);
 
   return 0;
