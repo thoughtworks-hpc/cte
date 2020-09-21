@@ -247,9 +247,11 @@ void OrderManagerService::HandleMatchResult(
 
       if (maker_order.amount() <= maker_concluded_amount) {
         if_maker_concluded = true;
+        order_id_to_order_status_.erase(trade.maker_id());
       }
       if (taker_order.amount() <= taker_concluded_amount) {
         if_taker_concluded = true;
+        order_id_to_order_status_.erase(trade.taker_id());
       }
     } else {
       if_order_exists = false;
