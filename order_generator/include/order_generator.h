@@ -41,7 +41,7 @@ class Order {
   int symbol_;
   int price_;
   int amount_;
-  bool trading_side_;
+  int trading_side_;
 
  public:
   int GetUserId() const;

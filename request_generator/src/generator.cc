@@ -2,7 +2,7 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
-#include "src/generator.h"
+#include "include/generator.h"
 
 #include <grpcpp/create_channel.h>
 
@@ -19,7 +19,7 @@ std::mutex Generator::mutex_requests_count_;
 std::vector<int> Generator::count_each_server_;
 
 bool Generator::PrepareOrders() {
-  std::string resp = database_->GetOrders(db_host_address_, db_port_);
+  std::string resp = database_->GetOrders();
   if (resp.empty()) {
     return false;
   }
@@ -54,20 +54,26 @@ void Generator::Start() {
   if (!PrepareOrders()) {
     return;
   }
-  // auto last_check_order = orders_.front();
-  for (int i = 0; i < num_of_threads_; i++) {
-    std::queue<order_manager_proto::Order> orders;
-    orders_for_thread_.push_back(orders);
-  }
 
   int order_size = orders_.size();
+  int thread_num_now = 0;
   for (int i = 0; i < order_size; i++) {
-    orders_for_thread_[i % num_of_threads_].push(orders_.front());
+    if (symbol_to_thread_.find(orders_.front().symbol()) ==
+        symbol_to_thread_.end()) {
+      symbol_to_thread_[orders_.front().symbol()] = thread_num_now;
+      if (thread_num_now == num_of_threads_ - 1) {
+        thread_num_now = 0;
+      } else {
+        thread_num_now++;
+      }
+    }
+
+    orders_for_thread_[symbol_to_thread_[orders_.front().symbol()]].push(
+        orders_.front());
     orders_.pop();
   }
 
   std::vector<std::thread*> thread_vector;
-
   for (int i = 0; i < num_of_threads_; i++) {
     std::thread* th =
         new std::thread(SendRequest, orders_for_thread_[i], grpc_servers_);
@@ -139,13 +145,4 @@ void Generator::SendRequest(std::queue<order_manager_proto::Order> orders,
 
   std::cout << "[INFO] thread #" << std::this_thread::get_id() << " finished"
             << std::endl;
-  //  for (int i = 0; i < count_each_server.size(); i++) {
-  //    std::cout << "[INFO] thread #" << std::this_thread::get_id() << " send
-  //    #"
-  //              << i << " : " << count_each_server[i] << std::endl;
-  //  }
-}
-void Generator::Clean() {
-  requests_count_ = 0;
-  count_each_server_.clear();
 }

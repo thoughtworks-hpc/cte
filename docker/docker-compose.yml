@@ -1,0 +1,90 @@
+version: "3.7"
+services:
+  request_generator:
+    image: cte:latest
+    environment:
+      INFLUXDB_BIND_ADDRESS: 127.0.0.1:8088
+    ports:
+      - "55556:8086"
+      - "55557:8088"
+    volumes:
+      - /tmp/:/tmp/
+    networks:
+      - cte
+    command: /bin/bash request_generator_script.sh
+
+  order_manager_akka:
+    image: cte:latest
+    ports:
+      - "55558:8086"
+      - 50052:50051
+    networks:
+      - cte
+    command: /bin/bash order_to_akka.sh
+
+  order_manager_cte:
+    image: cte:latest
+    ports:
+      - "55559:8086"
+      - 50051:50051
+    networks:
+      - cte
+    command: /bin/bash order_to_cte.sh
+
+  cte_match_engin_result_host:
+    image: cte:latest
+    environment:
+      HOST: cte_match_engin_result_host
+      ROLE: merge_result_host
+      SEEDS: cte_match_engin_result_host:4445
+      APP: /bin/match_engine_server
+      APP_ARGS: --symbol_id_list="1,2,3,4"
+    ports:
+      - 51001:51001
+    networks:
+      - cte
+
+  cte_match_engin_normal_host:
+    image: cte:latest
+    environment:
+      HOST: cte_match_engin_normal_host
+      ROLE: normal_host
+      SEEDS: cte_match_engin_result_host:4445
+      APP: /bin/match_engine_server
+      APP_ARGS: --symbol_id_list="5,6,7,8"
+    ports:
+      - 51002:51001
+    networks:
+      - cte
+
+  #  akka gateway
+  akkagateway:
+    image: akka-te:latest
+    environment:
+      APP_CONFIG_FILE: "./gateway.conf"
+    networks:
+      - cte
+  # akka node
+  akkanode:
+    image: akka-te:latest
+    environment:
+      APP_CONFIG_FILE: "./node.conf"
+    networks:
+      - cte
+
+  trade_reciever:
+    image: cte:latest
+    ports:
+      - "55555:8086"
+    volumes:
+      - /tmp/:/tmp/
+    networks:
+      - cte
+    environment:
+      CTE_MEASUREMENT_NAME: "cte_trades"
+      AKKA_TE_MEASUREMENT_NAME: "akka_te_trades"
+    command: /bin/bash trade_reciever_cte.sh
+
+networks:
+  cte:
+    driver: bridge

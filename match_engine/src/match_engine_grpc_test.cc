@@ -30,7 +30,8 @@ class MatchEngineGRPCTest : public ::testing::Test {
                match_actor2_);
 
     match_engine_cluster_ptr_ = new match_engine::MatchEngineCluster(
-        system_, k_symbol_router_port, k_match_result_port, router_actor_);
+        system_, k_symbol_router_port, k_match_result_port, router_actor_,
+        "localhost");
 
     match_engine_grpc_ = new match_engine::MatchEngineGRPCImpl(
         k_match_engine_grpc, *match_engine_cluster_ptr_, true);
@@ -172,4 +173,131 @@ TEST_F(MatchEngineGRPCTest, one_match) {
   EXPECT_EQ(20, trade.seller_user_id());
   EXPECT_EQ(10, trade.buyer_user_id());
   EXPECT_EQ(::match_engine_proto::TRADING_SELL, trade.trading_side());
+}
+
+TEST_F(MatchEngineGRPCTest, should_not_match_order_when_engine_switch_close) {
+  std::string grpc_host =
+      std::string(localhost_) + ":" + std::to_string(k_match_engine_grpc);
+  auto actor_system_channel =
+      grpc::CreateChannel(grpc_host, grpc::InsecureChannelCredentials());
+
+  ::match_engine_proto::TradingEngine::Stub client =
+      ::match_engine_proto::TradingEngine::Stub(actor_system_channel);
+
+  ::match_engine_proto::Order order1;
+  order1.set_order_id(1);
+  order1.set_symbol_id(k_test_symbol_id1);
+  order1.set_trading_side(::match_engine_proto::TRADING_BUY);
+  order1.set_price(1000);
+  order1.set_amount(100);
+  order1.set_user_id(10);
+
+  ::match_engine_proto::EngineSwitch engine_status;
+  engine_status.set_engine_status(::match_engine_proto::ENGINE_CLOSE);
+
+  match_engine_proto::Reply reply1;
+  match_engine_proto::Reply reply2;
+
+  grpc::ClientContext match_context1;
+  grpc::ClientContext match_context2;
+  grpc::Status status1 =
+      client.OpenCloseEngine(&match_context1, engine_status, &reply1);
+  grpc::Status status2 = client.Match(&match_context2, order1, &reply2);
+
+  if (status2.ok() || !status1.ok()) {
+    ASSERT_TRUE(false);
+    return;
+  }
+
+  EXPECT_EQ(::match_engine_proto::STATUS_SUCCESS, reply1.status());
+}
+
+TEST_F(MatchEngineGRPCTest, should_match_order_when_engine_switch_open) {
+  std::string grpc_host =
+      std::string(localhost_) + ":" + std::to_string(k_match_engine_grpc);
+  auto actor_system_channel =
+      grpc::CreateChannel(grpc_host, grpc::InsecureChannelCredentials());
+
+  ::match_engine_proto::TradingEngine::Stub client =
+      ::match_engine_proto::TradingEngine::Stub(actor_system_channel);
+
+  ::match_engine_proto::Order order1;
+  order1.set_order_id(1);
+  order1.set_symbol_id(k_test_symbol_id1);
+  order1.set_trading_side(::match_engine_proto::TRADING_BUY);
+  order1.set_price(1000);
+  order1.set_amount(100);
+  order1.set_user_id(10);
+
+  ::match_engine_proto::EngineSwitch engine_status;
+  engine_status.set_engine_status(::match_engine_proto::ENGINE_OPEN);
+
+  match_engine_proto::Reply reply1;
+  match_engine_proto::Reply reply2;
+
+  grpc::ClientContext match_context1;
+  grpc::ClientContext match_context2;
+  grpc::Status status1 =
+      client.OpenCloseEngine(&match_context1, engine_status, &reply1);
+  grpc::Status status2 = client.Match(&match_context2, order1, &reply2);
+
+  if (!status2.ok() || !status1.ok()) {
+    ASSERT_TRUE(false);
+    return;
+  }
+
+  EXPECT_EQ(::match_engine_proto::STATUS_SUCCESS, reply1.status());
+}
+
+TEST_F(MatchEngineGRPCTest, engine_switch_from_close_to_open) {
+  std::string grpc_host =
+      std::string(localhost_) + ":" + std::to_string(k_match_engine_grpc);
+  auto actor_system_channel =
+      grpc::CreateChannel(grpc_host, grpc::InsecureChannelCredentials());
+
+  ::match_engine_proto::TradingEngine::Stub client =
+      ::match_engine_proto::TradingEngine::Stub(actor_system_channel);
+
+  ::match_engine_proto::Order order1;
+  order1.set_order_id(1);
+  order1.set_symbol_id(k_test_symbol_id1);
+  order1.set_trading_side(::match_engine_proto::TRADING_BUY);
+  order1.set_price(1000);
+  order1.set_amount(100);
+  order1.set_user_id(10);
+
+  ::match_engine_proto::EngineSwitch engine_status;
+  engine_status.set_engine_status(::match_engine_proto::ENGINE_CLOSE);
+
+  match_engine_proto::Reply reply1;
+  match_engine_proto::Reply reply2;
+  match_engine_proto::Reply reply3;
+  match_engine_proto::Reply reply4;
+
+  grpc::ClientContext match_context1;
+  grpc::ClientContext match_context2;
+  grpc::ClientContext match_context3;
+  grpc::ClientContext match_context4;
+  grpc::Status status1 =
+      client.OpenCloseEngine(&match_context1, engine_status, &reply1);
+  grpc::Status status2 = client.Match(&match_context2, order1, &reply2);
+
+  if (status2.ok() || !status1.ok()) {
+    ASSERT_TRUE(false);
+    return;
+  }
+
+  EXPECT_EQ(::match_engine_proto::STATUS_SUCCESS, reply1.status());
+
+  engine_status.set_engine_status(::match_engine_proto::ENGINE_OPEN);
+  grpc::Status status3 =
+      client.OpenCloseEngine(&match_context3, engine_status, &reply3);
+  grpc::Status status4 = client.Match(&match_context4, order1, &reply4);
+
+  if (!status3.ok() || !status4.ok()) {
+    ASSERT_TRUE(false);
+    return;
+  }
+
+  EXPECT_EQ(::match_engine_proto::STATUS_SUCCESS, reply3.status());
 }

@@ -35,8 +35,7 @@ TEST(OrderManager, should_store_order_correctly_when_place_an_order) {
   EXPECT_EQ(order_stored.symbol_id(), 1);
   EXPECT_EQ(order_stored.trading_side(), order_manager_proto::TRADING_BUY);
   auto submit_time = order_stored.submit_time();
-  EXPECT_GT(submit_time.seconds(), 0);
-  EXPECT_GT(submit_time.nanos(), 0);
+  EXPECT_GT(submit_time, 0);
 }
 
 TEST(OrderManager, should_auto_increment_order_id_when_place_orders) {

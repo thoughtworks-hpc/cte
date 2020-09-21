@@ -16,3 +16,10 @@ find_package(GTest REQUIRED)
 target_link_libraries(${PROJECT_NAME}_test GTest::GTest order_generator)
 enable_testing()
 add_test(NAME ${PROJECT_NAME}_test COMMAND ${PROJECT_NAME}_test)
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/create_initial_prices_config.json
+        DESTINATION ${CMAKE_BINARY_DIR}/bin
+        )
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/create_orders_config.json
+        DESTINATION ${CMAKE_BINARY_DIR}/bin
+        )

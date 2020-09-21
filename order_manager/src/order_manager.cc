@@ -6,7 +6,6 @@
 
 #include <cdcf/logger.h>
 
-#include <thread>
 #include <utility>
 
 #include "../../common/include/influxdb.hpp"
@@ -25,6 +24,122 @@ OrderManagerService::OrderManagerService(
   }
 }
 
+void OrderManagerService::RecordTracker(int &time_interval_in_seconds) {
+  std::thread t([this, time_interval_in_seconds] {
+    auto start_time = std::chrono::system_clock::now();
+    send_data_list_.push_back(0);
+    receive_data_list_.push_back(0);
+    latency_list_.push_back(0);
+
+    auto time_interval = std::chrono::seconds(time_interval_in_seconds);
+    int send_data_amount_before = 0;
+    int receive_data_amount_before = 0;
+    int latency_sum_before = 0;
+    while (record_is_start_) {
+      auto time_now = std::chrono::system_clock::now();
+      if (time_now - start_time > time_interval) {
+        CDCF_LOGGER_INFO("In last {} seconds:", time_interval_in_seconds);
+        auto send_data_now = send_data_amount_ - send_data_amount_before;
+        auto receive_data_now =
+            receive_data_amount_ - receive_data_amount_before;
+        auto latency_sum_now = latency_sum_ - latency_sum_before;
+
+        send_data_list_.push_back(send_data_now);
+        receive_data_list_.push_back(receive_data_now);
+        if (send_data_now != 0) {
+          latency_list_.push_back(latency_sum_now / send_data_now);
+        } else {
+          latency_list_.push_back(0);
+        }
+
+        send_data_amount_before += send_data_now;
+        receive_data_amount_before += receive_data_now;
+        latency_sum_before += latency_sum_now;
+
+        CDCF_LOGGER_INFO("Send data amount: {}", send_data_now,
+                         time_interval_in_seconds);
+        CDCF_LOGGER_INFO("Receive data amount: {}", receive_data_now,
+                         time_interval_in_seconds);
+        if (send_data_amount_ != 0) {
+          auto latency_average = latency_sum_ / send_data_amount_;
+          CDCF_LOGGER_INFO("Latency average: {} milliseconds", latency_average);
+          CDCF_LOGGER_INFO("Latency max: {} milliseconds", latency_max_);
+          CDCF_LOGGER_INFO("Latency min: {} milliseconds", latency_min_);
+          if (latency_average >= latency_average_warning_) {
+            CDCF_LOGGER_WARN("Latency average is more than {} milliseconds",
+                             latency_average_warning_);
+          }
+        }
+        start_time = time_now;
+      }
+    }
+  });
+  t.detach();
+}
+
+::grpc::Status OrderManagerService::StartEndManager(
+    ::grpc::ServerContext *context,
+    const ::order_manager_proto::ManagerStatus *status,
+    ::order_manager_proto::Reply *response) {
+  if (::order_manager_proto::MANAGER_START == status->status()) {
+    if (!record_is_start_) {
+      CDCF_LOGGER_INFO("Order manger record is open.");
+      record_is_start_ = true;
+      //      test_mode_is_open_ = true;
+      RecordTracker(record_time_interval_);
+    } else {
+      CDCF_LOGGER_INFO("Order manger record is already open.");
+    }
+  } else if (::order_manager_proto::MANAGER_END == status->status()) {
+    if (record_is_start_) {
+      CDCF_LOGGER_INFO("Order manger record is close.");
+      PrintRecordResult();
+      record_is_start_ = false;
+      send_data_amount_ = 0;
+      receive_data_amount_ = 0;
+      latency_sum_ = 0;
+      latency_max_ = 0;
+      latency_min_ = 100000;
+      send_data_list_.clear();
+      receive_data_list_.clear();
+    } else {
+      CDCF_LOGGER_INFO("Order manger record is already close.");
+    }
+  }
+
+  response->set_error_code(order_manager_proto::SUCCESS);
+  return grpc::Status::OK;
+}
+
+int OrderManagerService::PrintRecordResult() {
+  if (!record_is_start_) {
+    CDCF_LOGGER_INFO("Record is empty without start!");
+    return 1;
+  }
+  std::ofstream outfile("performance_testing.csv");
+  outfile << "This is the total performance:" << std::endl;
+  outfile << "Manager send," << send_data_amount_ << std::endl;
+  outfile << "Manager receive," << receive_data_amount_ << std::endl;
+  if (send_data_amount_ != 0) {
+    auto latency_average = latency_sum_ / send_data_amount_;
+    outfile << "Latency average," << latency_average << " milliseconds"
+            << std::endl;
+    outfile << "Latency max," << latency_max_ << " milliseconds" << std::endl;
+    outfile << "Latency min," << latency_min_ << " milliseconds" << std::endl;
+  }
+  outfile << " " << std::endl;
+  outfile << "Elapsed time(seconds),send amount,receive amount,latency average"
+          << std::endl;
+  for (int i = 0; i < send_data_list_.size(); i++) {
+    outfile << i * record_time_interval_ << ",";
+    outfile << send_data_list_[i] << ",";
+    outfile << receive_data_list_[i] << ",";
+    outfile << latency_list_[i] << "," << std::endl;
+  }
+
+  return 0;
+}
+
 ::grpc::Status OrderManagerService::PlaceOrder(
     ::grpc::ServerContext *context, const ::order_manager_proto::Order *request,
     ::order_manager_proto::Reply *response) {
@@ -34,12 +149,39 @@ OrderManagerService::OrderManagerService(
   BuildMatchEngineOrder(*request, order);
 
   SaveOrderStatus(order);
-  order_store_->PersistOrder(order, "unsubmitted", 0);
+  if (!test_mode_is_open_) {
+    order_store_->PersistOrder(order, "unsubmitted", 0);
+  }
 
   std::string message;
   if (match_engine_stub_) {
+    std::chrono::system_clock::time_point send_time =
+        std::chrono::system_clock::now();
+    if (record_is_start_) {
+      send_data_amount_ += 1;
+      send_time = std::chrono::system_clock::now();
+    }
+
     match_engine_stub_->Match(order, &reply);
-    int ret = 0;
+
+    if (record_is_start_) {
+      auto receive_time = std::chrono::system_clock::now();
+      auto latency = std::chrono::duration_cast<std::chrono::milliseconds>(
+          receive_time - send_time);
+      latency_sum_ += latency.count();
+      if (latency.count() < latency_min_ && latency.count() >= 0) {
+        latency_min_ = latency.count();
+      }
+      if (latency.count() > latency_max_) {
+        latency_max_ = latency.count();
+      }
+      if (test_mode_is_open_) {
+        return grpc::Status::OK;
+      }
+    }
+
+    int ret;
+
     if (reply.status() == match_engine_proto::STATUS_SUCCESS) {
       ret = order_store_->PersistOrder(order, "submitted", 0);
     } else {
@@ -71,6 +213,12 @@ void OrderManagerService::SaveOrderStatus(
 
 void OrderManagerService::HandleMatchResult(
     const ::match_engine_proto::Trade &trade) {
+  if (record_is_start_) {
+    receive_data_amount_ += 1;
+    if (test_mode_is_open_) {
+      return;
+    }
+  }
   int32_t maker_concluded_amount = 0;
   int32_t taker_concluded_amount = 0;
   match_engine_proto::Order maker_order;
@@ -155,8 +303,15 @@ void OrderManagerService::BuildMatchEngineOrder(
   order.set_amount(request.amount());
   order.set_trading_side(static_cast<match_engine_proto::TradingSide>(
       static_cast<int>(request.trading_side())));
-  auto submit_time = new google::protobuf::Timestamp{};
-  submit_time->set_seconds(nanoseconds_since_epoch / 1000000000);
-  submit_time->set_nanos(nanoseconds_since_epoch % 1000000000);
-  order.set_allocated_submit_time(submit_time);
+  order.set_submit_time(nanoseconds_since_epoch);
+}
+void OrderManagerService::SetRecordTimeInterval(int interval) {
+  record_time_interval_ = interval;
+}
+void OrderManagerService::SetLatencyAverageWarning(
+    int latency_average_warning) {
+  latency_average_warning_ = latency_average_warning;
+}
+void OrderManagerService::SetTestModeIsOpen(bool test_mode_is_open) {
+  test_mode_is_open_ = test_mode_is_open;
 }
