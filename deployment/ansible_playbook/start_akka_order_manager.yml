@@ -5,7 +5,7 @@
   gather_facts: no
   tasks:
     - docker_compose:
-        project_name: order_manager
+        project_name: akka_order_manager
         state: present
         pull: yes
         recreate: always
