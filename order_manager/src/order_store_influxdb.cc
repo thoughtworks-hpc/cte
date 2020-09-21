@@ -4,6 +4,8 @@
 
 #include "../include/order_store_influxdb.h"
 
+#include <cdcf/logger.h>
+
 #include "../../common/include/influxdb.hpp"
 
 OrderStoreInfluxDB::OrderStoreInfluxDB(const std::string& host, int port)
@@ -18,8 +20,7 @@ OrderStoreInfluxDB::OrderStoreInfluxDB(const std::string& host, int port)
   influxdb_cpp::server_info si(host_, port_, "", "", "");
   ret = influxdb_cpp::create_db(resp, "order_manager", si);
   if (0 != ret) {
-    std::cout << "create database of order_manager failed ret:" << ret
-              << std::endl;
+    CDCF_LOGGER_ERROR("create database of order_manager failed ret: {}", ret);
   }
 }
 
@@ -51,10 +52,9 @@ int OrderStoreInfluxDB::PersistOrder(const match_engine_proto::Order& order,
                 .post_http(si, &resp);
 
   if (0 == ret && resp.empty()) {
-    std::cout << "write db success" << std::endl;
+    CDCF_LOGGER_DEBUG("write db success");
   } else {
-    std::cout << "write db failed, ret:" << ret << " resp:" << resp
-              << std::endl;
+    CDCF_LOGGER_ERROR("write db failed, ret: {}", resp);
   }
 
   return ret;

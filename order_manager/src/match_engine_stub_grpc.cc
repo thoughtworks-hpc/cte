@@ -4,6 +4,8 @@
 
 #include "../include/match_engine_stub_grpc.h"
 
+#include <cdcf/logger.h>
+
 #include <thread>
 
 using grpc::Channel;
@@ -35,6 +37,7 @@ int MatchEngineStubGrpc::Match(const match_engine_proto::Order &request,
   if (!request_stubs_.empty()) {
     grpc::ClientContext client_context;
     status = GetNextRequestStub()->Match(&client_context, request, response);
+    CDCF_LOGGER_DEBUG("send match request for order {}", request.order_id());
   }
 
   return status.error_code();
