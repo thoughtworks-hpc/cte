@@ -7,6 +7,10 @@
 
 > -r, --match_engine_request_addresses: Specify match engine request only addresses, request only address supports only order matching request
 
+> -l, --log_level:  Log level, "info" or "debug", default: info
+
+> -f, --log_file:  Log file location, default: /tmp/order_manager.log
+
 > --db_user: InfluxDB username
 
 > --db_password: InfluxDB password

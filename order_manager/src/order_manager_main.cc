@@ -92,13 +92,19 @@ int main(int argc, char* argv[]) {
                                      cxxopts::value<std::string>())(
       "r,match_engine_request_addresses", "Match engine request only addresses",
       cxxopts::value<std::string>())("h,help", "print usage")(
-      "t,test_mode_is_open", "Open test mode or not",
-      cxxopts::value<std::string>())("db_user", "InfluxDB username",
-                                     cxxopts::value<std::string>())(
-      "db_password", "InfluxDB password", cxxopts::value<std::string>())(
-      "db_name", "Intended InfluxDB database name to use",
+      "l,log_level", R"(Log level, "info" or "debug", default: info)",
       cxxopts::value<std::string>())(
-      "db_measurement", "Intended InfluxDB measurement name to use",
+      "f,log_file", "Log file location, default: /tmp/order_manager.log",
+      cxxopts::value<std::string>())("t,test_mode_is_open",
+                                     "Open test mode or not",
+                                     cxxopts::value<std::string>())(
+      "db_user", "InfluxDB username", cxxopts::value<std::string>())(
+      "db_password", "InfluxDB password", cxxopts::value<std::string>())(
+      "db_name",
+      "Intended InfluxDB database name to use, default: order_manager",
+      cxxopts::value<std::string>())(
+      "db_measurement",
+      "Intended InfluxDB measurement name to use, default: order",
       cxxopts::value<std::string>());
 
   auto result = options.parse(argc, argv);
@@ -145,6 +151,20 @@ int main(int argc, char* argv[]) {
     split(result["match_engine_request_addresses"].as<std::string>(), ',',
           std::back_inserter(match_engine_request_addresses));
   }
+
+  cdcf::CDCFConfig cdcf_config;
+  if (result.count("log_level")) {
+    cdcf_config.log_level_ = result["log_level"].as<std::string>();
+  }
+  if (cdcf_config.log_level_ != "debug") {
+    cdcf_config.log_no_display_filename_and_line_number_ = true;
+  }
+  if (result.count("log_file")) {
+    cdcf_config.log_file_ = result["log_file"].as<std::string>();
+  } else {
+    cdcf_config.log_file_ = "/tmp/order_manager.log";
+  }
+  cdcf::Logger::Init(cdcf_config);
 
   RunServer(order_manager_address, database_config, match_engine_main_address,
             match_engine_request_addresses, test_mode_is_open);
