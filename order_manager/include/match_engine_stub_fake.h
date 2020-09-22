@@ -14,7 +14,7 @@ class MatchEngineStubFake : public MatchEngineStub {
     return ::grpc::Status::OK;
   }
 
-  void SubscribeMatchResult(
+  std::shared_ptr<std::thread> SubscribeMatchResult(
       std::function<void(::match_engine_proto::Trade)> handler) override;
 
   void ProvideMatchResult(const ::match_engine_proto::Trade& trade);

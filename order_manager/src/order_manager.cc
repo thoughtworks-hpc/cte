@@ -17,10 +17,16 @@ OrderManagerService::OrderManagerService(
       order_store_(std::move(order_store)),
       match_engine_stub_(std::move(match_engine_stub)) {
   if (match_engine_stub_) {
-    match_engine_stub_->SubscribeMatchResult(
+    result_subscribe_thread_ = match_engine_stub_->SubscribeMatchResult(
         [this](const ::match_engine_proto::Trade &trade) {
           HandleMatchResult(trade);
         });
+  }
+}
+
+OrderManagerService::~OrderManagerService() {
+  if (result_subscribe_thread_ != nullptr) {
+    result_subscribe_thread_->join();
   }
 }
 

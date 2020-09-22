@@ -32,6 +32,7 @@ class OrderManagerService final
   explicit OrderManagerService(
       std::shared_ptr<OrderStore> order_store,
       std::shared_ptr<MatchEngineStub> match_engine_stub);
+  ~OrderManagerService();
 
   ::grpc::Status PlaceOrder(::grpc::ServerContext* context,
                             const ::order_manager_proto::Order* request,
@@ -63,6 +64,8 @@ class OrderManagerService final
   std::shared_ptr<OrderStore> order_store_;
 
   std::shared_ptr<MatchEngineStub> match_engine_stub_;
+
+  std::shared_ptr<std::thread> result_subscribe_thread_;
 
   std::atomic_bool record_is_start_ = false;
   std::atomic_int send_data_amount_ = 0;

@@ -44,24 +44,25 @@ MatchEngineStubGrpc::MatchEngineStubGrpc(
   return status;
 }
 
-void MatchEngineStubGrpc::SubscribeMatchResult(
+std::shared_ptr<std::thread> MatchEngineStubGrpc::SubscribeMatchResult(
     std::function<void(::match_engine_proto::Trade)> handler) {
-  std::thread t([this, handler] {
-    if (main_stub_ != nullptr) {
-      std::this_thread::sleep_for(std::chrono::seconds(10));
-      grpc::ClientContext client_context;
-      match_engine_proto::Trade trade;
-      std::unique_ptr<ClientReader<match_engine_proto::Trade>> reader(
-          main_stub_->SubscribeMatchResult(&client_context,
-                                           google::protobuf::Empty()));
-      while (reader->Read(&trade)) {
-        // trade.PrintDebugString();
-        handler(trade);
-      }
-      Status status = reader->Finish();
-    }
-  });
-  t.detach();
+  std::shared_ptr<std::thread> t =
+      std::make_shared<std::thread>([this, handler] {
+        if (main_stub_ != nullptr) {
+          grpc::ClientContext client_context;
+          match_engine_proto::Trade trade;
+          std::unique_ptr<ClientReader<match_engine_proto::Trade>> reader(
+              main_stub_->SubscribeMatchResult(&client_context,
+                                               google::protobuf::Empty()));
+          while (reader->Read(&trade)) {
+            // trade.PrintDebugString();
+            handler(trade);
+          }
+          Status status = reader->Finish();
+        }
+      });
+
+  return t;
 }
 
 std::shared_ptr<::match_engine_proto::TradingEngine::Stub>
