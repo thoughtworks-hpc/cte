@@ -91,7 +91,6 @@ void OrderManagerService::RecordTracker(int &time_interval_in_seconds) {
     if (!record_is_start_) {
       CDCF_LOGGER_INFO("Order manger record is open.");
       record_is_start_ = true;
-      //      test_mode_is_open_ = true;
       RecordTracker(record_time_interval_);
     } else {
       CDCF_LOGGER_INFO("Order manger record is already open.");
