@@ -5,6 +5,8 @@
 #ifndef ORDER_MANAGER_INCLUDE_MATCH_ENGINE_STUB_FAKE_H_
 #define ORDER_MANAGER_INCLUDE_MATCH_ENGINE_STUB_FAKE_H_
 
+#include <memory>
+
 #include "./match_engine_stub.h"
 
 class MatchEngineStubFake : public MatchEngineStub {
