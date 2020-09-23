@@ -7,15 +7,26 @@
 
 > -r, --match_engine_request_addresses: Specify match engine request only addresses, request only address supports only order matching request
 
-> -h, --help: Print Usage
+> -l, --log_level:  Log level, "info" or "debug", default: info
+
+> -f, --log_file:  Log file location, default: /tmp/order_manager.log
 
 > -t, --test_mode_is_open: '0' means not open, in this mode, order manager will not write database, '1' or other number means open
 
+> --db_user: InfluxDB username
+
+> --db_password: InfluxDB password
+
+> --db_name: Intended InfluxDB database name to use, default: order_mananger
+
+> --db_measurement: Intended InfluxDB measurement name to use, default: order
+
+> -h, --help: Print Usage
 >
 # Example
 
 ```shell script
-./order_manager -a localhost:50051 -d localhost:8086 -m localhost:50052 -r localhost:50053,localhost:50054 -t 0
+./order_manager -a localhost:50051 -d localhost:8086 -m localhost:50052 -r localhost:50053,localhost:50054 -t 0 --db_name order_manager
 ```
 # Order Storage Location
 Orders will be persisted to the specified influxdb in database "order_manager" with measurement of "order'.

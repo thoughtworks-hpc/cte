@@ -4,6 +4,8 @@
 
 #include "../include/order_manager.h"
 
+#include <cdcf/logger.h>
+
 #include <utility>
 
 #include "../../common/include/influxdb.hpp"
@@ -15,10 +17,16 @@ OrderManagerService::OrderManagerService(
       order_store_(std::move(order_store)),
       match_engine_stub_(std::move(match_engine_stub)) {
   if (match_engine_stub_) {
-    match_engine_stub_->SubscribeMatchResult(
+    result_subscribe_thread_ = match_engine_stub_->SubscribeMatchResult(
         [this](const ::match_engine_proto::Trade &trade) {
           HandleMatchResult(trade);
         });
+  }
+}
+
+OrderManagerService::~OrderManagerService() {
+  if (result_subscribe_thread_ != nullptr) {
+    result_subscribe_thread_->join();
   }
 }
 
@@ -159,7 +167,7 @@ int OrderManagerService::PrintRecordResult() {
       send_time = std::chrono::system_clock::now();
     }
 
-    match_engine_stub_->Match(order, &reply);
+    ::grpc::Status status = match_engine_stub_->Match(order, &reply);
 
     if (record_is_start_) {
       auto receive_time = std::chrono::system_clock::now();
@@ -178,20 +186,17 @@ int OrderManagerService::PrintRecordResult() {
     }
 
     int ret;
-
-    if (reply.status() == match_engine_proto::STATUS_SUCCESS) {
-      ret = order_store_->PersistOrder(order, "submitted", 0);
-    } else {
+    if (reply.status() != match_engine_proto::STATUS_SUCCESS || !status.ok()) {
       ret = order_store_->PersistOrder(order, "submission error", 0);
+    } else {
+      ret = order_store_->PersistOrder(order, "submitted", 0);
     }
     if (0 == ret) {
-      std::cout << "submitted and saved order " << order.order_id()
-                << std::endl;
+      CDCF_LOGGER_INFO("submitted and saved order {}", order.order_id());
       message = "order submitted";
       response->set_error_code(order_manager_proto::SUCCESS);
     } else {
-      std::cout << "submission error for order " << order.order_id()
-                << std::endl;
+      CDCF_LOGGER_INFO("submission error for order {}", order.order_id());
       message = "order submission error";
       response->set_error_code(order_manager_proto::FAILURE);
     }
@@ -225,6 +230,7 @@ void OrderManagerService::HandleMatchResult(
   bool if_order_exists = false;
   bool if_maker_concluded = false;
   bool if_taker_concluded = false;
+
   {
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -246,9 +252,11 @@ void OrderManagerService::HandleMatchResult(
 
       if (maker_order.amount() <= maker_concluded_amount) {
         if_maker_concluded = true;
+        order_id_to_order_status_.erase(trade.maker_id());
       }
       if (taker_order.amount() <= taker_concluded_amount) {
         if_taker_concluded = true;
+        order_id_to_order_status_.erase(trade.taker_id());
       }
     } else {
       if_order_exists = false;
@@ -256,8 +264,9 @@ void OrderManagerService::HandleMatchResult(
   }
 
   if (if_order_exists) {
-    std::cout << "receive trade for order " << trade.maker_id() << " as maker"
-              << " and order " << trade.taker_id() << " as taker" << std::endl;
+    CDCF_LOGGER_INFO(
+        "receive trade for order {} as maker and order {} as taker",
+        trade.maker_id(), trade.taker_id());
     std::string maker_status;
     std::string taker_status;
     if (if_maker_concluded) {
@@ -277,8 +286,8 @@ void OrderManagerService::HandleMatchResult(
     order_store_->PersistOrder(taker_order, taker_status,
                                taker_concluded_amount);
   } else {
-    std::cout << "order in trade doesn't exist for either " << trade.maker_id()
-              << " or " << trade.taker_id() << std::endl;
+    CDCF_LOGGER_ERROR("order in trade doesn't exist for either {} or {}",
+                      trade.maker_id(), trade.taker_id());
   }
 }
 
