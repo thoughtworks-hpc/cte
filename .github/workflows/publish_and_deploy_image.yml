@@ -1,6 +1,6 @@
 name: 'Publish, deploy and run Docker image'
 on:
-  workflow_dispatch：
+  workflow_dispatch:
     inputs:
       DEBUG_FLAG:
         description: '0 to Enable write db, 1 to disable write db'
