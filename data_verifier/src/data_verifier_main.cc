@@ -102,7 +102,7 @@ int main(int argc, char* argv[]) {
 
   cdcf::CDCFConfig cdcf_config;
   cdcf_config.log_level_ = log_level;
-  cdcf_config.log_file_ = "/tmp/data_verifier.log";
+  cdcf_config.log_file_ = "/tmp/log/data_verifier.log";
   if (log_level != "debug") {
     cdcf_config.log_no_display_filename_and_line_number_ = true;
   }
