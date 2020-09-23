@@ -1,5 +1,11 @@
 name: 'Publish, deploy and run Docker image'
-on: [workflow_dispatch]
+on:
+  workflow_dispatch：
+    inputs:
+      DEBUG_FLAG:
+        description: '0 to Enable write db, 1 to disable write db'
+        required: true
+
 jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub
@@ -52,14 +58,14 @@ jobs:
           playbook: start_cte_order_manager.yml
           directory: ./deployment/ansible_playbook
           options: |
-            --extra-vars DEBUG=${{ DEBUG_FLAG }}
+            --extra-vars DEBUG=${{ github.event.inputs.DEBUG_FLAG }}
       - name: Start akka order manager
         uses: dawidd6/action-ansible-playbook@v2
         with:
           playbook: start_akka_order_manager.yml
           directory: ./deployment/ansible_playbook
           options: |
-            --extra-vars DEBUG=${{ DEBUG_FLAG }}
+            --extra-vars DEBUG=${{ github.event.inputs.DEBUG_FLAG }}
       - name: Start request generator
         uses: dawidd6/action-ansible-playbook@v2
         with:
