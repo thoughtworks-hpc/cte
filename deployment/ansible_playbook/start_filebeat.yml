@@ -4,6 +4,7 @@
     - cte_match_engine
     - akka_te_match_engine
     - request_generator
+    - cte_order_manager
   tasks:
     - name: Copy filebeat_config to remote nodes
       copy:
