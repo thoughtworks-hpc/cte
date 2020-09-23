@@ -18,6 +18,7 @@ class TradePersistInfluxdb : public DatabaseWriteInterface {
   std::string username_;
   std::string password_;
   std::string database_table_name_;
+  int count_;
 
   TradePersistInfluxdb(std::string databaseName, std::string ip,
                        std::string port, std::string username,
@@ -28,6 +29,7 @@ class TradePersistInfluxdb : public DatabaseWriteInterface {
         username_(std::move(username)),
         password_(std::move(password)),
         database_table_name_(std::move(database_table_name)) {
+    count_ = 0;
     CreateDatabase();
   }
 

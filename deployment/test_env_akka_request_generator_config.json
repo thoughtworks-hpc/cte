@@ -1,0 +1,15 @@
+{
+  "default_num_of_threads": 1,
+  "default_num_of_requests": -1,
+  "default_db_ip_address": "172.30.28.8",
+  "default_db_port": "8086",
+  "default_db_name": "orders",
+  "database_user_name": "",
+  "database_password": "",
+  "grpc_server": [
+    {
+      "ip": "172.30.28.11",
+      "port": "50051"
+    }
+  ]
+}

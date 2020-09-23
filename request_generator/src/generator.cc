@@ -129,6 +129,10 @@ void Generator::SendRequest(std::queue<order_manager_proto::Order> orders,
                 << " failed" << std::endl;
     }
     server_index++;
+    if (count % 5000 == 0) {
+      std::cout << "[INFO] thread #" << std::this_thread::get_id() << " send "
+                << count << " requests" << std::endl;
+    }
   }
   mutex_requests_count_.lock();
   requests_count_ += count;

@@ -1,0 +1,31 @@
+---
+- name: Run cte cluster container using latest image
+  hosts: cte_order_manager
+  become: true
+  gather_facts: no
+  tasks:
+    - docker_compose:
+        project_name: cte_order_manager
+        state: present
+        pull: yes
+        recreate: always
+        definition:
+          version: "2.2"
+          services:
+            cte_order_manager:
+              image: highperformancecomputing/cte:latest
+              container_name: cte_order_manager
+              environment:
+                DB_HOST: 172.30.28.8
+                MATCH_ENGIN: 172.30.28.10
+                MATCH_ENGIN_PORT: 51001
+                ORDER_MANAGER_PORT: 50051
+                DEBUG: "{{ DEBUG }}"
+              command: /bin/bash start_order_manager.sh
+              network_mode: host
+              volumes:
+                - /tmp/log:/tmp/log
+
+    - assert:
+        that:
+          - "cte_order_manager.cte_order_manager.state.running"

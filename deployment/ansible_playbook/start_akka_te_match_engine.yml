@@ -1,0 +1,27 @@
+---
+- name: Run cte cluster container using latest image
+  hosts: akka_te_match_engine
+  become: true
+  gather_facts: no
+  tasks:
+    - docker_compose:
+        project_name: akka_te_match_engine
+        state: present
+        pull: yes
+        recreate: always
+        definition:
+          version: "2.2"
+          services:
+            akka_te_match_engine:
+              image: highperformancecomputing/akka-te:latest
+              container_name: akka_te_match_engine
+              environment:
+                APP_CONFIG_FILE: "./gateway.conf"
+              network_mode: host
+              extra_hosts:
+                - "akkagateway:127.0.0.1"
+              volumes:
+                - /tmp/log:/tmp/log
+    - assert:
+        that:
+          - "akka_te_match_engine.akka_te_match_engine.state.running"
