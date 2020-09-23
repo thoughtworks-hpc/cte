@@ -51,13 +51,15 @@ jobs:
         with:
           playbook: start_cte_order_manager.yml
           directory: ./deployment/ansible_playbook
-
+          options: |
+            --extra-vars DEBUG=${{ DEBUG_FLAG }}
       - name: Start akka order manager
         uses: dawidd6/action-ansible-playbook@v2
         with:
           playbook: start_akka_order_manager.yml
           directory: ./deployment/ansible_playbook
-
+          options: |
+            --extra-vars DEBUG=${{ DEBUG_FLAG }}
       - name: Start request generator
         uses: dawidd6/action-ansible-playbook@v2
         with:

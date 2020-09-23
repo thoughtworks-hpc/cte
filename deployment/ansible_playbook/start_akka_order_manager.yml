@@ -12,19 +12,18 @@
         definition:
           version: "2.2"
           services:
-                akka_order_manager:
-                  image: highperformancecomputing/cte:latest
-                  container_name: akka_order_manager
-                  environment:
-                    DB_HOST: 172.30.28.8
-                    MATCH_ENGIN: 172.30.28.12
-                    MATCH_ENGIN_PORT: 50051
-                    ORDER_MANAGER_PORT: 50051
-                    DEBUG: 1
-                  command: /bin/bash start_order_manager.sh
-                  network_mode: host
-                  volumes:
-                    - /tmp/log:/tmp/log
+            akka_order_manager:
+              image: highperformancecomputing/cte:latest
+              container_name: akka_order_manager
+              environment:
+                DB_HOST: 172.30.28.8
+                MATCH_ENGIN: 172.30.28.12
+                MATCH_ENGIN_PORT: 50051
+                ORDER_MANAGER_PORT: 50051
+              command: /bin/bash start_order_manager.sh
+              network_mode: host
+              volumes:
+                - /tmp/log:/tmp/log
     - assert:
         that:
           - "akka_order_manager.akka_order_manager.state.running"
