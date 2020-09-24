@@ -24,6 +24,7 @@ std::vector<std::string> StrSplit(const std::string& in,
 }
 
 void caf_main(caf::actor_system& system, const match_engine::Config& config) {
+  cdcf::Logger::Init(config);
   caf::actor router_actor = system.spawn(match_engine::SymbolRouterActor);
   system.middleman().publish(router_actor, config.match_router_port);
   match_engine::MatchEngineCluster match_engine_cluster(

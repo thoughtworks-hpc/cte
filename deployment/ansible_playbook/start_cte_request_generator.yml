@@ -1,0 +1,24 @@
+---
+- name: Run cte cluster container using latest image
+  hosts: request_generator
+  become: true
+  gather_facts: no
+  tasks:
+    - docker_compose:
+        project_name: request_generator
+        state: present
+        pull: yes
+        recreate: always
+        definition:
+          version: "2.2"
+          services:
+            request_generator:
+              image: highperformancecomputing/cte:latest
+              container_name: request_generator
+              network_mode: host
+              command: /bin/bash start_request_generator.sh
+              volumes:
+                - /tmp/log:/tmp/log
+    - assert:
+        that:
+          - "request_generator.request_generator.state.running"

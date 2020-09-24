@@ -19,7 +19,7 @@
 > Potential log levels:
 > "trace", "debug", "info", "warning", "error", "critical", "off"
 
-> -f, define log file output path, default is "/tmp/trade_persistence_tool.log"
+> -f, define log file output path, default is "/tmp/log/trade_persistence_tool.log"
 
 > -n, define database name, tool will create a database named by this argument, default is "trade_manager"
 

@@ -1,0 +1,28 @@
+---
+- name: Run cte cluster container using latest image
+  hosts: trade_manager
+  become: true
+  gather_facts: no
+  tasks:
+    - docker_compose:
+        project_name: trade_manager
+        state: present
+        pull: yes
+        recreate: always
+        definition:
+          version: "2.2"
+          services:
+            trade_manager:
+              image: highperformancecomputing/cte:latest
+              container_name: trade_manager
+              environment:
+                DB_HOST: 172.30.28.8
+                CTE_MATCH_ENGIN: 172.30.28.10
+                AKKA_MATCH_ENGIN: 172.30.28.12
+              command: /bin/bash start_trade_manager.sh
+              network_mode: host
+              volumes:
+                - /tmp/log:/tmp/log
+    - assert:
+        that:
+          - "trade_manager.trade_manager.state.running"

@@ -25,22 +25,20 @@ bool TradePersistenceClient::PersistTrades() {
   int count = 0;
   while (reader->Read(&trade)) {
     CDCF_LOGGER_INFO("Receive #{} trade", ++count);
-    CDCF_LOGGER_DEBUG("#{} trade info:", count);
-    CDCF_LOGGER_DEBUG("symbol_id: {}", trade.symbol_id());
-    CDCF_LOGGER_DEBUG("maker_id: {}", trade.maker_id());
-    CDCF_LOGGER_DEBUG("taker_id: {}", trade.taker_id());
-    CDCF_LOGGER_DEBUG("price: {}", trade.price());
-    CDCF_LOGGER_DEBUG("trading_side: {}", trade.trading_side());
-    CDCF_LOGGER_DEBUG("amount: {}", trade.amount());
-    CDCF_LOGGER_DEBUG("buyer_user_id: {}", trade.buyer_user_id());
-    CDCF_LOGGER_DEBUG("seller_user_id: {}", trade.seller_user_id());
+    CDCF_LOGGER_DEBUG(
+        "Receive #{} trade: symbol_id: {}, maker_id: {}, taker_id: {}, price: "
+        "{}, "
+        "trading_side: {}, amount: {}, buyer_user_id: {}, seller_user_id: {}",
+        count, trade.symbol_id(), trade.maker_id(), trade.taker_id(),
+        trade.price(), trade.trading_side(), trade.amount(),
+        trade.buyer_user_id(), trade.seller_user_id());
 
     auto trade_entity = TradeEntity(trade);
     if (!database->PersistTrade(trade_entity)) {
-      CDCF_LOGGER_ERROR("  Write Database Failed");
       return false;
     } else {
-      CDCF_LOGGER_INFO("Write #{} trade to db success", count);
+      CDCF_LOGGER_INFO("Write #{} trade to database: {} success", count,
+                       database_table_name_);
     }
   }
   CDCF_LOGGER_INFO("GRPC Reader finished");

@@ -22,21 +22,20 @@ class MatchEngineStubGrpc : public MatchEngineStub {
       const std::shared_ptr<grpc::Channel>& main_channel,
       const std::vector<std::shared_ptr<grpc::Channel>>& request_channel);
 
-  int Match(const ::match_engine_proto::Order& request,
-            ::match_engine_proto::Reply* response) override;
-  void SubscribeMatchResult(
+  ::grpc::Status Match(const ::match_engine_proto::Order& request,
+                       ::match_engine_proto::Reply* response) override;
+  std::shared_ptr<std::thread> SubscribeMatchResult(
       std::function<void(::match_engine_proto::Trade)> handler) override;
 
  private:
   std::shared_ptr<::match_engine_proto::TradingEngine::Stub>
   GetNextRequestStub();
 
-  //    grpc::ClientContext client_context_;
-
   std::shared_ptr<::match_engine_proto::TradingEngine::Stub> main_stub_;
   std::vector<std::shared_ptr<::match_engine_proto::TradingEngine::Stub>>
       request_stubs_;
   std::atomic<unsigned int> request_stub_index_;
+  mutable std::mutex request_stubs_mutex_;
 };
 
 #endif  // ORDER_MANAGER_INCLUDE_MATCH_ENGINE_STUB_GRPC_H_

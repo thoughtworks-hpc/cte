@@ -11,9 +11,12 @@
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
 
+#include <chrono>
 #include <memory>
 #include <mutex>
+#include <shared_mutex>
 #include <string>
+#include <thread>
 #include <unordered_map>
 #include <vector>
 
@@ -21,6 +24,7 @@
 #include "../../common/protobuf_gen/order_manager.grpc.pb.h"
 #include "./match_engine_stub.h"
 #include "./order_store.h"
+#include "cdcf/logger.h"
 
 class OrderManagerService final
     : public order_manager_proto::OrderManager::Service {
@@ -28,10 +32,17 @@ class OrderManagerService final
   explicit OrderManagerService(
       std::shared_ptr<OrderStore> order_store,
       std::shared_ptr<MatchEngineStub> match_engine_stub);
+  ~OrderManagerService();
 
   ::grpc::Status PlaceOrder(::grpc::ServerContext* context,
                             const ::order_manager_proto::Order* request,
                             ::order_manager_proto::Reply* response) override;
+  ::grpc::Status StartEndManager(
+      ::grpc::ServerContext* context,
+      const ::order_manager_proto::ManagerStatus* status,
+      ::order_manager_proto::Reply* response) override;
+
+  void RecordTracker(int& time_interval_in_seconds);
 
  private:
   class OrderStatus {
@@ -44,6 +55,7 @@ class OrderManagerService final
                              match_engine_proto::Order& order);
   void SaveOrderStatus(const match_engine_proto::Order& order);
   void HandleMatchResult(const ::match_engine_proto::Trade& trade);
+  int PrintRecordResult();
 
   std::atomic<int64_t> order_id_;
   mutable std::mutex mutex_;
@@ -52,6 +64,26 @@ class OrderManagerService final
   std::shared_ptr<OrderStore> order_store_;
 
   std::shared_ptr<MatchEngineStub> match_engine_stub_;
+
+  std::shared_ptr<std::thread> result_subscribe_thread_;
+
+  std::atomic_bool record_is_start_ = false;
+  std::atomic_int send_data_amount_ = 0;
+  std::atomic_int receive_data_amount_ = 0;
+  std::atomic_int latency_sum_ = 0;
+  std::atomic_int latency_max_ = 0;
+  std::atomic_int latency_min_ = 100000;
+  std::vector<int> send_data_list_;
+  std::vector<int> receive_data_list_;
+  std::vector<int> latency_list_;
+  int record_time_interval_ = 0;
+  int latency_average_warning_ = 0;
+  std::atomic_bool test_mode_is_open_ = false;
+
+ public:
+  void SetRecordTimeInterval(int interval);
+  void SetLatencyAverageWarning(int latency_average_warning);
+  void SetTestModeIsOpen(bool test_mode_is_open);
 };
 
 #endif  // ORDER_MANAGER_INCLUDE_ORDER_MANAGER_H_

@@ -4,9 +4,10 @@
 
 #include "../include/match_engine_stub_fake.h"
 
-void MatchEngineStubFake::SubscribeMatchResult(
+std::shared_ptr<std::thread> MatchEngineStubFake::SubscribeMatchResult(
     std::function<void(::match_engine_proto::Trade)> handler) {
   handler_ = handler;
+  return nullptr;
 }
 
 void MatchEngineStubFake::ProvideMatchResult(

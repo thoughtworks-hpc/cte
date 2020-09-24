@@ -4,10 +4,12 @@
 
 #include "../include/order_store_influxdb.h"
 
+#include <cdcf/logger.h>
+
 #include "../../common/include/influxdb.hpp"
 
-OrderStoreInfluxDB::OrderStoreInfluxDB(const std::string& host, int port)
-    : host_(host), port_(port) {
+OrderStoreInfluxDB::OrderStoreInfluxDB(const DatabaseConfig& config)
+    : host_(config.db_address), port_(config.db_port) {
   std::string resp;
   int ret;
 
@@ -15,17 +17,32 @@ OrderStoreInfluxDB::OrderStoreInfluxDB(const std::string& host, int port)
     host_ = "127.0.0.1";
   }
 
-  influxdb_cpp::server_info si(host_, port_, "", "", "");
-  ret = influxdb_cpp::create_db(resp, "order_manager", si);
+  if (!config.db_name.empty()) {
+    database_ = config.db_name;
+  }
+
+  if (!config.db_measurement.empty()) {
+    measurement_ = config.db_measurement;
+  }
+
+  if (!config.db_user.empty()) {
+    user_ = config.db_user;
+  }
+
+  if (!config.db_password.empty()) {
+    password_ = config.db_password;
+  }
+
+  influxdb_cpp::server_info si(host_, port_, "", user_, password_);
+  ret = influxdb_cpp::create_db(resp, database_, si);
   if (0 != ret) {
-    std::cout << "create database of order_manager failed ret:" << ret
-              << std::endl;
+    CDCF_LOGGER_ERROR("create database of {} failed ret: {}", database_, ret);
   }
 }
 
 int OrderStoreInfluxDB::PersistOrder(const match_engine_proto::Order& order,
                                      std::string status, int concluded_amount) {
-  influxdb_cpp::server_info si(host_, port_, "order_manager", "", "");
+  influxdb_cpp::server_info si(host_, port_, database_, user_, password_);
   std::string resp;
 
   std::string trading_side;
@@ -38,7 +55,7 @@ int OrderStoreInfluxDB::PersistOrder(const match_engine_proto::Order& order,
   }
 
   int ret = influxdb_cpp::builder()
-                .meas("order")
+                .meas(measurement_)
                 .tag("order_id", std::to_string(order.order_id()))
                 .tag("symbol_id", std::to_string(order.symbol_id()))
                 .field("user_id", order.user_id())
@@ -51,10 +68,9 @@ int OrderStoreInfluxDB::PersistOrder(const match_engine_proto::Order& order,
                 .post_http(si, &resp);
 
   if (0 == ret && resp.empty()) {
-    std::cout << "write db success" << std::endl;
+    CDCF_LOGGER_DEBUG("write db success");
   } else {
-    std::cout << "write db failed, ret:" << ret << " resp:" << resp
-              << std::endl;
+    CDCF_LOGGER_ERROR("write db failed, ret: {}", resp);
   }
 
   return ret;

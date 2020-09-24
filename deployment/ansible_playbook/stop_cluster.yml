@@ -1,0 +1,51 @@
+---
+- name: Stop trade_manager
+  hosts: trade_manager
+  become: true
+  gather_facts: no
+  tasks:
+    - docker_container:
+        name: trade_manager
+        state: absent
+- name: Stop request_generator
+  hosts: request_generator
+  become: true
+  gather_facts: no
+  tasks:
+    - docker_container:
+        name: request_generator
+        state: absent
+- name: Stop cte_order_manager
+  hosts: cte_order_manager
+  become: true
+  gather_facts: no
+  tasks:
+    - docker_container:
+        name: cte_order_manager
+        state: absent
+
+- name: Stop akka_order_manager
+  hosts: akka_order_manager
+  become: true
+  gather_facts: no
+  tasks:
+    - docker_container:
+        name: akka_order_manager
+        state: absent
+
+- name: Stop cte_match_engine
+  hosts: cte_match_engine
+  become: true
+  gather_facts: no
+  tasks:
+    - docker_container:
+        name: cte_match_engine
+        state: absent
+- name: Stop akka_te_match_engine
+  hosts: akka_te_match_engine
+  become: true
+  gather_facts: no
+  tasks:
+    - docker_container:
+        name: akka_te_match_engine
+        state: absent

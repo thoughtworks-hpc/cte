@@ -21,5 +21,5 @@
   "ordered_data_sources": true,
   "ordered_by_symbol": true,
   "compare_entire_data_source_in_one_turn": true,
-  "number_of_entries_to_compare_each_turn": 10000
+  "number_of_entries_to_compare_each_turn": 1000
 }

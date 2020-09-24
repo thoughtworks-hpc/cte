@@ -1,5 +1,11 @@
 name: 'Publish, deploy and run Docker image'
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
+    inputs:
+      DEBUG_FLAG:
+        description: '0 to Enable write db, 1 to disable write db'
+        required: true
+
 jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub
@@ -8,11 +14,60 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v2
         with:
-          ref: develop
-      - name: Push to Docker Hub
-        uses: docker/build-push-action@v1
+          ref: prepare_for_deployment
+      - name: Publish Docker
+        uses: elgohr/Publish-Docker-Github-Action@2.21
         with:
+          name: highperformancecomputing/cte
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: highperformancecomputing/cte
           tags: latest
+
+#      - name: Start database
+#        uses: dawidd6/action-ansible-playbook@v2
+#        with:
+#          playbook: start_database.yml
+#          directory: ./deployment/ansible_playbook
+      - name: Stop clusrer
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: stop_cluster.yml
+          directory: ./deployment/ansible_playbook
+
+      - name: Start cte match engin
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: start_cte_match_engine.yml
+          directory: ./deployment/ansible_playbook
+
+      - name: Start akka_te match engin
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: start_akka_te_match_engine.yml
+          directory: ./deployment/ansible_playbook
+
+      - name: Start trade manager
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: start_trade_manager.yml
+          directory: ./deployment/ansible_playbook
+
+      - name: Start cte order manager
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: start_cte_order_manager.yml
+          directory: ./deployment/ansible_playbook
+          options: |
+            --extra-vars DEBUG=${{ github.event.inputs.DEBUG_FLAG }}
+      - name: Start akka order manager
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: start_akka_order_manager.yml
+          directory: ./deployment/ansible_playbook
+          options: |
+            --extra-vars DEBUG=${{ github.event.inputs.DEBUG_FLAG }}
+      - name: Start request generator
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: start_cte_request_generator.yml
+          directory: ./deployment/ansible_playbook
