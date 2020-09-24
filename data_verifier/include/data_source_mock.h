@@ -16,6 +16,8 @@ class DataSourceMock : public DataSource {
  public:
   int GetDataEntryNumber() override;
   std::vector<std::string> GetDataEntries(int limit, int offset) override;
+  std::unordered_map<std::string, std::vector<std::string>>
+  GetDataEntriesBySymbol(int limit, int offset) override;
   bool CompareDataEntry(const std::string& source,
                         const std::string& target) override;
   bool FindIfDataEntryExists(const std::string& entry) override;

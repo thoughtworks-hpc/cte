@@ -6,6 +6,7 @@
 #define DATA_VERIFIER_INCLUDE_DATA_SOURCE_INFLUXDB_H_
 
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -22,6 +23,9 @@ class DataSourceInfluxDB : public DataSource {
 
   std::vector<std::string> GetDataEntries(int limit, int offset) override;
 
+  std::unordered_map<std::string, std::vector<std::string>>
+  GetDataEntriesBySymbol(int limit, int offset) override;
+
   bool CompareDataEntry(const std::string& source,
                         const std::string& target) override;
 
@@ -37,6 +41,10 @@ class DataSourceInfluxDB : public DataSource {
                                         const nlohmann::json& j_target);
     static std::optional<std::vector<std::string>>
     ExtractValuesElementFromJsonString(const std::string& j);
+
+    static std::optional<
+        std::unordered_map<std::string, std::vector<std::string>>>
+    ExtractValuesElementFromJsonStringBySymbol(const std::string& j);
   };
 
  private:

@@ -58,6 +58,15 @@ std::vector<std::string> DataSourceInfluxDB::GetDataEntries(int limit,
       std::vector<std::string>());
 }
 
+std::unordered_map<std::string, std::vector<std::string>>
+DataSourceInfluxDB::GetDataEntriesBySymbol(int limit, int offset) {
+  std::string data;
+  GetDataEntries(limit, offset, data);
+
+  return Algorithm::ExtractValuesElementFromJsonStringBySymbol(data).value_or(
+      std::unordered_map<std::string, std::vector<std::string>>());
+}
+
 std::optional<std::vector<std::string>>
 DataSourceInfluxDB::Algorithm::ExtractValuesElementFromJsonString(
     const std::string& data) {
@@ -84,6 +93,37 @@ DataSourceInfluxDB::Algorithm::ExtractValuesElementFromJsonString(
   element = data_entries;
 
   return element;
+}
+
+std::optional<std::unordered_map<std::string, std::vector<std::string>>>
+DataSourceInfluxDB::Algorithm::ExtractValuesElementFromJsonStringBySymbol(
+    const std::string& data) {
+  std::unordered_map<std::string, std::vector<std::string>> data_entries;
+  std::optional<std::unordered_map<std::string, std::vector<std::string>>>
+      elements_by_symbol;
+
+  json j_source = json::parse(data);
+  json j_source_values;
+
+  if (Algorithm::ExtractValuesJsonArray(data, j_source_values) != 0) {
+    return std::nullopt;
+  }
+
+  int j_src_size = j_source_values.size();
+  if (j_src_size <= 0) {
+    return std::nullopt;
+  }
+
+  for (int i = 0; i < j_src_size; ++i) {
+    json j_element = j_source_values[i].get<json>();
+
+    auto symbol_id_ = j_element[8].get<std::string>();
+
+    data_entries[symbol_id_].push_back(j_element.dump());
+  }
+  elements_by_symbol = data_entries;
+
+  return elements_by_symbol;
 }
 
 std::string DataSourceInfluxDB::GetQueryResult(const std::string& sql) {
@@ -166,15 +206,15 @@ bool DataSourceInfluxDB::Algorithm::CompareTradeJsonElement(
       return false;
     }
     // price
-    if (j_source[5].get<std::string>() != j_target[5].get<std::string>()) {
+    if (j_source[4].get<std::string>() != j_target[4].get<std::string>()) {
       return false;
     }
     // sell_trade_id
-    if (j_source[6].get<std::string>() != j_target[6].get<std::string>()) {
+    if (j_source[5].get<std::string>() != j_target[5].get<std::string>()) {
       return false;
     }
     // sell_user_id
-    if (j_source[7].get<std::string>() != j_target[7].get<std::string>()) {
+    if (j_source[6].get<std::string>() != j_target[6].get<std::string>()) {
       return false;
     }
     // symbol_id

@@ -2,7 +2,7 @@
   "server": [
     {
       "host": "127.0.0.1",
-      "port": 55555,
+      "port": 8086,
       "database": "trade_manager",
       "measurement": "cte_trades",
       "user": "",
@@ -10,15 +10,16 @@
     },
     {
       "host": "127.0.0.1",
-      "port": 55555,
+      "port": 8086,
       "database": "trade_manager",
-      "measurement": "cte_trades",
+      "measurement": "akka_te_trades",
       "user": "",
       "password": ""
     }
   ],
   "level_log": "info",
   "ordered_data_sources": true,
+  "ordered_by_symbol": true,
   "compare_entire_data_source_in_one_turn": true,
   "number_of_entries_to_compare_each_turn": 10000
 }

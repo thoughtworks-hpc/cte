@@ -45,11 +45,12 @@ int ParserConfigJsonForDatabaseServerInfo(
 
 int ParserConfigJsonForMiscOptions(
     const json& config, std::string& log_level, bool& ordered_data_sources,
-    bool& compare_entire_data_source_in_one_turn,
+    bool& ordered_by_symbol, bool& compare_entire_data_source_in_one_turn,
     int& number_of_entries_to_compare_each_turn) {
   try {
     log_level = config["level_log"].get<std::string>();
     ordered_data_sources = config["ordered_data_sources"].get<bool>();
+    ordered_by_symbol = config["ordered_by_symbol"].get<bool>();
     compare_entire_data_source_in_one_turn =
         config["compare_entire_data_source_in_one_turn"].get<bool>();
     number_of_entries_to_compare_each_turn =
@@ -89,13 +90,14 @@ int main(int argc, char* argv[]) {
 
   std::string log_level = "info";
   bool is_ordered_data_sources = true;
+  bool is_ordered_by_symbol = true;
   bool compare_entire_data_source_in_one_turn = true;
   int number_of_entries_to_compare_each_turn = 10000;
 
-  ret =
-      ParserConfigJsonForMiscOptions(config, log_level, is_ordered_data_sources,
-                                     compare_entire_data_source_in_one_turn,
-                                     number_of_entries_to_compare_each_turn);
+  ret = ParserConfigJsonForMiscOptions(
+      config, log_level, is_ordered_data_sources, is_ordered_by_symbol,
+      compare_entire_data_source_in_one_turn,
+      number_of_entries_to_compare_each_turn);
   if (ret != 0) {
     std::cout << "parse config json failed" << std::endl;
   }
@@ -114,7 +116,7 @@ int main(int argc, char* argv[]) {
       std::make_shared<DataSourceInfluxDB>(server_info_b, measurement_b);
 
   DataVerifier data_verifier(data_source_a, data_source_b,
-                             is_ordered_data_sources);
+                             is_ordered_data_sources, is_ordered_by_symbol);
   data_verifier.SetNumberOfEntriesToCompareEachTurn(
       number_of_entries_to_compare_each_turn);
   if (!compare_entire_data_source_in_one_turn) {

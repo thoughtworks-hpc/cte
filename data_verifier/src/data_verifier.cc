@@ -29,8 +29,15 @@ bool DataVerifier::VerifyEquality() {
 
   int ret;
   if (is_ordered_data_sources_) {
-    CDCF_LOGGER_INFO("start compare ordered data sources");
-    ret = VerifyEqualityForOrderedDataSource(data_source_entry_number, 0);
+    if (is_ordered_by_symbol_) {
+      CDCF_LOGGER_INFO("start compare ordered by symbol data sources");
+      ret = VerifyEqualityForOrderedBySymbolDataSource(data_source_entry_number,
+                                                       0);
+    } else {
+      CDCF_LOGGER_INFO("start compare fully ordered data sources");
+      ret =
+          VerifyEqualityForFullyOrderedDataSource(data_source_entry_number, 0);
+    }
   } else {
     CDCF_LOGGER_INFO("start compare unordered data sources");
     ret = VerifyEqualityForUnorderedDataSource(data_source_entry_number, 0);
@@ -39,7 +46,8 @@ bool DataVerifier::VerifyEquality() {
   return ret;
 }
 
-bool DataVerifier::VerifyEqualityForOrderedDataSource(int limit, int offset) {
+bool DataVerifier::VerifyEqualityForFullyOrderedDataSource(int limit,
+                                                           int offset) {
   int data_source_number_remaining = limit;
   int data_source_number_to_retrieve =
       limit > number_of_entries_to_compare_each_turn_
@@ -71,6 +79,54 @@ bool DataVerifier::VerifyEqualityForOrderedDataSource(int limit, int offset) {
         "{} entries compared with {} remaining", data_source_number_to_retrieve,
         data_source_number_remaining > 0 ? data_source_number_remaining : 0);
   }
+  return !inconsistency_found;
+}
+
+bool DataVerifier::VerifyEqualityForOrderedBySymbolDataSource(int limit,
+                                                              int offset) {
+  int data_source_number_to_retrieve = limit;
+
+  CDCF_LOGGER_INFO("{} entries to compare", limit);
+  bool inconsistency_found = false;
+
+  auto data_entries_map_a = data_source_a_->GetDataEntriesBySymbol(
+      data_source_number_to_retrieve, offset);
+  auto data_entries_map_b = data_source_b_->GetDataEntriesBySymbol(
+      data_source_number_to_retrieve, offset);
+
+  std::string symbol_id;
+  for (const auto& pair_a : data_entries_map_a) {
+    symbol_id = pair_a.first;
+    if (data_entries_map_b.find(symbol_id) == data_entries_map_b.end()) {
+      CDCF_LOGGER_ERROR(
+          "symbol {} from data source a not found in data source b", symbol_id);
+      inconsistency_found = true;
+      continue;
+    }
+
+    auto& data_entries_a = data_entries_map_a[symbol_id];
+    auto& data_entries_b = data_entries_map_b[symbol_id];
+
+    if (data_entries_a.size() != data_entries_b.size()) {
+      CDCF_LOGGER_ERROR(
+          "trade data entry number inconsistent between {} and {} from 2 data "
+          "sources for symbol {}",
+          data_entries_a.size(), data_entries_b.size(), symbol_id);
+    }
+
+    for (int i = 0; i < std::min(data_entries_a.size(), data_entries_b.size());
+         ++i) {
+      if (!data_source_a_->CompareDataEntry(data_entries_a[i],
+                                            data_entries_b[i])) {
+        CDCF_LOGGER_ERROR(
+            "trade data inconsistent between {} and {} from 2 data sources",
+            data_entries_a[i], data_entries_b[i]);
+        inconsistency_found = true;
+      }
+    }
+    CDCF_LOGGER_INFO("comparison of symbol {} finished", symbol_id);
+  }
+
   return !inconsistency_found;
 }
 
