@@ -65,4 +65,7 @@ COPY deployment/start_request_generator.sh /bin/start_request_generator.sh
 COPY deployment/start_order_manager.sh /bin/start_order_manager.sh
 COPY deployment/start_trade_manager.sh /bin/start_trade_manager.sh
 
+COPY --from=builder /cte/bin/data_verifier /tmp/data_verifier
+COPY deployment/test_env_data_verifier_config.json /tmp/data_verifier_config.json
+
 CMD ["/bin/script.sh"]

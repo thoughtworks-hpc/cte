@@ -1,0 +1,24 @@
+{
+  "server": [
+    {
+      "host": "172.30.28.8",
+      "port": 8086,
+      "database": "trade_manager",
+      "measurement": "cte_trades",
+      "user": "",
+      "password": ""
+    },
+    {
+      "host": "172.30.28.8",
+      "port": 8086,
+      "database": "trade_manager",
+      "measurement": "cte_trades",
+      "user": "",
+      "password": ""
+    }
+  ],
+  "level_log": "debug",
+  "ordered_data_sources": true,
+  "compare_entire_data_source_in_one_turn": true,
+  "number_of_entries_to_compare_each_turn": 1000
+}
