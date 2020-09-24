@@ -196,7 +196,7 @@ int OrderManagerService::PrintRecordResult() {
       message = "order submitted";
       response->set_error_code(order_manager_proto::SUCCESS);
     } else {
-      CDCF_LOGGER_INFO("submission error for order {}", order.order_id());
+      CDCF_LOGGER_ERROR("submission error for order {}", order.order_id());
       message = "order submission error";
       response->set_error_code(order_manager_proto::FAILURE);
     }
