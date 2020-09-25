@@ -4,7 +4,7 @@ curl -POST http://172.30.28.8:8086/query --data-urlencode "q=DROP DATABASE order
 curl -POST http://172.30.28.8:8086/query --data-urlencode "q=DROP DATABASE trade_manager"
 cd bin
 /bin/request_generator_main -f test_env_cte_request_generator_config.json &
-cte_pid=echo $!
+cte_pid=$!
 /bin/request_generator_main -f test_env_akka_request_generator_config.json
 
 while true
