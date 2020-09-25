@@ -3,8 +3,9 @@
 curl -POST http://172.30.28.8:8086/query -s --data-urlencode "q=DROP DATABASE order_manager"
 curl -POST http://172.30.28.8:8086/query -s --data-urlencode "q=DROP DATABASE trade_manager"
 
-curl -POST http://172.30.28.8:8086/query  --data-urlencode "q=CREATE DATABASE order_manager"
-curl -POST http://172.30.28.8:8086/query  --data-urlencode "q=CREATE DATABASE trade_manager"
+curl -POST http://172.30.28.8:8086/query -s --data-urlencode "q=CREATE DATABASE order_manager"
+curl -POST http://172.30.28.8:8086/query -s --data-urlencode "q=CREATE DATABASE trade_manager"
+echo '[IMPORTANT] akka-te is finished, waiting for database service'
 
 cd bin
 /bin/request_generator_main -f test_env_cte_request_generator_config.json &
