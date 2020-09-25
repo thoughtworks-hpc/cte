@@ -12,7 +12,7 @@
       "host": "127.0.0.1",
       "port": 8086,
       "database": "trade_manager",
-      "measurement": "cte_trades",
+      "measurement": "akka_te_trades",
       "user": "",
       "password": ""
     }
