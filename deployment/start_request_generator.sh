@@ -38,7 +38,7 @@ done
 
 while true
 do
-  count1=$(curl -GET 'http://172.30.28.8:8086/query?pretty=true'-s --data-urlencode "db=trade_manager" --data-urlencode "q=SELECT count(*) FROM akka_te_trades" | python -c 'import json,sys;obj=json.load(sys.stdin); print(obj["results"][0]["series"][0]["values"][0][1])')
+  count1=$(curl -GET 'http://172.30.28.8:8086/query?pretty=true' -s --data-urlencode "db=trade_manager" --data-urlencode "q=SELECT count(*) FROM akka_te_trades" | python -c 'import json,sys;obj=json.load(sys.stdin); print(obj["results"][0]["series"][0]["values"][0][1])')
   sleep 5
   count2=$(curl -GET 'http://172.30.28.8:8086/query?pretty=true' -s --data-urlencode "db=trade_manager" --data-urlencode "q=SELECT count(*) FROM akka_te_trades" | python -c 'import json,sys;obj=json.load(sys.stdin); print(obj["results"][0]["series"][0]["values"][0][1])')
   if [ $count1 == $count2 ]
