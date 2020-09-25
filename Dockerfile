@@ -32,7 +32,7 @@ RUN cmake . -DCMAKE_TOOLCHAIN_FILE=conan_paths.cmake -DCMAKE_BUILD_TYPE=Release 
 FROM debian
 RUN apt-get clean \
     && apt-get update \
-    && apt-get install influxdb vim -y
+    && apt-get install influxdb vim curl python3 -y
 RUN apt-get clean \
     && apt-get update \
     && apt-get install influxdb-client
