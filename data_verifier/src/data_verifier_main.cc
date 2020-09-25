@@ -44,9 +44,10 @@ int ParserConfigJsonForDatabaseServerInfo(
 }
 
 int ParserConfigJsonForMiscOptions(
-    const json& config, std::string& log_level, bool& ordered_data_sources,
-    bool& ordered_by_symbol, bool& compare_entire_data_source_in_one_turn,
-    int& number_of_entries_to_compare_each_turn) {
+    const json& config, std::string& log_level, bool& ordered_data_sources, bool& ordered_by_symbol,
+    bool& compare_entire_data_source_in_one_turn,
+    int& number_of_entries_to_compare_each_turn,
+    std::string& log_file_path) {
   try {
     log_level = config["level_log"].get<std::string>();
     ordered_data_sources = config["ordered_data_sources"].get<bool>();
@@ -55,6 +56,7 @@ int ParserConfigJsonForMiscOptions(
         config["compare_entire_data_source_in_one_turn"].get<bool>();
     number_of_entries_to_compare_each_turn =
         config["number_of_entries_to_compare_each_turn"].get<int>();
+    log_file_path = config["log_file_path"].get<std::string>();
   } catch (const std::exception& e) {
     std::cout << "ParserConfigJsonForMiscOptions error: " << e.what()
               << std::endl;
@@ -81,6 +83,7 @@ int main(int argc, char* argv[]) {
   influxdb_cpp::server_info server_info_b("127.0.0.1", 8086);
   std::string measurement_a;
   std::string measurement_b;
+  std::string log_file_path;
   int ret = 0;
   ret = ParserConfigJsonForDatabaseServerInfo(
       config, server_info_a, server_info_b, measurement_a, measurement_b);
@@ -94,17 +97,17 @@ int main(int argc, char* argv[]) {
   bool compare_entire_data_source_in_one_turn = true;
   int number_of_entries_to_compare_each_turn = 10000;
 
-  ret = ParserConfigJsonForMiscOptions(
-      config, log_level, is_ordered_data_sources, is_ordered_by_symbol,
-      compare_entire_data_source_in_one_turn,
-      number_of_entries_to_compare_each_turn);
+  ret =
+      ParserConfigJsonForMiscOptions(config, log_level, is_ordered_data_sources, is_ordered_by_symbol,
+                                     compare_entire_data_source_in_one_turn,
+                                     number_of_entries_to_compare_each_turn, log_file_path);
   if (ret != 0) {
     std::cout << "parse config json failed" << std::endl;
   }
 
   cdcf::CDCFConfig cdcf_config;
   cdcf_config.log_level_ = log_level;
-  cdcf_config.log_file_ = "/tmp/log/data_verifier.log";
+  cdcf_config.log_file_ = log_file_path;
   if (log_level != "debug") {
     cdcf_config.log_no_display_filename_and_line_number_ = true;
   }
