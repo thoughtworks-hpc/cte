@@ -46,7 +46,6 @@ do
 done
 
 echo '[IMPORTANT] start data_verifier now'
+cd /tmp
 /tmp/data_verifier
 sleep infinity
-
-echo '{"hostname":"test","domainname":"example.com"}' |
