@@ -8,6 +8,7 @@
 #include <bitset>
 #include <mutex>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "./data_source.h"
