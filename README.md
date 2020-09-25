@@ -26,3 +26,5 @@ $ ctest .
 
 [CDCF: C++ Distributed Computing Framework](https://github.com/thoughtworks-hpc/cdcf)
 
+## Document
+[CTE Develop Document](https://github.com/thoughtworks-hpc/cte/tree/develop/document)
