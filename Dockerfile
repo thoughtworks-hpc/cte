@@ -32,7 +32,7 @@ RUN cmake . -DCMAKE_TOOLCHAIN_FILE=conan_paths.cmake -DCMAKE_BUILD_TYPE=Release 
 FROM debian
 RUN apt-get clean \
     && apt-get update \
-    && apt-get install influxdb vim -y
+    && apt-get install influxdb vim curl python procps -y
 RUN apt-get clean \
     && apt-get update \
     && apt-get install influxdb-client
@@ -64,5 +64,8 @@ COPY deployment/start_test_env_database.sh /bin/start_test_env_database.sh
 COPY deployment/start_request_generator.sh /bin/start_request_generator.sh
 COPY deployment/start_order_manager.sh /bin/start_order_manager.sh
 COPY deployment/start_trade_manager.sh /bin/start_trade_manager.sh
+
+COPY --from=builder /cte/bin/data_verifier /tmp/data_verifier
+COPY deployment/test_env_data_verifier_config.json /tmp/data_verifier_config.json
 
 CMD ["/bin/script.sh"]
