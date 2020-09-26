@@ -127,6 +127,6 @@ int main(int argc, char* argv[]) {
   if (data_verifier.VerifyEquality()) {
     CDCF_LOGGER_INFO("trade data matches between 2 data sources");
   } else {
-    CDCF_LOGGER_INFO("trade data doesn't match between 2 data sources");
+    CDCF_LOGGER_ERROR("trade data doesn't match between 2 data sources");
   }
 }

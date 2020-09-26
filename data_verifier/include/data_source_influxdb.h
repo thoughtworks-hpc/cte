@@ -31,6 +31,10 @@ class DataSourceInfluxDB : public DataSource {
 
   bool FindIfDataEntryExists(const std::string& entry) override;
 
+  std::string GetDataSourceName() override { return measurement_; }
+
+  std::string GetDataEntryDebugString(const std::string& entry) override;
+
   struct Algorithm {
     static bool CompareTradeJson(const std::string& source,
                                  const std::string& target);
@@ -45,6 +49,9 @@ class DataSourceInfluxDB : public DataSource {
     static std::optional<
         std::unordered_map<std::string, std::vector<std::string>>>
     ExtractValuesElementFromJsonStringBySymbol(const std::string& j);
+
+    static std::string GetDebugTradeString(
+        const std::string& trade_json_string);
   };
 
  private:

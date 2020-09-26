@@ -67,63 +67,46 @@ DataSourceInfluxDB::GetDataEntriesBySymbol(int limit, int offset) {
       std::unordered_map<std::string, std::vector<std::string>>());
 }
 
-std::optional<std::vector<std::string>>
-DataSourceInfluxDB::Algorithm::ExtractValuesElementFromJsonString(
-    const std::string& data) {
-  std::vector<std::string> data_entries;
-  std::optional<std::vector<std::string>> element;
+bool DataSourceInfluxDB::FindIfDataEntryExists(const std::string& entry) {
+  j_entry_ = json::parse(entry);
 
-  json j_source = json::parse(data);
-  json j_source_values;
-
-  if (Algorithm::ExtractValuesJsonArray(data, j_source_values) != 0) {
-    return std::nullopt;
+  try {
+    amount_ = j_entry_[1].get<std::string>();
+    buy_order_id_ = j_entry_[2].get<std::string>();
+    buy_user_id_ = j_entry_[3].get<std::string>();
+    price_ = j_entry_[4].get<std::string>();
+    sell_order_id_ = j_entry_[5].get<std::string>();
+    sell_user_id_ = j_entry_[6].get<std::string>();
+    symbol_id_ = j_entry_[8].get<std::string>();
+  } catch (const std::exception& e) {
+    CDCF_LOGGER_ERROR("FindIfJsonExists error:  {}", e.what());
+    return false;
   }
 
-  int j_src_size = j_source_values.size();
-  if (j_src_size <= 0) {
-    return std::nullopt;
+  std::string sql(std::move(
+      BuildFindIfEntryExistsQuery(amount_, buy_order_id_, buy_user_id_, price_,
+                                  sell_order_id_, sell_user_id_, symbol_id_)));
+
+  std::string resp(std::move(GetQueryResult(sql)));
+
+  if (IsEmptyQueryResult(resp)) {
+    CDCF_LOGGER_ERROR("QueryResult :  {}", resp);
+    return false;
+  } else {
+    return true;
   }
-
-  for (int i = 0; i < j_src_size; ++i) {
-    json j_element = j_source_values[i].get<json>();
-
-    data_entries.push_back(j_element.dump());
-  }
-  element = data_entries;
-
-  return element;
 }
 
-std::optional<std::unordered_map<std::string, std::vector<std::string>>>
-DataSourceInfluxDB::Algorithm::ExtractValuesElementFromJsonStringBySymbol(
-    const std::string& data) {
-  std::unordered_map<std::string, std::vector<std::string>> data_entries;
-  std::optional<std::unordered_map<std::string, std::vector<std::string>>>
-      elements_by_symbol;
+bool DataSourceInfluxDB::CompareDataEntry(const std::string& source,
+                                          const std::string& target) {
+  json j_source = json::parse(source);
+  json j_target = json::parse(target);
+  return Algorithm::CompareTradeJsonElement(j_source, j_target);
+}
 
-  json j_source = json::parse(data);
-  json j_source_values;
-
-  if (Algorithm::ExtractValuesJsonArray(data, j_source_values) != 0) {
-    return std::nullopt;
-  }
-
-  int j_src_size = j_source_values.size();
-  if (j_src_size <= 0) {
-    return std::nullopt;
-  }
-
-  for (int i = 0; i < j_src_size; ++i) {
-    json j_element = j_source_values[i].get<json>();
-
-    auto symbol_id_ = j_element[8].get<std::string>();
-
-    data_entries[symbol_id_].push_back(j_element.dump());
-  }
-  elements_by_symbol = data_entries;
-
-  return elements_by_symbol;
+std::string DataSourceInfluxDB::GetDataEntryDebugString(
+    const std::string& entry) {
+  return Algorithm::GetDebugTradeString(entry);
 }
 
 std::string DataSourceInfluxDB::GetQueryResult(const std::string& sql) {
@@ -182,6 +165,67 @@ and "symbol_id" = '{}')",
 
   CDCF_LOGGER_DEBUG("BuildFindIfEntryExistsQuery SQL: {}", sql);
   return sql;
+}
+
+// Algorithm
+
+std::optional<std::vector<std::string>>
+DataSourceInfluxDB::Algorithm::ExtractValuesElementFromJsonString(
+    const std::string& data) {
+  std::vector<std::string> data_entries;
+  std::optional<std::vector<std::string>> element;
+
+  json j_source = json::parse(data);
+  json j_source_values;
+
+  if (Algorithm::ExtractValuesJsonArray(data, j_source_values) != 0) {
+    return std::nullopt;
+  }
+
+  int j_src_size = j_source_values.size();
+  if (j_src_size <= 0) {
+    return std::nullopt;
+  }
+
+  for (int i = 0; i < j_src_size; ++i) {
+    json j_element = j_source_values[i].get<json>();
+
+    data_entries.push_back(j_element.dump());
+  }
+  element = data_entries;
+
+  return element;
+}
+
+std::optional<std::unordered_map<std::string, std::vector<std::string>>>
+DataSourceInfluxDB::Algorithm::ExtractValuesElementFromJsonStringBySymbol(
+    const std::string& data) {
+  std::unordered_map<std::string, std::vector<std::string>> data_entries;
+  std::optional<std::unordered_map<std::string, std::vector<std::string>>>
+      elements_by_symbol;
+
+  json j_source = json::parse(data);
+  json j_source_values;
+
+  if (Algorithm::ExtractValuesJsonArray(data, j_source_values) != 0) {
+    return std::nullopt;
+  }
+
+  int j_src_size = j_source_values.size();
+  if (j_src_size <= 0) {
+    return std::nullopt;
+  }
+
+  for (int i = 0; i < j_src_size; ++i) {
+    json j_element = j_source_values[i].get<json>();
+
+    auto symbol_id_ = j_element[8].get<std::string>();
+
+    data_entries[symbol_id_].push_back(j_element.dump());
+  }
+  elements_by_symbol = data_entries;
+
+  return elements_by_symbol;
 }
 
 bool DataSourceInfluxDB::Algorithm::CompareTradeJsonElement(
@@ -280,39 +324,27 @@ bool DataSourceInfluxDB::Algorithm::CompareTradeJson(
   return true;
 }
 
-bool DataSourceInfluxDB::FindIfDataEntryExists(const std::string& entry) {
-  j_entry_ = json::parse(entry);
-
+std::string DataSourceInfluxDB::Algorithm::GetDebugTradeString(
+    const std::string& trade_json_string) {
+  json trade_json = json::parse(trade_json_string);
+  std::string trade_string;
   try {
-    amount_ = j_entry_[1].get<std::string>();
-    buy_order_id_ = j_entry_[2].get<std::string>();
-    buy_user_id_ = j_entry_[3].get<std::string>();
-    price_ = j_entry_[4].get<std::string>();
-    sell_order_id_ = j_entry_[5].get<std::string>();
-    sell_user_id_ = j_entry_[6].get<std::string>();
-    symbol_id_ = j_entry_[8].get<std::string>();
+    auto deal_time = trade_json[0].get<uint64_t>();
+    auto amount = trade_json[1].get<std::string>();
+    //    auto buy_trade_id = trade_json[2].get<std::string>();
+    auto buy_user_id = trade_json[3].get<std::string>();
+    auto price = trade_json[4].get<std::string>();
+    //    auto sell_trade_id = trade_json[5].get<std::string>();
+    auto sell_user_id = trade_json[6].get<std::string>();
+    //    auto submit_time = trade_json[7].get<uint64_t>();
+    auto symbol_id = trade_json[8].get<std::string>();
+    //    auto uuid = trade_json[9].get<std::string>();
+
+    trade_string = fmt::format(
+        R"([symbol={},price={},amount={},buy_uid={},sell_uid={},time={}])",
+        symbol_id, price, amount, buy_user_id, sell_user_id, deal_time);
   } catch (const std::exception& e) {
-    CDCF_LOGGER_ERROR("FindIfJsonExists error:  {}", e.what());
-    return false;
+    CDCF_LOGGER_DEBUG("GetDebugTradeString error:  {}", e.what());
   }
-
-  std::string sql(std::move(
-      BuildFindIfEntryExistsQuery(amount_, buy_order_id_, buy_user_id_, price_,
-                                  sell_order_id_, sell_user_id_, symbol_id_)));
-
-  std::string resp(std::move(GetQueryResult(sql)));
-
-  if (IsEmptyQueryResult(resp)) {
-    CDCF_LOGGER_ERROR("QueryResult :  {}", resp);
-    return false;
-  } else {
-    return true;
-  }
-}
-
-bool DataSourceInfluxDB::CompareDataEntry(const std::string& source,
-                                          const std::string& target) {
-  json j_source = json::parse(source);
-  json j_target = json::parse(target);
-  return Algorithm::CompareTradeJsonElement(j_source, j_target);
+  return trade_string;
 }

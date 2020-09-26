@@ -22,6 +22,11 @@ class DataSourceMock : public DataSource {
   bool CompareDataEntry(const std::string& source,
                         const std::string& target) override;
   bool FindIfDataEntryExists(const std::string& entry) override;
+  std::string GetDataSourceName() override { return std::string(); }
+  std::string GetDataEntryDebugString(const std::string& entry) override {
+    return std::string();
+  }
+
   bool IfGotAllDataEntries();
 
  private:

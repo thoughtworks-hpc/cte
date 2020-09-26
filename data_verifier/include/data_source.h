@@ -19,6 +19,8 @@ class DataSource {
   virtual bool CompareDataEntry(const std::string& source,
                                 const std::string& target) = 0;
   virtual bool FindIfDataEntryExists(const std::string& entry) = 0;
+  virtual std::string GetDataSourceName() = 0;
+  virtual std::string GetDataEntryDebugString(const std::string& entry) = 0;
 };
 
 #endif  // DATA_VERIFIER_INCLUDE_DATA_SOURCE_H_
