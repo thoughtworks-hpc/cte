@@ -180,9 +180,9 @@ int OrderManagerService::PrintRecordResult() {
       if (latency.count() > latency_max_) {
         latency_max_ = latency.count();
       }
-      if (test_mode_is_open_) {
-        return grpc::Status::OK;
-      }
+    }
+    if (test_mode_is_open_) {
+      return grpc::Status::OK;
     }
 
     int ret;
@@ -219,9 +219,9 @@ void OrderManagerService::HandleMatchResult(
     const ::match_engine_proto::Trade &trade) {
   if (record_is_start_) {
     receive_data_amount_ += 1;
-    if (test_mode_is_open_) {
-      return;
-    }
+  }
+  if (test_mode_is_open_) {
+    return;
   }
   int32_t maker_concluded_amount = 0;
   int32_t taker_concluded_amount = 0;
