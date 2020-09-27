@@ -43,17 +43,21 @@ int ParserConfigJsonForDatabaseServerInfo(
   return 0;
 }
 
-int ParserConfigJsonForMiscOptions(
-    const json& config, std::string& log_level, bool& ordered_data_sources,
-    bool& compare_entire_data_source_in_one_turn,
-    int& number_of_entries_to_compare_each_turn) {
+int ParserConfigJsonForMiscOptions(const json& config, std::string& log_level,
+                                   bool& ordered_data_sources,
+                                   bool& ordered_by_symbol,
+                                   bool& compare_entire_data_source_in_one_turn,
+                                   int& number_of_entries_to_compare_each_turn,
+                                   std::string& log_file_path) {
   try {
     log_level = config["level_log"].get<std::string>();
     ordered_data_sources = config["ordered_data_sources"].get<bool>();
+    ordered_by_symbol = config["ordered_by_symbol"].get<bool>();
     compare_entire_data_source_in_one_turn =
         config["compare_entire_data_source_in_one_turn"].get<bool>();
     number_of_entries_to_compare_each_turn =
         config["number_of_entries_to_compare_each_turn"].get<int>();
+    log_file_path = config["log_file_path"].get<std::string>();
   } catch (const std::exception& e) {
     std::cout << "ParserConfigJsonForMiscOptions error: " << e.what()
               << std::endl;
@@ -80,6 +84,7 @@ int main(int argc, char* argv[]) {
   influxdb_cpp::server_info server_info_b("127.0.0.1", 8086);
   std::string measurement_a;
   std::string measurement_b;
+  std::string log_file_path;
   int ret = 0;
   ret = ParserConfigJsonForDatabaseServerInfo(
       config, server_info_a, server_info_b, measurement_a, measurement_b);
@@ -89,23 +94,21 @@ int main(int argc, char* argv[]) {
 
   std::string log_level = "info";
   bool is_ordered_data_sources = true;
+  bool is_ordered_by_symbol = true;
   bool compare_entire_data_source_in_one_turn = true;
   int number_of_entries_to_compare_each_turn = 10000;
 
-  ret =
-      ParserConfigJsonForMiscOptions(config, log_level, is_ordered_data_sources,
-                                     compare_entire_data_source_in_one_turn,
-                                     number_of_entries_to_compare_each_turn);
+  ret = ParserConfigJsonForMiscOptions(
+      config, log_level, is_ordered_data_sources, is_ordered_by_symbol,
+      compare_entire_data_source_in_one_turn,
+      number_of_entries_to_compare_each_turn, log_file_path);
   if (ret != 0) {
     std::cout << "parse config json failed" << std::endl;
   }
 
   cdcf::CDCFConfig cdcf_config;
   cdcf_config.log_level_ = log_level;
-  cdcf_config.log_file_ = "/tmp/log/data_verifier.log";
-  if (log_level != "debug") {
-    cdcf_config.log_no_display_filename_and_line_number_ = true;
-  }
+  cdcf_config.log_file_ = log_file_path;
   cdcf::Logger::Init(cdcf_config);
 
   auto data_source_a =
@@ -114,7 +117,7 @@ int main(int argc, char* argv[]) {
       std::make_shared<DataSourceInfluxDB>(server_info_b, measurement_b);
 
   DataVerifier data_verifier(data_source_a, data_source_b,
-                             is_ordered_data_sources);
+                             is_ordered_data_sources, is_ordered_by_symbol);
   data_verifier.SetNumberOfEntriesToCompareEachTurn(
       number_of_entries_to_compare_each_turn);
   if (!compare_entire_data_source_in_one_turn) {
@@ -124,6 +127,6 @@ int main(int argc, char* argv[]) {
   if (data_verifier.VerifyEquality()) {
     CDCF_LOGGER_INFO("trade data matches between 2 data sources");
   } else {
-    CDCF_LOGGER_INFO("trade data doesn't match between 2 data sources");
+    CDCF_LOGGER_ERROR("trade data doesn't match between 2 data sources");
   }
 }

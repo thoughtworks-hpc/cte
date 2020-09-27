@@ -6,6 +6,7 @@
 #define DATA_VERIFIER_INCLUDE_DATA_SOURCE_INFLUXDB_H_
 
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -22,10 +23,17 @@ class DataSourceInfluxDB : public DataSource {
 
   std::vector<std::string> GetDataEntries(int limit, int offset) override;
 
+  std::unordered_map<std::string, std::vector<std::string>>
+  GetDataEntriesBySymbol(int limit, int offset) override;
+
   bool CompareDataEntry(const std::string& source,
                         const std::string& target) override;
 
   bool FindIfDataEntryExists(const std::string& entry) override;
+
+  std::string GetDataSourceName() override { return measurement_; }
+
+  std::string GetDataEntryDebugString(const std::string& entry) override;
 
   struct Algorithm {
     static bool CompareTradeJson(const std::string& source,
@@ -37,6 +45,13 @@ class DataSourceInfluxDB : public DataSource {
                                         const nlohmann::json& j_target);
     static std::optional<std::vector<std::string>>
     ExtractValuesElementFromJsonString(const std::string& j);
+
+    static std::optional<
+        std::unordered_map<std::string, std::vector<std::string>>>
+    ExtractValuesElementFromJsonStringBySymbol(const std::string& j);
+
+    static std::string GetDebugTradeString(
+        const std::string& trade_json_string);
   };
 
  private:

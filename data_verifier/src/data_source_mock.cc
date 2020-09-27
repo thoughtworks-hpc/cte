@@ -19,6 +19,20 @@ std::vector<std::string> DataSourceMock::GetDataEntries(int limit, int offset) {
   return std::vector<std::string>();
 }
 
+std::unordered_map<std::string, std::vector<std::string>>
+DataSourceMock::GetDataEntriesBySymbol(int limit, int offset) {
+  if (offset + limit > record_.size()) {
+    limit = record_.size() - offset;
+  }
+  record_mutex_.lock();
+  for (int i = offset; i < offset + limit; ++i) {
+    record_.set(i);
+  }
+  record_mutex_.unlock();
+
+  return std::unordered_map<std::string, std::vector<std::string>>();
+}
+
 bool DataSourceMock::CompareDataEntry(const std::string& source,
                                       const std::string& target) {
   return true;

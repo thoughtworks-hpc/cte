@@ -16,10 +16,12 @@ class DataVerifier {
  public:
   DataVerifier(std::shared_ptr<DataSource> data_source_a,
                std::shared_ptr<DataSource> data_source_b,
-               bool is_ordered_data_sources = true)
+               bool is_ordered_data_sources = true,
+               bool is_ordered_by_symbol = true)
       : data_source_a_(data_source_a),
         data_source_b_(data_source_b),
-        is_ordered_data_sources_(is_ordered_data_sources) {}
+        is_ordered_data_sources_(is_ordered_data_sources),
+        is_ordered_by_symbol_(is_ordered_by_symbol) {}
 
   bool VerifyEquality();
   void SetNumberOfEntriesToCompareEachTurn(int number) {
@@ -33,12 +35,14 @@ class DataVerifier {
   }
 
  private:
-  bool VerifyEqualityForOrderedDataSource(int limit, int offset);
+  bool VerifyEqualityForFullyOrderedDataSource(int limit, int offset);
+  bool VerifyEqualityForOrderedBySymbolDataSource(int limit, int offset);
   bool VerifyEqualityForUnorderedDataSource(int limit, int offset);
 
   std::shared_ptr<DataSource> data_source_a_;
   std::shared_ptr<DataSource> data_source_b_;
   bool is_ordered_data_sources_ = true;
+  bool is_ordered_by_symbol_ = true;
   bool compare_entire_data_source_in_one_turn = true;
   int number_of_entries_to_compare_each_turn_ = 10000;
 };
