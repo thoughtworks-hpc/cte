@@ -1,9 +1,12 @@
 ---
 - name: Stop filebeat container
   hosts:
-    - trade_manager
     - cte_match_engine
+    - cte_order_manager
     - akka_te_match_engine
+    - akka_order_manager
+    - request_generator
+    - trade_manager
   become: true
   gather_facts: no
   tasks:
