@@ -5,6 +5,10 @@ on:
       DEBUG_FLAG:
         description: '0 to Enable write db, 1 to disable write db'
         required: true
+      NUM_OF_REQUEST:
+        description: 'numbers of requests, default is -1 means send all data in database'
+        required: false
+        default: '-1'
 
 jobs:
   push_to_registry:
@@ -71,3 +75,5 @@ jobs:
         with:
           playbook: start_cte_request_generator.yml
           directory: ./deployment/ansible_playbook
+          options: |
+            --extra-vars NUM_OF_REQUEST=${{ github.event.inputs.NUM_OF_REQUEST }}

@@ -7,9 +7,9 @@ curl -POST http://172.30.28.8:8086/query -s --data-urlencode "q=CREATE DATABASE 
 curl -POST http://172.30.28.8:8086/query -s --data-urlencode "q=CREATE DATABASE trade_manager"
 
 cd bin
-/bin/request_generator_main -f test_env_cte_request_generator_config.json &
+/bin/request_generator_main -n $NUM_OF_REQUEST -f test_env_cte_request_generator_config.json &
 cte_pid=$!
-/bin/request_generator_main -f test_env_akka_request_generator_config.json
+/bin/request_generator_main -n $NUM_OF_REQUEST -f test_env_akka_request_generator_config.json
 echo '[IMPORTANT] akka-te is finished, waiting for database service'
 
 while true
