@@ -22,7 +22,7 @@ MatchEngineCluster::MatchEngineCluster(caf::actor_system& system,
 
 void MatchEngineCluster::Update(const cdcf::cluster::Event& event) {
   if (event.member.hostname == host_ || event.member.host == host_) {
-    CDCF_LOGGER_INFO(
+    CDCF_LOGGER_ERROR(
         "Receive locate node event ignore. hostname:{}, host:{}, member "
         "status:{} ",
         event.member.hostname, event.member.host, event.member.status);
