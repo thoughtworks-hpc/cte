@@ -331,18 +331,19 @@ std::string DataSourceInfluxDB::Algorithm::GetDebugTradeString(
   try {
     auto deal_time = trade_json[0].get<uint64_t>();
     auto amount = trade_json[1].get<std::string>();
-    //    auto buy_trade_id = trade_json[2].get<std::string>();
+    auto buy_trade_id = trade_json[2].get<std::string>();
     auto buy_user_id = trade_json[3].get<std::string>();
     auto price = trade_json[4].get<std::string>();
-    //    auto sell_trade_id = trade_json[5].get<std::string>();
+    auto sell_trade_id = trade_json[5].get<std::string>();
     auto sell_user_id = trade_json[6].get<std::string>();
     //    auto submit_time = trade_json[7].get<uint64_t>();
     auto symbol_id = trade_json[8].get<std::string>();
     //    auto uuid = trade_json[9].get<std::string>();
 
     trade_string = fmt::format(
-        R"([symbol={},price={},amount={},buy_uid={},sell_uid={},time={}])",
-        symbol_id, price, amount, buy_user_id, sell_user_id, deal_time);
+        R"([symbol={},price={},amount={},buy_uid={},sell_uid={},buy_oid={},sell_oid={},time={}])",
+        symbol_id, price, amount, buy_user_id, sell_user_id, buy_trade_id,
+        sell_trade_id, deal_time);
   } catch (const std::exception& e) {
     CDCF_LOGGER_DEBUG("GetDebugTradeString error:  {}", e.what());
   }

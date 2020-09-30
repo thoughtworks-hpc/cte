@@ -33,8 +33,8 @@ bool DataVerifier::VerifyEquality() {
   if (is_ordered_data_sources_) {
     if (is_ordered_by_symbol_) {
       CDCF_LOGGER_INFO("start to compare ordered by symbol data sources");
-      ret = VerifyEqualityForOrderedBySymbolDataSource(data_source_entry_number,
-                                                       0);
+      ret = VerifyEqualityForOrderedBySymbolDataSource(data_source_a_number,
+                                                       data_source_b_number, 0);
     } else {
       CDCF_LOGGER_INFO("start to compare fully ordered data sources");
       ret =
@@ -84,17 +84,16 @@ bool DataVerifier::VerifyEqualityForFullyOrderedDataSource(int limit,
   return !inconsistency_found;
 }
 
-bool DataVerifier::VerifyEqualityForOrderedBySymbolDataSource(int limit,
-                                                              int offset) {
-  int data_source_number_to_retrieve = limit;
-
-  CDCF_LOGGER_INFO("{} entries to compare", limit);
+bool DataVerifier::VerifyEqualityForOrderedBySymbolDataSource(
+    int data_source_a_limit, int data_source_b_limit, int offset) {
+  CDCF_LOGGER_INFO("{} entries to compare",
+                   std::max(data_source_a_limit, data_source_b_limit));
   bool inconsistency_found = false;
 
-  auto data_entries_map_a = data_source_a_->GetDataEntriesBySymbol(
-      data_source_number_to_retrieve, offset);
-  auto data_entries_map_b = data_source_b_->GetDataEntriesBySymbol(
-      data_source_number_to_retrieve, offset);
+  auto data_entries_map_a =
+      data_source_a_->GetDataEntriesBySymbol(data_source_a_limit, offset);
+  auto data_entries_map_b =
+      data_source_b_->GetDataEntriesBySymbol(data_source_b_limit, offset);
 
   CDCF_LOGGER_INFO("finish loading data from data sources");
 
@@ -126,7 +125,8 @@ bool DataVerifier::VerifyEqualityForOrderedBySymbolDataSource(int limit,
     std::map<std::string, std::string> unmatched_data_entries_a;
     std::map<std::string, std::string> unmatched_data_entries_b;
 
-    for (int i = 0; i < std::min(data_entries_a.size(), data_entries_b.size());
+    int i;
+    for (i = 0; i < std::min(data_entries_a.size(), data_entries_b.size());
          ++i) {
       if (!data_source_a_->CompareDataEntry(data_entries_a[i],
                                             data_entries_b[i])) {
@@ -182,6 +182,25 @@ bool DataVerifier::VerifyEqualityForOrderedBySymbolDataSource(int limit,
         }
       }
     }
+
+    if (i < data_entries_a.size()) {
+      CDCF_LOGGER_ERROR("leftover entries from data source {}:",
+                        data_source_a_->GetDataSourceName());
+      for (int j = i; j < data_entries_a.size(); ++j) {
+        CDCF_LOGGER_INFO(
+            "{}", data_source_a_->GetDataEntryDebugString(data_entries_a[j]));
+      }
+    }
+
+    if (i < data_entries_b.size()) {
+      CDCF_LOGGER_ERROR("leftover entries from data source {}:",
+                        data_source_b_->GetDataSourceName());
+      for (int j = i; j < data_entries_b.size(); ++j) {
+        CDCF_LOGGER_INFO(
+            "{}", data_source_b_->GetDataEntryDebugString(data_entries_b[j]));
+      }
+    }
+
     CDCF_LOGGER_INFO("comparison of symbol {} finishes", symbol_id);
   }
   return !inconsistency_found;

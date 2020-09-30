@@ -31,7 +31,9 @@ class DataSourceInfluxDB : public DataSource {
 
   bool FindIfDataEntryExists(const std::string& entry) override;
 
-  std::string GetDataSourceName() override { return measurement_; }
+  std::string GetDataSourceName() override {
+    return si_.db_ + ":" + measurement_;
+  }
 
   std::string GetDataEntryDebugString(const std::string& entry) override;
 

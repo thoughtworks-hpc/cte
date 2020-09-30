@@ -36,7 +36,9 @@ class DataVerifier {
 
  private:
   bool VerifyEqualityForFullyOrderedDataSource(int limit, int offset);
-  bool VerifyEqualityForOrderedBySymbolDataSource(int limit, int offset);
+  bool VerifyEqualityForOrderedBySymbolDataSource(int data_source_a_limit,
+                                                  int data_source_b_limit,
+                                                  int offset);
   bool VerifyEqualityForUnorderedDataSource(int limit, int offset);
 
   std::shared_ptr<DataSource> data_source_a_;
