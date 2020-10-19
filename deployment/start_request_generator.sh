@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 i=0
-while [ $i -lt 10 ]; do
+while true; do
 #  curl -POST http://172.30.28.8:8086/query -s --data-urlencode "q=DROP DATABASE order_manager"
 #  curl -POST http://172.30.28.8:8086/query -s --data-urlencode "q=DROP DATABASE trade_manager"
 
