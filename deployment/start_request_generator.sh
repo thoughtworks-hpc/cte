@@ -8,7 +8,7 @@ while [ $i -lt 3 ]; do
   curl -POST http://172.30.28.8:8086/query -s --data-urlencode "q=CREATE DATABASE order_manager"
   curl -POST http://172.30.28.8:8086/query -s --data-urlencode "q=CREATE DATABASE trade_manager"
 
-  cd bin
+  cd /bin
   /bin/request_generator_main -n $NUM_OF_REQUEST -f test_env_cte_request_generator_config.json &
   cte_pid=$!
   /bin/request_generator_main -n $NUM_OF_REQUEST -f test_env_akka_request_generator_config.json
