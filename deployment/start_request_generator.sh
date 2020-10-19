@@ -72,7 +72,7 @@ while [ $i -lt 3 ]; do
   fi
 
   i=$(( i + 1 ))
-  echo $i
+  echo "round $i"
 
   curl -POST 'http://172.30.28.8:8086/query?pretty=true' -s --data-urlencode 'db=orders' --data-urlencode "q=select * into orders_backup_${i} from orders"
   curl -POST 'http://172.30.28.8:8086/query?pretty=true' -s --data-urlencode 'db=orders' --data-urlencode "q=drop measurement orders"
