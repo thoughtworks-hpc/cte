@@ -15,7 +15,7 @@ while [ $i -lt 3 ]; do
   cd /bin
   /bin/create_initial_prices
   echo '[IMPORTANT] initial prices are generated'
-  /bin/create_orders test_env_create_orders_config.json
+  /bin/create_orders initial_prices.json test_env_create_orders_config.json
   echo '[IMPORTANT] initial orders are generated'
 
   /bin/request_generator_main -n $NUM_OF_REQUEST -f test_env_cte_request_generator_config.json &
