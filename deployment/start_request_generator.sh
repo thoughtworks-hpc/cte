@@ -15,7 +15,7 @@ while [ $i -lt 3 ]; do
   cd /bin
   /bin/create_initial_prices
   echo '[IMPORTANT] initial prices are generated'
-  /bin/create_orders
+  /bin/create_orders test_env_create_orders_config.json
   echo '[IMPORTANT] initial orders are generated'
 
   /bin/request_generator_main -n $NUM_OF_REQUEST -f test_env_cte_request_generator_config.json &
@@ -72,7 +72,7 @@ while [ $i -lt 3 ]; do
   fi
 
   i=$(( i + 1 ))
-  echo "round $i"
+  echo "Round is: $i"
 
   curl -POST 'http://172.30.28.8:8086/query?pretty=true' -s --data-urlencode 'db=orders' --data-urlencode "q=select * into orders_backup_${i} from orders"
   curl -POST 'http://172.30.28.8:8086/query?pretty=true' -s --data-urlencode 'db=orders' --data-urlencode "q=drop measurement orders"
