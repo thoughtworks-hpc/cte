@@ -27,11 +27,11 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: latest
 
-#      - name: Start database
-#        uses: dawidd6/action-ansible-playbook@v2
-#        with:
-#          playbook: start_database.yml
-#          directory: ./deployment/ansible_playbook
+      - name: Start database
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: start_database.yml
+          directory: ./deployment/ansible_playbook
       - name: Stop clusrer
         uses: dawidd6/action-ansible-playbook@v2
         with:
