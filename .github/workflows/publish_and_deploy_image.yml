@@ -21,7 +21,6 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
-        if: github.event.inputs.SKIP_PUBLISH_DOCKER_IMAGE != 'true'
         with:
           ref: develop
       - name: Publish Docker
