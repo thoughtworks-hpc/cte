@@ -11,6 +11,10 @@ while true; do
     curl -POST http://172.30.28.8:8086/query -s --data-urlencode "q=CREATE DATABASE trade_manager"
   fi
 
+  if [[ $i -eq 20 ]]
+  then
+    break
+  fi
 
   cd /bin
   /bin/create_initial_prices
