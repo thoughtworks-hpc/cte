@@ -12,13 +12,13 @@ on:
       SKIP_PUBLISH_DOCKER_IMAGE:
         description: 'whether to skip building and publishing new docker image'
         required: false
-        default: false
+        default: "false"
 
 jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub
     runs-on: self-hosted
-    if: github.event.inputs.SKIP_PUBLISH_DOCKER != "true"
+    if: github.event.inputs.SKIP_PUBLISH_DOCKER_IMAGE != "true"
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
