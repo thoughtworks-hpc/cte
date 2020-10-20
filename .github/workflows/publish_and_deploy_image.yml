@@ -9,6 +9,10 @@ on:
         description: 'numbers of requests, default is -1 means send all data in database'
         required: false
         default: '-1'
+      SKIP_PUBLISH_DOCKER_IMAGE:
+        description: 'whether to skip building and publishing new docker image'
+        required: false
+        default: 'false'
 
 jobs:
   push_to_registry:
@@ -18,9 +22,10 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v2
         with:
-          ref: long_run
+          ref: develop
       - name: Publish Docker
         uses: elgohr/Publish-Docker-Github-Action@2.21
+        if: github.event.inputs.SKIP_PUBLISH_DOCKER_IMAGE != 'true'
         with:
           name: highperformancecomputing/cte
           username: ${{ secrets.DOCKER_USERNAME }}
