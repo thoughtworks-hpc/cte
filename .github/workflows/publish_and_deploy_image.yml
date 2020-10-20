@@ -11,8 +11,8 @@ on:
         default: '-1'
       SKIP_PUBLISH_DOCKER_IMAGE:
         description: 'whether to skip building and publishing new docker image'
-          required: false
-          default: false
+        required: false
+        default: false
 
 jobs:
   push_to_registry:
