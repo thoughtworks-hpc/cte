@@ -13,7 +13,7 @@ WORKDIR /cte
 COPY conanfile.txt .
 RUN conan install . -s compiler.libcxx=libstdc++11 --build missing
 # copy node_keeper to dir /cte
-RUN find /root/.conan/data/cdcf/1.2.1/hpc/stable/package -name node_keeper | xargs cp -t .
+RUN find /root/.conan/data/cdcf/1.2.2/hpc/stable/package -name node_keeper | xargs cp -t .
 
 COPY CMakeLists.txt .
 COPY common common
