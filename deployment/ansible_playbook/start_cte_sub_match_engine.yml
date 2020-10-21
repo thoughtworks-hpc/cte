@@ -1,31 +1,31 @@
 ---
 - name: Run cte cluster container using latest image
-  hosts: cte_match_engine
+  hosts: cte_sub_match_engine
   become: true
   gather_facts: no
   tasks:
     - docker_compose:
-        project_name: cte_match_engine
+        project_name: cte_sub_match_engine
         state: present
         pull: yes
         recreate: always
         definition:
           version: "2.2"
           services:
-            cte_match_engine:
+            cte_sub_match_engine:
               image: highperformancecomputing/cte:latest
-              container_name: cte_match_engine
+              container_name: cte_sub_match_engine
               environment:
-                HOST: cte_match_engine
-                ROLE: merge_result_host
+                HOST: cte_sub_match_engine
                 SEEDS: cte_match_engine:4445
                 APP: /bin/match_engine_server
-                APP_ARGS: --symbol_id_list="1,2,3,4" --log_file=/tmp/log/cte_match_engine.log --log_level=debug
+                APP_ARGS: --symbol_id_list="5,6,7,8" --log_file=/tmp/log/cte_sub_match_engine.log --log_level=debug
               network_mode: host
               extra_hosts:
                 - "cte_match_engine:172.30.28.10"
+                - "cte_sub_match_engine:172.30.28.3"
               volumes:
                 - /tmp/log:/tmp/log
     - assert:
         that:
-          - "cte_match_engine.cte_match_engine.state.running"
+          - "cte_sub_match_engine.cte_sub_match_engine.state.running"
