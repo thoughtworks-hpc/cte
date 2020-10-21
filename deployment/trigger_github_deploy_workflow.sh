@@ -11,5 +11,5 @@ curl \
   -H "Accept: application/vnd.github.v3+json" \
   https://api.github.com/repos/thoughtworks-hpc/cte/actions/workflows/publish_and_deploy_image.yml/dispatches \
   -d '{"ref": "long_run",
-  "inputs": {"DEBUG_FLAG": "0", "NUM_OF_REQUEST": "1000", "SKIP_PUBLISH_DOCKER_IMAGE": "false"}
+  "inputs": {"DEBUG_FLAG": "0", "NUM_OF_REQUEST": "100000", "SKIP_PUBLISH_DOCKER_IMAGE": "false"}
   }'
