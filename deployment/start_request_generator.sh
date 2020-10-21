@@ -7,6 +7,12 @@ while true; do
 
   if [[ $i -eq 0 ]]
   then
+    curl -POST http://172.30.28.30:8086/query -s --data-urlencode "q=DROP DATABASE orders"
+    curl -POST http://172.30.28.30:8086/query -s --data-urlencode "q=DROP DATABASE akka_order_manager"
+    curl -POST http://172.30.28.30:8086/query -s --data-urlencode "q=DROP DATABASE cte_order_manager"
+
+    curl -POST http://172.30.28.30:8086/query -s --data-urlencode "q=DROP DATABASE trade_manager"
+
     curl -POST http://172.30.28.30:8086/query -s --data-urlencode "q=CREATE DATABASE order_manager"
     curl -POST http://172.30.28.30:8086/query -s --data-urlencode "q=CREATE DATABASE trade_manager"
   fi
@@ -81,8 +87,10 @@ while true; do
   curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=orders' --data-urlencode "q=select * into orders_backup_${i} from orders"
   curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=orders' --data-urlencode "q=drop measurement orders"
 
-  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=order_manager' --data-urlencode 'q=select * into order_backup_'${i}' from "order"'
-  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=order_manager' --data-urlencode 'q=drop measurement "order"'
+  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=cte_order_manager' --data-urlencode 'q=select * into order_backup_'${i}' from "order"'
+  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=cte_order_manager' --data-urlencode 'q=drop measurement "order"'
+  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=akka_order_manager' --data-urlencode 'q=select * into order_backup_'${i}' from "order"'
+  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=akka_order_manager' --data-urlencode 'q=drop measurement "order"'
 
   curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=trade_manager' --data-urlencode "q=select * into akka_te_trades_backup_${i} from akka_te_trades"
   curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=trade_manager' --data-urlencode "q=drop measurement akka_te_trades"
