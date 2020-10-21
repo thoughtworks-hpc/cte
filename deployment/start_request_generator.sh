@@ -10,10 +10,10 @@ while true; do
     curl -POST http://172.30.28.30:8086/query -s --data-urlencode "q=DROP DATABASE orders"
     curl -POST http://172.30.28.30:8086/query -s --data-urlencode "q=DROP DATABASE akka_order_manager"
     curl -POST http://172.30.28.30:8086/query -s --data-urlencode "q=DROP DATABASE cte_order_manager"
-
     curl -POST http://172.30.28.30:8086/query -s --data-urlencode "q=DROP DATABASE trade_manager"
 
-    curl -POST http://172.30.28.30:8086/query -s --data-urlencode "q=CREATE DATABASE order_manager"
+    curl -POST http://172.30.28.30:8086/query -s --data-urlencode "q=CREATE DATABASE akka_order_manager"
+    curl -POST http://172.30.28.30:8086/query -s --data-urlencode "q=CREATE DATABASE cte_order_manager"
     curl -POST http://172.30.28.30:8086/query -s --data-urlencode "q=CREATE DATABASE trade_manager"
   fi
 
