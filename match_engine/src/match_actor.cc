@@ -197,7 +197,7 @@ caf::behavior MatchActor(caf::stateful_actor<OrderBook>* self) {
       },
       [=](caf::actor& result_receiver) {
         CDCF_LOGGER_DEBUG("set result_receiver success, actor id:{}",
-                         self->id());
+                          self->id());
         self->state.match_result_actor = result_receiver;
       }};
 }
