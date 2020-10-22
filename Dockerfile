@@ -13,7 +13,7 @@ WORKDIR /cte
 COPY conanfile.txt .
 RUN conan install . -s compiler.libcxx=libstdc++11 --build missing
 # copy node_keeper to dir /cte
-RUN find /root/.conan/data/cdcf/1.2.1/hpc/stable/package -name node_keeper | xargs cp -t .
+RUN find /root/.conan/data/cdcf/1.2.2/hpc/stable/package -name node_keeper | xargs cp -t .
 
 COPY CMakeLists.txt .
 COPY common common
@@ -64,6 +64,7 @@ COPY deployment/start_test_env_database.sh /bin/start_test_env_database.sh
 COPY deployment/start_request_generator.sh /bin/start_request_generator.sh
 COPY deployment/start_order_manager.sh /bin/start_order_manager.sh
 COPY deployment/start_trade_manager.sh /bin/start_trade_manager.sh
+COPY deployment/test_env_create_orders_config.json /bin/test_env_create_orders_config.json
 
 COPY --from=builder /cte/bin/data_verifier /tmp/data_verifier
 COPY deployment/test_env_data_verifier_config.json /tmp/data_verifier_config.json

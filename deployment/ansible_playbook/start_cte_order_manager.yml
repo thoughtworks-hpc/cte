@@ -16,7 +16,7 @@
               image: highperformancecomputing/cte:latest
               container_name: cte_order_manager
               environment:
-                DB_HOST: 172.30.28.8
+                DB_HOST: 172.30.28.30
                 MATCH_ENGIN: 172.30.28.10
                 MATCH_ENGIN_PORT: 51001
                 ORDER_MANAGER_PORT: 50051

@@ -21,8 +21,7 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
-        with:
-          ref: develop
+
       - name: Publish Docker
         uses: elgohr/Publish-Docker-Github-Action@2.21
         if: github.event.inputs.SKIP_PUBLISH_DOCKER_IMAGE != 'true'
@@ -31,6 +30,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: latest
+
 #      - name: Start database
 #        uses: dawidd6/action-ansible-playbook@v2
 #        with:
@@ -48,10 +48,22 @@ jobs:
           playbook: start_cte_match_engine.yml
           directory: ./deployment/ansible_playbook
 
+      - name: Start cte sub match engin
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: start_cte_sub_match_engine.yml
+          directory: ./deployment/ansible_playbook
+
       - name: Start akka_te match engin
         uses: dawidd6/action-ansible-playbook@v2
         with:
           playbook: start_akka_te_match_engine.yml
+          directory: ./deployment/ansible_playbook
+
+      - name: Start akka_te sub match engin
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: start_akka_te_sub_match_engine.yml
           directory: ./deployment/ansible_playbook
 
       - name: Start trade manager

@@ -1,10 +1,10 @@
 {
-  "order_amount": 100,
+  "order_amount": 100000,
   "user_id_min": 1,
   "user_id_max": 100,
   "trading_amount_min": 100,
   "trading_amount_max": 1000,
-  "database_host": "127.0.0.1",
+  "database_host": "172.30.28.30",
   "database_port": 8086,
   "database_name": "orders",
   "database_user": "",
