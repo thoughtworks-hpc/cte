@@ -21,8 +21,8 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
-        with:
-          ref: long_run
+#        with:
+#          ref: long_run
       - name: Publish Docker
         uses: elgohr/Publish-Docker-Github-Action@2.21
         if: github.event.inputs.SKIP_PUBLISH_DOCKER_IMAGE != 'true'
