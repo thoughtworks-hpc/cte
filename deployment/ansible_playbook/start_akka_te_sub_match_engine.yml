@@ -12,7 +12,7 @@
         definition:
           version: "2.2"
           services:
-            akka_te_match_engine:
+            akka_te_sub_match_engine:
               image: highperformancecomputing/akka-te:latest
               container_name: akka_te_sub_match_engine
               environment:
