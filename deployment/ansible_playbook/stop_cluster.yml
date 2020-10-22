@@ -41,6 +41,16 @@
     - docker_container:
         name: cte_match_engine
         state: absent
+
+- name: Stop cte_sub_match_engine
+  hosts: cte_sub_match_engine
+  become: true
+  gather_facts: no
+  tasks:
+    - docker_container:
+        name: cte_sub_match_engine
+        state: absent
+
 - name: Stop akka_te_match_engine
   hosts: akka_te_match_engine
   become: true
@@ -48,4 +58,13 @@
   tasks:
     - docker_container:
         name: akka_te_match_engine
+        state: absent
+
+- name: Stop akka_te_sub_match_engine
+  hosts: akka_te_sub_match_engine
+  become: true
+  gather_facts: no
+  tasks:
+    - docker_container:
+        name: akka_te_sub_match_engine
         state: absent
