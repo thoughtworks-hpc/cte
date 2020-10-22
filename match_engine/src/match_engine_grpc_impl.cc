@@ -58,7 +58,7 @@ grpc::Status match_engine::MatchEngineGRPCImpl::Match(
     return ::grpc::Status(::grpc::StatusCode::UNAVAILABLE, "Engine is close");
   }
 
-  CDCF_LOGGER_INFO(
+  CDCF_LOGGER_DEBUG(
       "Receive Match request order, id:{}, symbol id: {}, user id:{}, "
       "price:{}, "
       "amount:{}, commit time:{}",
@@ -137,7 +137,7 @@ void TransformGrpcTrade(const MatchedTrade &trade,
 
 void MatchEngineGRPCImpl::SendMatchResult(const TradeList &trade_list) {
   for (const auto &trade : trade_list) {
-    CDCF_LOGGER_INFO(
+    CDCF_LOGGER_DEBUG(
         "send merge trade to client: taker id:{}, maker id:{}, buyer:{}, "
         "seller:{}, deal time:{}, trade side:{}, price:{}, amount:{}",
         trade.taker_id, trade.maker_id, trade.buyer_user_id,
