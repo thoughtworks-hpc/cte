@@ -18,7 +18,7 @@
               environment:
                 APP_CONFIG_FILE: "./gateway.conf"
                 HOST_NAME: "127.0.0.1"
-                SYMBOL_IDS: "1, 2, 3, 4"
+                SYMBOL_IDS: "1, 2, 3, 4,5,6,7,8"
               network_mode: host
               extra_hosts:
                 - "akkagateway:127.0.0.1"
