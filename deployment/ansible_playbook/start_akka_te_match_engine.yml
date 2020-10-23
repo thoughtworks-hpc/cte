@@ -23,7 +23,7 @@
               extra_hosts:
                 - "akkagateway:127.0.0.1"
               volumes:
-                - /tmp/not_log:/tmp/log
+                - /tmp/log:/tmp/log
     - assert:
         that:
           - "akka_te_match_engine.akka_te_match_engine.state.running"
