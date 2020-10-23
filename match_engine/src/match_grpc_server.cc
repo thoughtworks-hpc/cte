@@ -27,9 +27,11 @@ void caf_main(caf::actor_system& system, const match_engine::Config& config) {
   cdcf::Logger::Init(config);
 
   caf::actor router_actor = system.spawn(match_engine::SymbolRouterActor);
-  auto msg = system.middleman().publish(router_actor, config.match_router_port, nullptr, true);
-  CDCF_LOGGER_DEBUG("{}", caf::to_string(msg.error()));
-
+  auto msg = system.middleman().publish(router_actor, config.match_router_port,
+                                        nullptr, true);
+  if (msg != config.match_router_port) {
+    CDCF_LOGGER_ERROR("publish actor error:{}", caf::to_string(msg.error()));
+  }
 
   match_engine::MatchEngineCluster match_engine_cluster(
       system, config.match_router_port, config.merge_result_port, router_actor,
@@ -56,8 +58,11 @@ void caf_main(caf::actor_system& system, const match_engine::Config& config) {
     CDCF_LOGGER_INFO("spawn result actor, port:{}", config.merge_result_port);
     result_merge_actor =
         system.spawn(match_engine::MatchResultDealActor, &match_engine_grpc);
-    auto msg = system.middleman().publish(result_merge_actor, config.merge_result_port, nullptr, true);
-    CDCF_LOGGER_DEBUG("{}", caf::to_string(msg.error()));
+    auto msg = system.middleman().publish(
+        result_merge_actor, config.merge_result_port, nullptr, true);
+    if (msg != config.merge_result_port) {
+      CDCF_LOGGER_ERROR("publish actor error:{}", caf::to_string(msg.error()));
+    }
 
     self->send(router_actor, result_merge_actor);
   }

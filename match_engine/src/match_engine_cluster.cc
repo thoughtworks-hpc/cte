@@ -88,17 +88,6 @@ void MatchEngineCluster::AddNewNode(std::string host, std::string hostname,
   auto remote_symbol_router =
       system_.middleman().remote_actor(host, symbol_router_port_);
 
-  for (int i = 0; i < 50; ++i) {
-    if (!remote_symbol_router) {
-      remote_symbol_router =
-          system_.middleman().remote_actor(host, symbol_router_port_);
-    } else {
-      break;
-    }
-    CDCF_LOGGER_ERROR("Try to get remote symbol router {} times... ", i);
-    sleep(1);
-  }
-
   if (!remote_symbol_router) {
     CDCF_LOGGER_ERROR("Get remote symbol router failed, host:{}, port:{}", host,
                       symbol_router_port_);
@@ -127,17 +116,6 @@ void MatchEngineCluster::AddNewNode(std::string host, std::string hostname,
   if (role == kResultHostRoleName) {
     auto merge_result_actor_ptr =
         system_.middleman().remote_actor(host, merge_result_port_);
-
-    for (int i = 0; i < 50; ++i) {
-      if (!merge_result_actor_ptr) {
-        merge_result_actor_ptr =
-            system_.middleman().remote_actor(host, merge_result_port_);
-      } else {
-        break;
-      }
-      CDCF_LOGGER_ERROR("Try to get merge result actor {} times... ", i);
-      sleep(1);
-    }
 
     if (!merge_result_actor_ptr) {
       CDCF_LOGGER_ERROR(
