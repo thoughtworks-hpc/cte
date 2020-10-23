@@ -11,7 +11,7 @@
 
 > -f, --log_file:  Log file location, default: /tmp/order_manager.log
 
-> -t, --test_mode_is_open: '0' means not open, in this mode, order manager will not write database, '1' or other number means open
+> -t, --test_mode_is_open: '0' means not open. '1' or other number means open, in this mode, order manager will not write database.
 
 > --db_user: InfluxDB username
 
