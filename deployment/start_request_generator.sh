@@ -7,7 +7,7 @@ while true; do
 
   if [[ $i -eq 0 ]]
   then
-    curl -POST http://172.30.28.30:8086/query -s --data-urlencode "q=DROP DATABASE orders"
+    #curl -POST http://172.30.28.30:8086/query -s --data-urlencode "q=DROP DATABASE orders"
     curl -POST http://172.30.28.30:8086/query -s --data-urlencode "q=DROP DATABASE akka_order_manager"
     curl -POST http://172.30.28.30:8086/query -s --data-urlencode "q=DROP DATABASE cte_order_manager"
     curl -POST http://172.30.28.30:8086/query -s --data-urlencode "q=DROP DATABASE trade_manager"
@@ -18,13 +18,15 @@ while true; do
   fi
 
   cd /bin
-  /bin/create_initial_prices
-  echo '[IMPORTANT] initial prices are generated'
-  /bin/create_orders initial_prices.json test_env_create_orders_config.json
-  echo '[IMPORTANT] initial orders are generated'
+  #  /bin/create_initial_prices
+  #  echo '[IMPORTANT] initial prices are generated'
+  #  /bin/create_orders initial_prices.json test_env_create_orders_config.json
+  #  echo '[IMPORTANT] initial orders are generated'
 
+  echo '[IMPORTANT] start cte match engine'
   /bin/request_generator_main -n $NUM_OF_REQUEST -f test_env_cte_request_generator_config.json &
   cte_pid=$!
+  echo '[IMPORTANT] start akka-te match engine'
   /bin/request_generator_main -n $NUM_OF_REQUEST -f test_env_akka_request_generator_config.json
   echo '[IMPORTANT] akka-te is finished, waiting for database service'
 
@@ -79,8 +81,8 @@ done
   i=$(( i + 1 ))
   echo "Round is: $i"
 
-  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=orders' --data-urlencode "q=select * into orders_backup_${i} from orders"
-  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=orders' --data-urlencode "q=drop measurement orders"
+  #curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=orders' --data-urlencode "q=select * into orders_backup_${i} from orders"
+  #curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=orders' --data-urlencode "q=drop measurement orders"
 
   curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=cte_order_manager' --data-urlencode 'q=select * into order_backup_'${i}' from "order"'
   curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=cte_order_manager' --data-urlencode 'q=drop measurement "order"'
