@@ -133,7 +133,7 @@ void SendMatchResult(caf::stateful_actor<OrderBook>* sender,
 
   if (nullptr != sender->state.match_result_actor) {
     for (auto& one_match : match_result) {
-      CDCF_LOGGER_INFO(
+      CDCF_LOGGER_DEBUG(
           "Match actor send match result, symbol id:{}, price: {}, amount:{}, "
           "taker id:{}, maker id:{}, trade side:{}, seller id:{}, buyer id:{}, "
           "match time:{}, submit time: {}",
@@ -169,7 +169,7 @@ void SendMatchResult(caf::stateful_actor<OrderBook>* sender,
 caf::behavior MatchActor(caf::stateful_actor<OrderBook>* self) {
   return {
       [=](RawOrder& order) {
-        CDCF_LOGGER_INFO(
+        CDCF_LOGGER_DEBUG(
             "match actor Receive new order, id:{}, price:{}, amount:{}, trade "
             "site:{}, "
             "submit time: {}, "
@@ -196,8 +196,8 @@ caf::behavior MatchActor(caf::stateful_actor<OrderBook>* self) {
         }
       },
       [=](caf::actor& result_receiver) {
-        CDCF_LOGGER_INFO("set result_receiver success, actor id:{}",
-                         self->id());
+        CDCF_LOGGER_DEBUG("set result_receiver success, actor id:{}",
+                          self->id());
         self->state.match_result_actor = result_receiver;
       }};
 }

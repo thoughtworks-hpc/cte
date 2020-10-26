@@ -48,12 +48,6 @@ jobs:
           playbook: start_cte_match_engine.yml
           directory: ./deployment/ansible_playbook
 
-      - name: Start cte sub match engin
-        uses: dawidd6/action-ansible-playbook@v2
-        with:
-          playbook: start_cte_sub_match_engine.yml
-          directory: ./deployment/ansible_playbook
-
       - name: Start akka_te match engin
         uses: dawidd6/action-ansible-playbook@v2
         with:
@@ -64,6 +58,12 @@ jobs:
         uses: dawidd6/action-ansible-playbook@v2
         with:
           playbook: start_akka_te_sub_match_engine.yml
+          directory: ./deployment/ansible_playbook
+
+      - name: Start cte sub match engin
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: start_cte_sub_match_engine.yml
           directory: ./deployment/ansible_playbook
 
       - name: Start trade manager

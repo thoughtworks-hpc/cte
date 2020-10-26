@@ -21,7 +21,7 @@
                 MATCH_ENGIN_PORT: 50051
                 ORDER_MANAGER_PORT: 50051
                 DEBUG: "{{ DEBUG }}"
-              command: /bin/bash start_order_manager.sh
+              command: /bin/bash start_akka_order_manager.sh
               network_mode: host
               volumes:
                 - /tmp/log:/tmp/log

@@ -24,7 +24,7 @@ bool TradePersistenceClient::PersistTrades() {
       clinet.SubscribeMatchResult(&client_context, google::protobuf::Empty()));
   int count = 0;
   while (reader->Read(&trade)) {
-    CDCF_LOGGER_INFO("Receive #{} trade", ++count);
+    CDCF_LOGGER_DEBUG("Receive #{} trade", ++count);
     CDCF_LOGGER_DEBUG(
         "Receive #{} trade: symbol_id: {}, maker_id: {}, taker_id: {}, price: "
         "{}, "
@@ -37,8 +37,8 @@ bool TradePersistenceClient::PersistTrades() {
     if (!database->PersistTrade(trade_entity)) {
       return false;
     } else {
-      CDCF_LOGGER_INFO("Write #{} trade to database: {} success", count,
-                       database_table_name_);
+      CDCF_LOGGER_DEBUG("Write #{} trade to database: {} success", count,
+                        database_table_name_);
     }
   }
   CDCF_LOGGER_INFO("GRPC Reader finished");

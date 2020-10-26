@@ -4,6 +4,8 @@
 
 #include "../include/match_engine_cluster.h"
 
+#include <unistd.h>
+
 #include <utility>
 
 #include "cdcf/logger.h"
@@ -89,7 +91,10 @@ void MatchEngineCluster::AddNewNode(std::string host, std::string hostname,
   if (!remote_symbol_router) {
     CDCF_LOGGER_ERROR("Get remote symbol router failed, host:{}, port:{}", host,
                       symbol_router_port_);
+    CDCF_LOGGER_ERROR("{}", caf::to_string(remote_symbol_router.error()));
   } else {
+    CDCF_LOGGER_INFO("Get remote symbol router succeeded, host:{}, port:{}",
+                     host, symbol_router_port_);
     self_actor_
         ->request(*remote_symbol_router, std::chrono::seconds(10),
                   GetAtom::value)
@@ -111,10 +116,12 @@ void MatchEngineCluster::AddNewNode(std::string host, std::string hostname,
   if (role == kResultHostRoleName) {
     auto merge_result_actor_ptr =
         system_.middleman().remote_actor(host, merge_result_port_);
+
     if (!merge_result_actor_ptr) {
       CDCF_LOGGER_ERROR(
           "Get remote merge result actor failed, remote host:{}, port:{}", host,
           merge_result_port_);
+      CDCF_LOGGER_ERROR("{}", caf::to_string(merge_result_actor_ptr.error()));
     } else {
       CDCF_LOGGER_INFO(
           "get remote merge result host success. remote host:{}, port:{}", host,

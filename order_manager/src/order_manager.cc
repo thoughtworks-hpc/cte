@@ -192,7 +192,7 @@ int OrderManagerService::PrintRecordResult() {
       ret = order_store_->PersistOrder(order, "submitted", 0);
     }
     if (0 == ret) {
-      CDCF_LOGGER_INFO("submitted and saved order {}", order.order_id());
+      CDCF_LOGGER_DEBUG("submitted and saved order {}", order.order_id());
       message = "order submitted";
       response->set_error_code(order_manager_proto::SUCCESS);
     } else {
@@ -264,7 +264,7 @@ void OrderManagerService::HandleMatchResult(
   }
 
   if (if_order_exists) {
-    CDCF_LOGGER_INFO(
+    CDCF_LOGGER_DEBUG(
         "receive trade for order {} as maker and order {} as taker",
         trade.maker_id(), trade.taker_id());
     std::string maker_status;
