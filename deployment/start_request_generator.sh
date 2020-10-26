@@ -37,33 +37,33 @@ while true; do
       break
     fi
     echo 'cte is still running, try sleep 5 seconds...'
-    sleep 5
+    sleep 30
   done
 
   while true
   do
-    count1=$(curl -GET 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode "db=trade_manager" --data-urlencode "q=SELECT count(*) FROM cte_trades" | python -c 'import json,sys;obj=json.load(sys.stdin); print(obj["results"][0]["series"][0]["values"][0][1])')
-    sleep 5
-    count2=$(curl -GET 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode "db=trade_manager" --data-urlencode "q=SELECT count(*) FROM cte_trades" | python -c 'import json,sys;obj=json.load(sys.stdin); print(obj["results"][0]["series"][0]["values"][0][1])')
+    count1=$(curl -GET 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode "db=trade_manager" --data-urlencode "q=SELECT count(symbol_id) FROM cte_trades" | python -c 'import json,sys;obj=json.load(sys.stdin); print(obj["results"][0]["series"][0]["values"][0][1])')
+    sleep 30
+    count2=$(curl -GET 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode "db=trade_manager" --data-urlencode "q=SELECT count(symbol_id) FROM cte_trades" | python -c 'import json,sys;obj=json.load(sys.stdin); print(obj["results"][0]["series"][0]["values"][0][1])')
     if [ $count1 == $count2 ]
     then
       echo '[IMPORTANT] cte database is available now'
       break
     fi
-    echo 'cte database is still busy, try to sleep 5 seconds...'
+    echo 'cte database is still busy, try to sleep 30 seconds...'
   done
 
   while true
   do
-    count1=$(curl -GET 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode "db=trade_manager" --data-urlencode "q=SELECT count(*) FROM akka_te_trades" | python -c 'import json,sys;obj=json.load(sys.stdin); print(obj["results"][0]["series"][0]["values"][0][1])')
-    sleep 5
-    count2=$(curl -GET 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode "db=trade_manager" --data-urlencode "q=SELECT count(*) FROM akka_te_trades" | python -c 'import json,sys;obj=json.load(sys.stdin); print(obj["results"][0]["series"][0]["values"][0][1])')
+    count1=$(curl -GET 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode "db=trade_manager" --data-urlencode "q=SELECT count(symbol_id) FROM akka_te_trades" | python -c 'import json,sys;obj=json.load(sys.stdin); print(obj["results"][0]["series"][0]["values"][0][1])')
+    sleep 30
+    count2=$(curl -GET 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode "db=trade_manager" --data-urlencode "q=SELECT count(symbol_id) FROM akka_te_trades" | python -c 'import json,sys;obj=json.load(sys.stdin); print(obj["results"][0]["series"][0]["values"][0][1])')
     if [ $count1 == $count2 ]
     then
       echo '[IMPORTANT] akka_te database is available now'
       break
     fi
-    echo 'akka_te database is still busy, try to sleep 5 seconds...'
+    echo 'akka_te database is still busy, try to sleep 30 seconds...'
   done
 
   echo '[IMPORTANT] start data_verifier now'
@@ -79,17 +79,33 @@ while true; do
   i=$(( i + 1 ))
   echo "Round is: $i"
 
-  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=orders' --data-urlencode "q=select * into orders_backup_${i} from orders"
-  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=orders' --data-urlencode "q=drop measurement orders"
+  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=orders' -s --data-urlencode "q=select * into orders_backup_${i} from orders"
+  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=orders' -s --data-urlencode "q=drop measurement orders"
 
-  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=cte_order_manager' --data-urlencode 'q=select * into order_backup_'${i}' from "order"'
-  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=cte_order_manager' --data-urlencode 'q=drop measurement "order"'
-  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=akka_order_manager' --data-urlencode 'q=select * into order_backup_'${i}' from "order"'
-  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=akka_order_manager' --data-urlencode 'q=drop measurement "order"'
+  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=cte_order_manager' -s --data-urlencode 'q=select * into order_backup_'${i}' from "order"'
+  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=cte_order_manager' -s --data-urlencode 'q=drop measurement "order"'
+  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=akka_order_manager' -s --data-urlencode 'q=select * into order_backup_'${i}' from "order"'
+  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=akka_order_manager' -s --data-urlencode 'q=drop measurement "order"'
 
-  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=trade_manager' --data-urlencode "q=select * into akka_te_trades_backup_${i} from akka_te_trades"
-  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=trade_manager' --data-urlencode "q=drop measurement akka_te_trades"
-  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=trade_manager' --data-urlencode "q=select * into cte_trades_backup_${i} from cte_trades"
-  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=trade_manager' --data-urlencode "q=drop measurement cte_trades"
+  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=trade_manager' -s --data-urlencode "q=select * into akka_te_trades_backup_${i} from akka_te_trades"
+  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=trade_manager' -s --data-urlencode "q=drop measurement akka_te_trades"
+  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=trade_manager' -s --data-urlencode "q=select * into cte_trades_backup_${i} from cte_trades"
+  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=trade_manager' -s --data-urlencode "q=drop measurement cte_trades"
+
+  temp_num1=$(( $i % 5 ))
+  temp_num2=$(( $i / 5 ))
+  if [[ $temp_num1 -eq 0 && $temp_num2 -gt 2 ]]
+  then
+    for j in {1..5}
+      do
+        temp_num3=$(( $i - 15 + $j ))
+        echo $i:$temp_num3
+          curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=orders' -s --data-urlencode "q=drop measurement orders_backup_${temp_num3} from orders"
+          curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=cte_order_manager' -s --data-urlencode 'q=drop measurement order_backup_'${temp_num3}' from "order"'
+          curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=akka_order_manager' -s --data-urlencode 'q=drop measurement order_backup_'${temp_num3}' from "order"'
+          curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=trade_manager' -s --data-urlencode "q=drop measurement akka_te_trades_backup_${temp_num3} from akka_te_trades"
+          curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=trade_manager' -s --data-urlencode "q=drop measurement cte_trades_backup_${temp_num3} from cte_trades"
+      done
+  fi
 done
 sleep infinity
