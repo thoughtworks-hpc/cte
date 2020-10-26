@@ -38,7 +38,7 @@ do
     echo '[IMPORTANT] cte is finished, waiting for database service'
     break
   fi
-  echo 'cte is still running, try sleep 5 seconds...'
+  echo 'cte is still running, try sleep 30 seconds...'
   sleep 30
 done
 

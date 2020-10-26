@@ -7,8 +7,8 @@
     - akka_order_manager
     - request_generator
     - trade_manager
-    - akka_te_sub_match_engine
     - cte_sub_match_engine
+    - akka_te_sub_match_engine
   tasks:
     - name: Copy filebeat_config to remote nodes
       copy:
@@ -24,8 +24,8 @@
     - akka_order_manager
     - request_generator
     - trade_manager
-    - akka_te_sub_match_engine
     - cte_sub_match_engine
+    - akka_te_sub_match_engine
   become: true
   gather_facts: no
   tasks:
