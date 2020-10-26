@@ -20,7 +20,7 @@
                 SEEDS: cte_match_engine:4445
                 ROLE: normal_host
                 APP: /bin/match_engine_server
-                APP_ARGS: --symbol_id_list="5,6,7,8" --log_file=/tmp/log/cte_sub_match_engine.log --log_level=debug
+                APP_ARGS: --symbol_id_list="5,6,7,8" --log_file=/tmp/log/cte_sub_match_engine.log --log_level=info
               network_mode: host
               extra_hosts:
                 - "cte_match_engine:172.30.28.10"
