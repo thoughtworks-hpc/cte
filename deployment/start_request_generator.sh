@@ -20,13 +20,16 @@ while true; do
   cd /bin
   /bin/create_initial_prices
   echo '[IMPORTANT] initial prices are generated'
+  echo '[IMPORTANT] initial prices are generated' >> /tmp/log/long_run_status.log
   /bin/create_orders initial_prices.json test_env_create_orders_config.json
   echo '[IMPORTANT] initial orders are generated'
+  echo '[IMPORTANT] initial orders are generated' >> /tmp/log/long_run_status.log
 
   /bin/request_generator_main -n $NUM_OF_REQUEST -f test_env_cte_request_generator_config.json &
   cte_pid=$!
   /bin/request_generator_main -n $NUM_OF_REQUEST -f test_env_akka_request_generator_config.json
   echo '[IMPORTANT] akka-te is finished, waiting for database service'
+  echo '[IMPORTANT] akka-te is finished, waiting for database service' >> /tmp/log/long_run_status.log
 
   while true
   do
@@ -34,9 +37,11 @@ while true; do
     if [ ! $PID_EXIST ]
     then
       echo '[IMPORTANT] cte is finished, waiting for database service'
+      echo '[IMPORTANT] cte is finished, waiting for database service' >> /tmp/log/long_run_status.log
       break
     fi
-    echo 'cte is still running, try sleep 5 seconds...'
+    echo 'cte is still running, try sleep 30 seconds...'
+    echo 'cte is still running, try sleep 30 seconds...' >> /tmp/log/long_run_status.log
     sleep 30
   done
 
@@ -48,9 +53,11 @@ while true; do
     if [ $count1 == $count2 ]
     then
       echo '[IMPORTANT] cte database is available now'
+      echo '[IMPORTANT] cte database is available now' >> /tmp/log/long_run_status.log
       break
     fi
     echo 'cte database is still busy, try to sleep 30 seconds...'
+    echo 'cte database is still busy, try to sleep 30 seconds...' >> /tmp/log/long_run_status.log
   done
 
   while true
@@ -61,12 +68,15 @@ while true; do
     if [ $count1 == $count2 ]
     then
       echo '[IMPORTANT] akka_te database is available now'
+      echo '[IMPORTANT] akka_te database is available now' >> /tmp/log/long_run_status.log
       break
     fi
     echo 'akka_te database is still busy, try to sleep 30 seconds...'
+    echo 'akka_te database is still busy, try to sleep 30 seconds...' >> /tmp/log/long_run_status.log
   done
 
   echo '[IMPORTANT] start data_verifier now'
+  echo '[IMPORTANT] start data_verifier now' >> /tmp/log/long_run_status.log
   cd /tmp
   /tmp/data_verifier
   result=$?
@@ -78,6 +88,7 @@ while true; do
 
   i=$(( i + 1 ))
   echo "Round is: $i"
+  echo "Round is: $i" >> /tmp/log/long_run_status.log
 
   curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=orders' -s --data-urlencode "q=select * into orders_backup_${i} from orders"
   curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=orders' -s --data-urlencode "q=drop measurement orders"
@@ -100,6 +111,7 @@ while true; do
       do
         temp_num3=$(( $i - 15 + $j ))
         echo $i:$temp_num3
+        echo $i:$temp_num3 >> /tmp/log/long_run_status.log
           curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=orders' -s --data-urlencode "q=drop measurement orders_backup_${temp_num3}"
           curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=cte_order_manager' -s --data-urlencode "q=drop measurement order_backup_${temp_num3}"
           curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=akka_order_manager' -s --data-urlencode "q=drop measurement order_backup_${temp_num3}"
