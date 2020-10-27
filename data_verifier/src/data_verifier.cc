@@ -169,7 +169,7 @@ bool DataVerifier::VerifyEqualityForOrderedBySymbolDataSource(
         CDCF_LOGGER_ERROR("unmatched entries from data source {}:",
                           data_source_a_->GetDataSourceName());
         for (const auto& entry : unmatched_data_entries_a) {
-          CDCF_LOGGER_INFO(
+          CDCF_LOGGER_WARN(
               "{}", data_source_a_->GetDataEntryDebugString(entry.second));
         }
       }

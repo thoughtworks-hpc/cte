@@ -5,8 +5,8 @@ while true; do
 #  curl -POST http://172.30.28.8:8086/query -s --data-urlencode "q=DROP DATABASE order_manager"
 #  curl -POST http://172.30.28.8:8086/query -s --data-urlencode "q=DROP DATABASE trade_manager"
 
-  echo "Round is: $i"
-  echo "Round is: $i" >> /tmp/log/long_run_status.log
+  echo "[IMPORTANT] round $i starts"
+  echo "[IMPORTANT] round $i starts" >> /tmp/log/long_run_status.log
 
   if [[ $i -eq 0 ]]
   then
