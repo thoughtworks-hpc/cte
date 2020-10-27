@@ -5,6 +5,9 @@ while true; do
 #  curl -POST http://172.30.28.8:8086/query -s --data-urlencode "q=DROP DATABASE order_manager"
 #  curl -POST http://172.30.28.8:8086/query -s --data-urlencode "q=DROP DATABASE trade_manager"
 
+  echo "Round is: $i"
+  echo "Round is: $i" >> /tmp/log/long_run_status.log
+
   if [[ $i -eq 0 ]]
   then
     curl -POST http://172.30.28.30:8086/query -s --data-urlencode "q=DROP DATABASE orders"
@@ -24,6 +27,9 @@ while true; do
   /bin/create_orders initial_prices.json test_env_create_orders_config.json
   echo '[IMPORTANT] initial orders are generated'
   echo '[IMPORTANT] initial orders are generated' >> /tmp/log/long_run_status.log
+
+  echo '[IMPORTANT] start generating requests to cte and akka-te'
+  echo '[IMPORTANT] start generating requests to cte and akka-te' >> /tmp/log/long_run_status.log
 
   /bin/request_generator_main -n $NUM_OF_REQUEST -f test_env_cte_request_generator_config.json &
   cte_pid=$!
@@ -87,8 +93,6 @@ while true; do
   fi
 
   i=$(( i + 1 ))
-  echo "Round is: $i"
-  echo "Round is: $i" >> /tmp/log/long_run_status.log
 
   curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=orders' -s --data-urlencode "q=select * into orders_backup_${i} from orders"
   curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=orders' -s --data-urlencode "q=drop measurement orders"
