@@ -28,8 +28,8 @@ while true; do
   echo '[IMPORTANT] initial orders are generated'
   echo '[IMPORTANT] initial orders are generated' >> /tmp/log/long_run_status.log
 
-  echo '[IMPORTANT] start generating requests to cte and akka-te'
-  echo '[IMPORTANT] start generating requests to cte and akka-te' >> /tmp/log/long_run_status.log
+  echo "[IMPORTANT] start generating $NUM_OF_REQUEST requests to cte and akka-te"
+  echo "[IMPORTANT] start generating $NUM_OF_REQUEST requests to cte and akka-te" >> /tmp/log/long_run_status.log
 
   /bin/request_generator_main -n $NUM_OF_REQUEST -f test_env_cte_request_generator_config.json &
   cte_pid=$!
