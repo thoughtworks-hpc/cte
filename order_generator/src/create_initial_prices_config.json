@@ -1,6 +1,6 @@
 {
   "symbol_id_min": 1,
-  "symbol_id_max": 50,
+  "symbol_id_max": 200,
   "price_min": 1,
   "price_max": 100
 }
