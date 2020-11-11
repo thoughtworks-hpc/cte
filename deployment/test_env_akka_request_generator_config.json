@@ -1,5 +1,5 @@
 {
-  "default_num_of_threads": 1,
+  "default_num_of_threads": 8,
   "default_num_of_requests": -1,
   "default_db_ip_address": "172.30.28.30",
   "default_db_port": "8086",
