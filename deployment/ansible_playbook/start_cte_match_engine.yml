@@ -20,7 +20,7 @@
                 ROLE: merge_result_host
                 SEEDS: cte_match_engine:4445
                 APP: /bin/match_engine_server
-                APP_ARGS: --symbol_id_list="1,2,3,4,5,6,7,8,9,10,11,12,13,14,25,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50" --log_file=/tmp/log/cte_match_engine.log --log_level=info
+                APP_ARGS: --symbol_id_list="1,2,3,4,5,6,7,8,9,10,11,12,13,14,25,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50" --log_file=/tmp/log/cte_match_engine.log --log_level=info --threads_proportion=16
               network_mode: host
               extra_hosts:
                 - "cte_match_engine:172.30.28.10"
