@@ -9,6 +9,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include <caf/all.hpp>
 
@@ -16,7 +17,7 @@
 namespace match_engine {
 
 struct SymbolRouterData {
-  std::map<int32_t, caf::actor> symbol_actor_map;
+  std::unordered_map<int32_t, caf::actor> symbol_actor_map;
   std::map<std::string, std::vector<int32_t> > node_symbol_map;
   std::vector<SymbolActorInfo> local_symbol_actors;
 };
