@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
     thread_local int count_ = 0;
     thread_local int last_round_vector_size = 0;
     while (true) {
-      CDCF_LOGGER_DEBUG(
+      CDCF_LOGGER_INFO(
           "Chunk Database IO Thread scans data ( waiting time: 30s )");
       thread_end_flag_mutex.lock();
       if (thread_end_flag) {

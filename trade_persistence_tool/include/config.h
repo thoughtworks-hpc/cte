@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-#include "trade_entity.h"
+#include "./trade_entity.h"
 
 extern std::vector<TradeEntity> trade_manager_db_buffer;
 extern std::mutex trade_manager_db_buffer_mutex;
