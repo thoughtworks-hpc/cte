@@ -9,8 +9,14 @@
 #include <string>
 
 #include "../../common/include/influxdb.hpp"
+#include "../include/config.h"
 
 bool TradePersistInfluxdb::PersistTrade(TradeEntity& trade) {
+  trade_manager_db_buffer_mutex.lock();
+  trade_manager_db_buffer.emplace_back(trade);
+  trade_manager_db_buffer_mutex.unlock();
+  return true;
+
   influxdb_cpp::server_info si(ip_, std::stoi(port_), database_name_, username_,
                                password_);
 
