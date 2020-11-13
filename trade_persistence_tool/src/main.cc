@@ -30,25 +30,28 @@ int main(int argc, char* argv[]) {
                                  config.database_name, config.db_username,
                                  config.db_password);
     thread_local int count_ = 0;
+    thread_local int last_round_vector_size = 0;
     while (true) {
+      CDCF_LOGGER_DEBUG(
+          "Chunk Database IO Thread scans data ( waiting time: 30s )");
       thread_end_flag_mutex.lock();
       if (thread_end_flag) {
-        trade_manager_db_buffer_mutex.lock();
         write_data_to_db(count_, config, si);
-        trade_manager_db_buffer_mutex.unlock();
         CDCF_LOGGER_INFO("Chunk Database IO Thread ends");
         return;
       }
       thread_end_flag_mutex.unlock();
 
-      trade_manager_db_buffer_mutex.lock();
-      if (trade_manager_db_buffer.size() >= 5000) {
+      if (trade_manager_db_buffer.size() >= 5000 ||
+          (last_round_vector_size == trade_manager_db_buffer.size() &&
+           last_round_vector_size != 0)) {
         if (!write_data_to_db(count_, config, si)) {
+          CDCF_LOGGER_ERROR("Write db failed, Chunk Database IO Thread ends");
           return;
         }
-        trade_manager_db_buffer_mutex.unlock();
-        sleep(30);
       }
+      last_round_vector_size = trade_manager_db_buffer.size();
+      sleep(30);
     }
   });
 
@@ -61,9 +64,10 @@ int main(int argc, char* argv[]) {
 bool write_data_to_db(int count_, trade_persistence_tool::Config& config,
                       influxdb_cpp::server_info& si) {
   trade_manager_db_buffer_mutex.lock();
-  CDCF_LOGGER_DEBUG("Try to send buffered trades data to influxdb");
+  CDCF_LOGGER_DEBUG("Try to send buffered trades data to {} table",
+                    config.database_table_name);
   std::string resp;
-  auto payload = influxdb_cpp::builder();
+  auto payload = influxdb_cpp::detail::field_caller();
   for (const auto& trade : trade_manager_db_buffer) {
     payload.meas(config.database_name)
         .tag("buy_order_id", trade.buy_order_id_)
@@ -89,11 +93,12 @@ bool write_data_to_db(int count_, trade_persistence_tool::Config& config,
           trade.trade_id_, trade.price_, trade.amount_, trade.sell_user_id_,
           trade.buy_user_id_);
     }
+    trade_manager_db_buffer.clear();
+    trade_manager_db_buffer_mutex.unlock();
+    return true;
   } else {
     CDCF_LOGGER_ERROR("Write db failed, ret:{} resp:{}", ret, resp);
     trade_manager_db_buffer_mutex.unlock();
     return false;
   }
-  trade_manager_db_buffer_mutex.unlock();
-  return true;
 }
