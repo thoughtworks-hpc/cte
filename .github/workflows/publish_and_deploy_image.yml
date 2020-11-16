@@ -21,8 +21,6 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
-        with:
-          ref: develop
 
       - name: Publish Docker
         uses: elgohr/Publish-Docker-Github-Action@2.21
