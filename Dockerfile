@@ -62,6 +62,7 @@ COPY deployment/test_env_akka_request_generator_config.json /bin/test_env_akka_r
 COPY deployment/test_env_cte_request_generator_config.json /bin/test_env_cte_request_generator_config.json
 COPY deployment/start_test_env_database.sh /bin/start_test_env_database.sh
 COPY deployment/start_request_generator.sh /bin/start_request_generator.sh
+COPY deployment/start_request_generator_test_performance.sh /bin/start_request_generator_test_performance.sh
 COPY deployment/start_cte_order_manager.sh /bin/start_cte_order_manager.sh
 COPY deployment/start_akka_order_manager.sh /bin/start_akka_order_manager.sh
 COPY deployment/start_trade_manager.sh /bin/start_trade_manager.sh
