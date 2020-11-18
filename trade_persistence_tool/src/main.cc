@@ -20,10 +20,12 @@ int main(int argc, char* argv[]) {
 
   tradePersistenceClient.PersistTrades();
   std::thread t([&tradePersistenceClient, &config]() {
-    std::this_thread::sleep_for(std::chrono::minutes(10));
-    CDCF_LOGGER_INFO("receive trade count for {}: {}",
-                     config.database_table_name,
-                     tradePersistenceClient.GetReceivedTradeCount());
+    while (true) {
+      std::this_thread::sleep_for(std::chrono::minutes(10));
+      CDCF_LOGGER_INFO("receive trade count for {}: {}",
+                       config.database_table_name,
+                       tradePersistenceClient.GetReceivedTradeCount());
+    }
   });
   t.join();
 }
