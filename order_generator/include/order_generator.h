@@ -48,6 +48,7 @@ class Order {
   int GetSymbol() const;
   int GetPrice() const;
   int GetAmount() const;
+  int GetTradingSide() const;
 };
 
 #endif  // ORDER_GENERATOR_INCLUDE_ORDER_GENERATOR_H_
