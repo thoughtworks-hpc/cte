@@ -103,9 +103,32 @@ while true; do
   curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=akka_order_manager' -s --data-urlencode 'q=drop measurement "order"'
 
   curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=trade_manager' -s --data-urlencode "q=select * into akka_te_trades_backup_${i} from akka_te_trades"
-  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=trade_manager' -s --data-urlencode "q=drop measurement akka_te_trades"
+
+  while true; do
+    echo '[IMPORTANT] start to clear akka_te_trades from trade_manager database'
+    echo '[IMPORTANT] start to clear akka_te_trades from trade_manager database' >>/tmp/log/long_run_status.log
+    curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=trade_manager' -s --data-urlencode "q=drop measurement akka_te_trades"
+    count=$(curl -GET 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode "db=trade_manager" --data-urlencode "q=SELECT count(symbol_id) FROM akka_te_trades" | python -c 'import json,sys;obj=json.load(sys.stdin); print(obj["results"][0]["series"][0]["values"][0][1])')
+    if [ -z "$count" ]; then
+      echo '[IMPORTANT] akka_te_trades cleared'
+      echo '[IMPORTANT] akka_te_trades cleared' >>/tmp/log/long_run_status.log
+      break
+    fi
+  done
+
   curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=trade_manager' -s --data-urlencode "q=select * into cte_trades_backup_${i} from cte_trades"
-  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=trade_manager' -s --data-urlencode "q=drop measurement cte_trades"
+
+  while true; do
+    echo '[IMPORTANT] start to clear cte_trades from trade_manager database'
+    echo '[IMPORTANT] start to clear cte_trades from trade_manager database' >>/tmp/log/long_run_status.log
+    curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=trade_manager' -s --data-urlencode "q=drop measurement cte_trades"
+    count=$(curl -GET 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode "db=trade_manager" --data-urlencode "q=SELECT count(symbol_id) FROM cte_trades" | python -c 'import json,sys;obj=json.load(sys.stdin); print(obj["results"][0]["series"][0]["values"][0][1])')
+    if [ -z "$count" ]; then
+      echo '[IMPORTANT] cte_trades cleared'
+      echo '[IMPORTANT] cte_trades cleared' >>/tmp/log/long_run_status.log
+      break
+    fi
+  done
 
   temp_num1=$(($i % 5))
   temp_num2=$(($i / 5))
