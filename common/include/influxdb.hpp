@@ -73,6 +73,12 @@ struct builder {
     return _m(m);
   }
 
+  void reset_payload() {
+    lines_.imbue(std::locale("C"));
+    lines_.clear();
+    lines_.str("");
+  }
+
   int chunk_post(const server_info& si, std::string* resp = NULL) {
     return _post_http(si, resp);
   }
