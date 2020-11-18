@@ -20,6 +20,14 @@ while true; do
     curl -POST http://172.30.28.30:8086/query -s --data-urlencode "q=CREATE DATABASE trade_manager"
   fi
 
+  cte_trades_count=$(curl -GET 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode "db=trade_manager" --data-urlencode "q=SELECT count(symbol_id) FROM cte_trades" | python -c 'import json,sys;obj=json.load(sys.stdin); print(obj["results"][0]["series"][0]["values"][0][1])')
+  akka_te_trades_count=$(curl -GET 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode "db=trade_manager" --data-urlencode "q=SELECT count(symbol_id) FROM akka_te_trades" | python -c 'import json,sys;obj=json.load(sys.stdin); print(obj["results"][0]["series"][0]["values"][0][1])')
+
+  echo "[IMPORTANT] cte_trades_count: ${cte_trades_count}"
+  echo "[IMPORTANT] cte_trades_count: ${cte_trades_count}" >> /tmp/log/long_run_status.log
+  echo "[IMPORTANT] akka_te_trades_count: ${akka_te_trades_count}"
+  echo "[IMPORTANT] akka_te_trades_count: ${akka_te_trades_count}" >> /tmp/log/long_run_status.log
+
   cd /bin
   /bin/create_initial_prices
   echo '[IMPORTANT] initial prices are generated'
