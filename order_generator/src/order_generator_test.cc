@@ -51,8 +51,8 @@ TEST(GenerateOrder, should_generate_order_in_range) {
     EXPECT_LE(order.GetUserId(), user_id_max);
     EXPECT_GE(order.GetSymbol(), symbol_id_min);
     EXPECT_LE(order.GetSymbol(), symbol_id_max);
-    EXPECT_GE(order.GetPrice(), initial_price_now * 0.9);
-    EXPECT_LE(order.GetPrice(), initial_price_now * 1.1);
+    EXPECT_GE(order.GetPrice(), static_cast<int>(initial_price_now * 0.9));
+    EXPECT_LE(order.GetPrice(), static_cast<int>(initial_price_now * 1.1));
     EXPECT_GE(order.GetAmount(), amount_min);
     EXPECT_LE(order.GetAmount(), amount_max);
   }
