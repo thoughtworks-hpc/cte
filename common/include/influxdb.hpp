@@ -76,6 +76,7 @@ struct builder {
   void reset_payload() {
     lines_.imbue(std::locale("C"));
     lines_.clear();
+    lines_.str("");
   }
 
  protected:
