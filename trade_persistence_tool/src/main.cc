@@ -2,6 +2,7 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
+#include <cdcf/logger.h>
 #include <unistd.h>
 
 #include "include/config.h"
@@ -18,4 +19,11 @@ int main(int argc, char* argv[]) {
       influxdb, config.order_manager_address, config.database_table_name);
 
   tradePersistenceClient.PersistTrades();
+  std::thread t([&tradePersistenceClient, &config]() {
+    std::this_thread::sleep_for(std::chrono::minutes(10));
+    CDCF_LOGGER_INFO("receive trade count for {}: {}",
+                     config.database_table_name,
+                     tradePersistenceClient.GetReceivedTradeCount());
+  });
+  t.join();
 }

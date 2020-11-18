@@ -4,7 +4,6 @@
 
 #include "include/trade_persistence_client.h"
 
-#include <cdcf/logger.h>
 #include <grpcpp/create_channel.h>
 
 #include <memory>
@@ -24,6 +23,7 @@ bool TradePersistenceClient::PersistTrades() {
       clinet.SubscribeMatchResult(&client_context, google::protobuf::Empty()));
   int count = 0;
   while (reader->Read(&trade)) {
+    received_trade_counter_++;
     CDCF_LOGGER_DEBUG("Receive #{} trade", ++count);
     CDCF_LOGGER_DEBUG(
         "Receive #{} trade: symbol_id: {}, maker_id: {}, taker_id: {}, price: "

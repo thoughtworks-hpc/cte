@@ -21,11 +21,13 @@ class TradePersistenceClient {
         database_table_name_(std::move(databaseTableName)) {}
 
   bool PersistTrades();
+  long GetReceivedTradeCount() { return received_trade_counter_; }
 
  private:
   DatabaseWriteInterface* database;
   std::string trade_engine_address_;
   std::string database_table_name_;
+  std::atomic_long received_trade_counter_ = 0;
 };
 
 std::vector<std::string> ParseIpAddress(std::string address);
