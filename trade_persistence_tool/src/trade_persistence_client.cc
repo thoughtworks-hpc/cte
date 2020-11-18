@@ -4,6 +4,7 @@
 
 #include "include/trade_persistence_client.h"
 
+#include <cdcf/logger.h>
 #include <grpcpp/create_channel.h>
 
 #include <memory>

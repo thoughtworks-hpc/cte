@@ -21,7 +21,7 @@ class TradePersistenceClient {
         database_table_name_(std::move(databaseTableName)) {}
 
   bool PersistTrades();
-  long GetReceivedTradeCount() { return received_trade_counter_; }
+  int64_t GetReceivedTradeCount() { return received_trade_counter_; }
 
  private:
   DatabaseWriteInterface* database;
