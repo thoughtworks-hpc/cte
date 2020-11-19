@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
     thread_local int last_round_vector_size = 0;
     while (true) {
       CDCF_LOGGER_INFO(
-          "Chunk Database IO Thread scans data ( waiting time: 30s )");
+          "Chunk Database IO Thread scans data ( waiting time: 10s )");
       thread_end_flag_mutex.lock();
       if (thread_end_flag) {
         write_data_to_db(count_, config, si);
@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
         }
       }
       last_round_vector_size = trade_manager_db_buffer.size();
-      sleep(30);
+      sleep(10);
     }
   });
 
@@ -64,8 +64,8 @@ int main(int argc, char* argv[]) {
 bool write_data_to_db(int count_, trade_persistence_tool::Config& config,
                       influxdb_cpp::server_info& si) {
   trade_manager_db_buffer_mutex.lock();
-  CDCF_LOGGER_DEBUG("Try to send buffered trades data to {} table",
-                    config.database_table_name);
+  CDCF_LOGGER_INFO("Try to send buffered {} trades data to {} table",
+                   trade_manager_db_buffer.size(), config.database_table_name);
   std::string resp;
   auto payload = influxdb_cpp::detail::field_caller();
   for (const auto& trade : trade_manager_db_buffer) {
