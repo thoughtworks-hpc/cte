@@ -12,7 +12,7 @@
 static bool thread_end_flag;
 static std::mutex thread_end_flag_mutex;
 
-bool write_data_to_db(int count_, trade_persistence_tool::Config& config,
+bool write_data_to_db(int& count_, trade_persistence_tool::Config& config,
                       influxdb_cpp::server_info& si);
 
 int main(int argc, char* argv[]) {
@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
     thread_local int count_ = 0;
     thread_local int last_round_vector_size = 0;
     while (true) {
-      CDCF_LOGGER_INFO(
+      CDCF_LOGGER_DEBUG(
           "Chunk Database IO Thread scans data ( waiting time: 10s )");
       thread_end_flag_mutex.lock();
       if (thread_end_flag) {
@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
   CDCF_LOGGER_CRITICAL("Trade Manager Shut Down");
 }
 
-bool write_data_to_db(int count_, trade_persistence_tool::Config& config,
+bool write_data_to_db(int& count_, trade_persistence_tool::Config& config,
                       influxdb_cpp::server_info& si) {
   trade_manager_db_buffer_mutex.lock();
   CDCF_LOGGER_INFO("Try to send buffered {} trades data to {} table",

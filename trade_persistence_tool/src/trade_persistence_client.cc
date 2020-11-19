@@ -24,12 +24,12 @@ bool TradePersistenceClient::PersistTrades() {
       clinet.SubscribeMatchResult(&client_context, google::protobuf::Empty()));
   int count = 0;
   while (reader->Read(&trade)) {
-    CDCF_LOGGER_DEBUG("Receive #{} trade", ++count);
+    // CDCF_LOGGER_DEBUG("Receive #{} trade", ++count);
     CDCF_LOGGER_DEBUG(
         "Receive #{} trade: symbol_id: {}, maker_id: {}, taker_id: {}, price: "
         "{}, "
         "trading_side: {}, amount: {}, buyer_user_id: {}, seller_user_id: {}",
-        count, trade.symbol_id(), trade.maker_id(), trade.taker_id(),
+        ++count, trade.symbol_id(), trade.maker_id(), trade.taker_id(),
         trade.price(), trade.trading_side(), trade.amount(),
         trade.buyer_user_id(), trade.seller_user_id());
 
