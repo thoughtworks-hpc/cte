@@ -6,6 +6,9 @@
 
 #include <unistd.h>
 
+std::vector<TradeEntity> trade_manager_db_buffer;
+std::mutex trade_manager_db_buffer_mutex;
+
 std::vector<std::string> trade_persistence_tool::ParseIpAddress(
     std::string address) {
   std::vector<std::string> output;

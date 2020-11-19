@@ -79,6 +79,10 @@ struct builder {
     lines_.str("");
   }
 
+  int chunk_post(const server_info& si, std::string* resp = NULL) {
+    return _post_http(si, resp);
+  }
+
  protected:
   detail::tag_caller& _m(const std::string& m) {
     _escape(m, ", ");

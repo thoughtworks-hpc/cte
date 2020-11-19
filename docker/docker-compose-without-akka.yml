@@ -16,7 +16,7 @@ services:
   order_manager_akka:
     image: cte:latest
     environment:
-      TEST_MODE_OPEN: 0
+      TEST_MODE_OPEN: 1
     ports:
       - "55558:8086"
       - 50052:50051
@@ -27,7 +27,7 @@ services:
   order_manager_cte:
     image: cte:latest
     environment:
-      TEST_MODE_OPEN: 0
+      TEST_MODE_OPEN: 1
     ports:
       - "55559:8086"
       - 50051:50051

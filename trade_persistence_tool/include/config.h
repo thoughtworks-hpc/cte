@@ -8,8 +8,14 @@
 #include <cdcf/cdcf_config.h>
 #include <cdcf/logger.h>
 
+#include <mutex>
 #include <string>
 #include <vector>
+
+#include "./trade_entity.h"
+
+extern std::vector<TradeEntity> trade_manager_db_buffer;
+extern std::mutex trade_manager_db_buffer_mutex;
 
 namespace trade_persistence_tool {
 class Config {
