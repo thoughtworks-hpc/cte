@@ -53,6 +53,7 @@ grpc::Status match_engine::MatchEngineGRPCImpl::OpenCloseEngine(
 grpc::Status match_engine::MatchEngineGRPCImpl::Match(
     ::grpc::ServerContext *context, const ::match_engine_proto::Order *request,
     ::match_engine_proto::Reply *response) {
+  received_order_count++;
   if (!this->engine_is_open_) {
     CDCF_LOGGER_INFO("Match Engine is close.");
     return ::grpc::Status(::grpc::StatusCode::UNAVAILABLE, "Engine is close");
@@ -93,6 +94,19 @@ grpc::Status match_engine::MatchEngineGRPCImpl::SubscribeMatchResult(
   // waiting for writer end
   (void)result_writer_keeper.writer_promise->get_future().get();
   delete result_writer_keeper.writer_promise;
+  return ::grpc::Status::OK;
+}
+
+grpc::Status match_engine::MatchEngineGRPCImpl::GetStats(
+    ::grpc::ServerContext *context, const ::google::protobuf::Empty *request,
+    ::match_engine_proto::Stat *response) {
+  response->set_status(match_engine_proto::STATUS_SUCCESS);
+  response->set_received_order_number(received_order_count);
+
+  Stats stats = match_engine_cluster_.GetStats();
+  response->set_processed_order_number(stats.processedOrderNumber);
+  response->set_generated_trade_number(stats.generatedTradeNumber);
+
   return ::grpc::Status::OK;
 }
 

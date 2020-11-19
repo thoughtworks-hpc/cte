@@ -23,6 +23,8 @@ class MatchEngineCluster : public cdcf::cluster::Observer {
 
   void AddNewNode(std::string host, std::string hostname, std::string role);
 
+  Stats GetStats();
+
  private:
   caf::actor_system& system_;
   uint16_t symbol_router_port_;

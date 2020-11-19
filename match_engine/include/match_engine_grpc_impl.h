@@ -30,6 +30,10 @@ class MatchEngineGRPCImpl final
                                const ::match_engine_proto::EngineSwitch *status,
                                ::match_engine_proto::Reply *response) override;
 
+  grpc::Status GetStats(::grpc::ServerContext *context,
+                        const ::google::protobuf::Empty *request,
+                        ::match_engine_proto::Stat *response) override;
+
   void Run();
   void RunWithWait();
   void SendMatchResult(const TradeList &trade_list) override;
@@ -44,6 +48,9 @@ class MatchEngineGRPCImpl final
   MatchResultWriteKeepers match_result_writer_keepers{};
   bool is_test_ = false;
   std::atomic_bool engine_is_open_ = true;
+
+  std::atomic_long received_order_count = 0;
+  std::atomic_long generated_trade_count = 0;
 };
 
 }  // namespace match_engine

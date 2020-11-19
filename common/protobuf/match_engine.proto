@@ -16,6 +16,8 @@ service TradingEngine {
     }
     rpc OpenCloseEngine (EngineSwitch) returns (Reply){
     }
+    rpc GetStats (google.protobuf.Empty) returns (Stat) {
+    }
 }
 
 enum TradingSide {
@@ -64,4 +66,11 @@ enum EngineStatus {
 
 message EngineSwitch {
     EngineStatus engine_status = 3;
+}
+
+message Stat {
+    int64 received_order_number = 1; //通过rpc收到的总订单数
+    int64 processed_order_number = 2; //通过match actor处理过的总订单数
+    int64 generated_trade_number = 3; //通过match actor生成的总成交单数
+    Status status = 4;
 }

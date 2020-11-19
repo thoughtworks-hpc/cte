@@ -21,6 +21,8 @@ struct OrderBook {
   OrderTable sell_list;
   OrderTable buy_list;
   caf::actor match_result_actor = nullptr;
+  int64_t processed_order_count = 0;
+  int64_t generated_trade_count = 0;
 };
 
 caf::behavior MatchActor(caf::stateful_actor<OrderBook>* self);

@@ -143,6 +143,7 @@ void SendMatchResult(caf::stateful_actor<OrderBook>* sender,
           one_match.deal_time, one_match.submit_time);
     }
 
+    sender->state.generated_trade_count++;
     sender
         ->request(sender->state.match_result_actor,
                   // std::chrono::seconds(k_send_match_result_timeout),
@@ -169,6 +170,7 @@ void SendMatchResult(caf::stateful_actor<OrderBook>* sender,
 caf::behavior MatchActor(caf::stateful_actor<OrderBook>* self) {
   return {
       [=](RawOrder& order) {
+        self->state.processed_order_count++;
         CDCF_LOGGER_DEBUG(
             "match actor Receive new order, id:{}, price:{}, amount:{}, trade "
             "site:{}, "
@@ -199,6 +201,15 @@ caf::behavior MatchActor(caf::stateful_actor<OrderBook>* self) {
         CDCF_LOGGER_DEBUG("set result_receiver success, actor id:{}",
                           self->id());
         self->state.match_result_actor = result_receiver;
+      },
+      [=](GetStatsAtom) {
+        Stats stats{};
+        CDCF_LOGGER_INFO("test 3: {}, {}", stats.processedOrderNumber,
+                          stats.generatedTradeNumber);
+        stats.processedOrderNumber = self->state.processed_order_count;
+        stats.generatedTradeNumber = self->state.generated_trade_count;
+
+        return stats;
       }};
 }
 

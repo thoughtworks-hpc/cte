@@ -55,6 +55,41 @@ caf::behavior SymbolRouterActor(caf::stateful_actor<SymbolRouterData>* self) {
         }
         self->send(self->state.symbol_actor_map[msg.symbol_id], msg);
         return true;
+      },
+      [=](GetStatsAtom) {
+        self->state.get_stats_destination =
+            caf::actor_cast<caf::actor>(self->current_sender());
+        int actor_num = self->state.symbol_actor_map.size();
+        CDCF_LOGGER_INFO("test 0: {}", actor_num);
+        for (const auto& symbolToActor : self->state.symbol_actor_map) {
+          CDCF_LOGGER_INFO("test: {}", symbolToActor.first);
+          self->request(symbolToActor.second, caf::infinite,
+                        GetStatsAtom::value)
+              .then([=](Stats result) mutable {
+                CDCF_LOGGER_INFO("test 2: {}, {}:{}, {}", symbolToActor.first,
+                                 result.processedOrderNumber,
+                                 result.generatedTradeNumber,
+                                 self->state.get_stats_results.size());
+                self->state.get_stats_results.push_back(result);
+                if (self->state.get_stats_results.size() == actor_num) {
+                  CDCF_LOGGER_INFO("test 4: {}",
+                                   self->state.get_stats_results.size());
+                  Stats stats{};
+                  for (const auto& get_stats_result :
+                       self->state.get_stats_results) {
+                    stats.processedOrderNumber +=
+                        get_stats_result.processedOrderNumber;
+                    stats.generatedTradeNumber +=
+                        get_stats_result.generatedTradeNumber;
+                  }
+
+                  self->state.get_stats_results.clear();
+                  CDCF_LOGGER_INFO("test 5: {}, {}", stats.processedOrderNumber,
+                                   stats.generatedTradeNumber);
+                  self->send(self->state.get_stats_destination, stats);
+                }
+              });
+        }
       }};
 }
 }  // namespace match_engine

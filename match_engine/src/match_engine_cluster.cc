@@ -132,4 +132,17 @@ void MatchEngineCluster::AddNewNode(std::string host, std::string hostname,
   }
 }
 
+Stats MatchEngineCluster::GetStats() {
+  Stats stats;
+  caf::scoped_actor self(system_);
+  self->send(symbol_id_router_, GetStatsAtom::value);
+  self->receive([&](Stats result) { stats = result; },
+                [&](caf::error& err) {
+                  stats.generatedTradeNumber = 0;
+                  stats.processedOrderNumber = 0;
+                  CDCF_LOGGER_ERROR("GetStats failed: {}", system_.render(err));
+                });
+  return stats;
+}
+
 }  // namespace match_engine

@@ -19,6 +19,8 @@ struct SymbolRouterData {
   std::map<int32_t, caf::actor> symbol_actor_map;
   std::map<std::string, std::vector<int32_t> > node_symbol_map;
   std::vector<SymbolActorInfo> local_symbol_actors;
+  caf::actor get_stats_destination;
+  std::vector<Stats> get_stats_results;
 };
 
 caf::behavior SymbolRouterActor(caf::stateful_actor<SymbolRouterData>* self);

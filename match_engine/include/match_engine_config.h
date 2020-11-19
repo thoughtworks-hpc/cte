@@ -30,6 +30,7 @@ struct MatchResultWriterKeeper {
 using MatchResultWriteKeepers = std::vector<MatchResultWriterKeeper>;
 
 using GetAtom = caf::atom_constant<caf::atom("get")>;
+using GetStatsAtom = caf::atom_constant<caf::atom("get_stats")>;
 
 struct SymbolActorInfo {
   int32_t symbol_id;
@@ -85,6 +86,11 @@ struct TradeListMsg {
   TradeList data;
 };
 
+struct Stats {
+  int64_t processedOrderNumber;
+  int64_t generatedTradeNumber;
+};
+
 template <class Inspector>
 typename Inspector::result_type inspect(Inspector& f, const RawOrder& x) {
   return f(caf::meta::type_name("RawOrder"), x.order_id, x.symbol_id, x.user_id,
@@ -110,6 +116,12 @@ typename Inspector::result_type inspect(Inspector& f, const TradeListMsg& x) {
   return f(caf::meta::type_name("TradeListMsg"), x.data);
 }
 
+template <class Inspector>
+typename Inspector::result_type inspect(Inspector& f, const Stats& x) {
+  return f(caf::meta::type_name("Stats"), x.generatedTradeNumber,
+           x.processedOrderNumber);
+}
+
 class SenderMatchInterface {
  public:
   virtual void SendMatchResult(const TradeList& trade_list) = 0;
@@ -128,6 +140,7 @@ class Config : public cdcf::actor_system::Config {
     add_message_type<SymbolActorInfo>("SymbolActorInfo");
     add_message_type<MatchedTrade>("MatchedTrade");
     add_message_type<TradeListMsg>("TradeListMsg");
+    add_message_type<Stats>("Stats");
     opt_group{custom_options_, "global"}
         .add(grpc_server_port, "grpc_server_port", "GRPC server port")
         .add(symbol_id_list, "symbol_id_list", "symbol list")
