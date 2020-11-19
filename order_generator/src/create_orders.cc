@@ -32,17 +32,37 @@ int main(int argc, char* argv[]) {
 
   auto initial_prices = GetAllInitialPrice(initial_price_file_path);
 
+  influxdb_cpp::server_info si(
+      orders_config["database_host"], orders_config["database_port"],
+      orders_config["database_name"], orders_config["database_user"],
+      orders_config["database_password"]);
+  influxdb_cpp::detail::ts_caller payload;
   for (int i = 0; i < orders_config["order_amount"]; i++) {
     Order order(initial_prices, orders_config["user_id_min"],
                 orders_config["user_id_max"],
                 orders_config["trading_amount_min"],
                 orders_config["trading_amount_max"]);
-    order.CreateOrderInDatabase(
-        orders_config["database_host"], orders_config["database_port"],
-        orders_config["database_name"], orders_config["database_user"],
-        orders_config["database_password"]);
-    if ((i + 1) % 10000 == 0) {
-      std::cout << "write db success, the round is: " << i << std::endl;
+
+    payload.meas("orders")
+        .field("user_id", order.GetUserId())
+        .field("symbol", order.GetSymbol())
+        .field("price", order.GetPrice())
+        .field("amount", order.GetAmount())
+        .field("trading_side", order.GetTradingSide())
+        .timestamp(i);
+
+    if ((i + 1) % 10000 == 0 ||
+        (orders_config["order_amount"] < 10000 &&
+         i == static_cast<int>(orders_config["order_amount"]) - 1)) {
+      std::string resp;
+      int ret = payload.post_http(si, &resp);
+      if (0 != ret || !resp.empty()) {
+        std::cout << "write db failed, ret:" << ret << " resp:" << resp
+                  << std::endl;
+        return ret;
+      }
+      payload.reset_payload();
+      std::cout << "write db success, the round is: " << i + 1 << std::endl;
     }
   }
 

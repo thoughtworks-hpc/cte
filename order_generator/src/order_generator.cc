@@ -87,33 +87,34 @@ Order::Order(const std::map<int, int>& all_initial_prices,
   this->trading_side_ = GenerateRandomNumber(1, 2);
 }
 
-int Order::CreateOrderInDatabase(const std::string& database_host,
-                                 const int& database_port,
-                                 const std::string& database_name,
-                                 const std::string& database_user,
-                                 const std::string& database_password) const {
-  std::string resp;
-  int ret;
-  influxdb_cpp::server_info si(database_host, database_port, database_name,
-                               database_user, database_password);
-
-  ret = influxdb_cpp::builder()
-            .meas("orders")
-            .field("user_id", (int32_t)this->user_id_)
-            .field("symbol", (int32_t)this->symbol_)
-            .field("price", (int32_t)this->price_)
-            .field("amount", (int32_t)this->amount_)
-            .field("trading_side", (int32_t)this->trading_side_)
-            .post_http(si, &resp);
-
-  if (0 != ret || !resp.empty()) {
-    std::cout << "write db failed, ret:" << ret << " resp:" << resp
-              << std::endl;
-  }
-
-  return ret;
-}
+// int Order::CreateOrderInDatabase(const std::string& database_host,
+//                                 const int& database_port,
+//                                 const std::string& database_name,
+//                                 const std::string& database_user,
+//                                 const std::string& database_password) const {
+//  std::string resp;
+//  int ret;
+//  influxdb_cpp::server_info si(database_host, database_port, database_name,
+//                               database_user, database_password);
+//
+//  ret = influxdb_cpp::builder()
+//            .meas("orders")
+//            .field("user_id", (int32_t)this->user_id_)
+//            .field("symbol", (int32_t)this->symbol_)
+//            .field("price", (int32_t)this->price_)
+//            .field("amount", (int32_t)this->amount_)
+//            .field("trading_side", (int32_t)this->trading_side_)
+//            .post_http(si, &resp);
+//
+//  if (0 != ret || !resp.empty()) {
+//    std::cout << "write db failed, ret:" << ret << " resp:" << resp
+//              << std::endl;
+//  }
+//
+//  return ret;
+//}
 int Order::GetUserId() const { return user_id_; }
 int Order::GetSymbol() const { return symbol_; }
 int Order::GetPrice() const { return price_; }
 int Order::GetAmount() const { return amount_; }
+int Order::GetTradingSide() const { return trading_side_; }

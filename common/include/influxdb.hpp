@@ -73,6 +73,12 @@ struct builder {
     return _m(m);
   }
 
+  void reset_payload() {
+    lines_.imbue(std::locale("C"));
+    lines_.clear();
+    lines_.str("");
+  }
+
  protected:
   detail::tag_caller& _m(const std::string& m) {
     _escape(m, ", ");
