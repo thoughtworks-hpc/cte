@@ -2,9 +2,10 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
-#ifndef CTE_DATABASE_INTERFACE_HPP
-#define CTE_DATABASE_INTERFACE_HPP
+#ifndef COMMON_INCLUDE_DATABASE_INTERFACE_HPP_
+#define COMMON_INCLUDE_DATABASE_INTERFACE_HPP_
 
+#include <string>
 #include <thread>
 #include <vector>
 
@@ -27,13 +28,13 @@ struct entity {
 class Database {
  public:
   virtual bool write(entity& data_entity) = 0;
-  virtual ~Database(){};
+  virtual ~Database() {}
 };
 
 class InfluxDB : public Database {
  public:
-  InfluxDB(influxdb_cpp::server_info& si, const int default_size = 20000);
-
+  explicit InfluxDB(influxdb_cpp::server_info& si,
+                    const int default_size = 20000);
   ~InfluxDB();
 
   bool write(entity& data_entity);
@@ -51,4 +52,4 @@ class InfluxDB : public Database {
 
 }  // namespace database_interface
 
-#endif  // CTE_DATABASE_INTERFACE_HPP
+#endif  // COMMON_INCLUDE_DATABASE_INTERFACE_HPP_
