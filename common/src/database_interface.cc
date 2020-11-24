@@ -4,10 +4,6 @@
 
 #include "../include/database_interface.hpp"
 
-#include <cdcf/logger.h>
-
-#include <utility>
-
 database_interface::InfluxDB::InfluxDB(influxdb_cpp::server_info& si,
                                        const int default_size)
     : si(si) {
@@ -38,47 +34,53 @@ void database_interface::InfluxDB::thread_main() {
   while (true) {
     CDCF_LOGGER_DEBUG(
         "Chunk Database IO Thread scans data ( waiting time: 10s )");
-    if (thread_end_flag) {
-      thread_write_db();
-      CDCF_LOGGER_INFO("Chunk Database IO Thread ends");
+    buffer_mutex.lock();
+    bool res = thread_write_db();
+    buffer_mutex.unlock();
+    if (!res) {
+      CDCF_LOGGER_ERROR("Write db failed, Chunk Database IO Thread ends");
       return;
     }
 
-    buffer_mutex.lock();
-    if (buffer.size() >= 5000 || (last_round_vector_size == buffer.size() &&
-                                  last_round_vector_size != 0)) {
-      if (thread_write_db()) {
-        CDCF_LOGGER_ERROR("Write db failed, Chunk Database IO Thread ends");
-        return;
-      }
+    if (thread_end_flag && 0 == buffer.size()) {
+      CDCF_LOGGER_INFO("Chunk Database IO Thread ends");
+      return;
     }
-    last_round_vector_size = buffer.size();
-    buffer_mutex.unlock();
-
-    sleep(10);
+    sleep(2);
   }
 }
 
 bool database_interface::InfluxDB::thread_write_db() {
+  auto size = std::min(buffer.size(), static_cast<unsigned long>(100000));
   CDCF_LOGGER_INFO("Try to send buffered {} trades data to table",
-                   buffer.size());
+                   std::to_string(size));
   std::string resp;
 
-  influxdb_cpp::detail::ts_caller payload = influxdb_cpp::detail::ts_caller();
-  for (const auto& trade_entity : buffer) {
+  influxdb_cpp::detail::field_caller payload =
+      influxdb_cpp::detail::field_caller();
+  for (int i = 0; i < size; ++i) {
+    const auto& trade_entity = buffer[i];
     payload.meas(trade_entity.measurement);
 
     for (const auto& tag : trade_entity.tag) {
       static_cast<influxdb_cpp::detail::tag_caller&>(
           (influxdb_cpp::detail::tag_caller&)payload)
-          .tag("", "");
+          .tag(tag.Key, tag.Value);
     }
 
-    for (const auto& field : trade_entity.field) {
-      static_cast<influxdb_cpp::detail::field_caller&>(
-          (influxdb_cpp::detail::field_caller&)payload)
-          .field("", "");
+    for (int j = 0; j < trade_entity.field.size(); ++j) {
+      auto field = trade_entity.field[j];
+      if (0 == j) {
+        static_cast<influxdb_cpp::detail::tag_caller&>(
+            (influxdb_cpp::detail::tag_caller&)payload)
+            .field(field.Key, field.Value);
+      } else {
+        static_cast<influxdb_cpp::detail::field_caller&>(
+            (influxdb_cpp::detail::field_caller&)payload)
+            .field(field.Key, field.Value);
+      }
     }
+    // CDCF_LOGGER_INFO("{}", payload.get_line());
   }
 
   int ret = payload.post_http(si, &resp);
@@ -101,3 +103,9 @@ bool database_interface::InfluxDB::thread_write_db() {
     return false;
   }
 }
+
+database_interface::entity::entity(const std::string& measurement,
+                                   const std::vector<data_pair>& tag,
+                                   const std::vector<data_pair>& field,
+                                   int64_t timestamp)
+    : measurement(measurement), tag(tag), field(field), timestamp(timestamp) {}

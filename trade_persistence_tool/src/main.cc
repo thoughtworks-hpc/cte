@@ -18,9 +18,11 @@ bool write_data_to_db(int& count_, trade_persistence_tool::Config& config,
 int main(int argc, char* argv[]) {
   trade_persistence_tool::Config config(argc, argv);
 
-  DatabaseWriteInterface* influxdb = new TradePersistInfluxdb(
+  TradePersistInfluxdb tradePersistInfluxdb(
       config.database_name, config.db_ip, config.db_port, config.db_username,
       config.db_password, config.database_table_name);
+  DatabaseWriteInterface* influxdb = &tradePersistInfluxdb;
+
   TradePersistenceClient tradePersistenceClient(
       influxdb, config.order_manager_address, config.database_table_name);
 

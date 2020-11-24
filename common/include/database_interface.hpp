@@ -5,10 +5,11 @@
 #ifndef COMMON_INCLUDE_DATABASE_INTERFACE_HPP_
 #define COMMON_INCLUDE_DATABASE_INTERFACE_HPP_
 
+#include <mutex>
 #include <string>
 #include <thread>
 #include <vector>
-
+#include <cdcf/logger.h>
 #include "./influxdb.hpp"
 
 namespace database_interface {
@@ -23,6 +24,8 @@ struct entity {
   std::vector<data_pair> tag;
   std::vector<data_pair> field;
   int64_t timestamp;
+  entity(const std::string& measurement, const std::vector<data_pair>& tag,
+         const std::vector<data_pair>& field, int64_t timestamp);
 };
 
 class Database {

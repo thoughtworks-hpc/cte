@@ -83,6 +83,8 @@ struct builder {
     lines_.str("");
   }
 
+  std::string get_line() { return lines_.str(); }
+
   int chunk_post(const server_info& si, std::string* resp = NULL) {
     return _post_http(si, resp);
   }
