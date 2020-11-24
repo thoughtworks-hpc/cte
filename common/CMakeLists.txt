@@ -47,4 +47,6 @@ list(APPEND PB_ALL_SOURCES ${ORDER_MANAGER_PROTO_SRCS} ${ORDER_MANAGER_GRPC_SRCS
 add_library(${PROJECT_NAME}_grpc ${PB_ALL_SOURCES})
 target_link_libraries(${PROJECT_NAME}_grpc gRPC::gRPC)
 
+add_library(${PROJECT_NAME}_database src/database_interface.cc)
+
 

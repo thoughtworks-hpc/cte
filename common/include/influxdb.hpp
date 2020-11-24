@@ -7,6 +7,10 @@
   Please see LICENSE file or visit https://github.com/orca-zhang/influxdb-cpp
   for details.
  */
+
+#ifndef INFLUXDB_HPP
+#define INFLUXDB_HPP
+
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -407,3 +411,5 @@ END:
 }
 }  // namespace detail
 }  // namespace influxdb_cpp
+
+#endif  // INFLUXDB_HPP
