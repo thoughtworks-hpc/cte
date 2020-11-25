@@ -70,8 +70,8 @@ bool write_data_to_db(int& count_, trade_persistence_tool::Config& config,
   auto payload = influxdb_cpp::detail::field_caller();
   for (const auto& trade : trade_manager_db_buffer) {
     payload.meas(config.database_table_name)
-        .tag("buy_order_id", trade.buy_order_id_)
-        .tag("sell_order_id", trade.sell_order_id_)
+        .field("buy_order_id", trade.buy_order_id_)
+        .field("sell_order_id", trade.sell_order_id_)
         .field("symbol_id", trade.symbol_id_)
         .field("trade_id", trade.trade_id_)
         .field("price", trade.price_)
