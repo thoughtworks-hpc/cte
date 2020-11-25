@@ -51,10 +51,10 @@ caf::behavior SymbolRouterActor(caf::stateful_actor<SymbolRouterData>* self) {
         if (0 == self->state.symbol_actor_map.count(msg.symbol_id)) {
           CDCF_LOGGER_ERROR("Can find symbol actor, symbol id:{}",
                             msg.symbol_id);
-          return false;
+//          return false;
         }
         self->send(self->state.symbol_actor_map[msg.symbol_id], msg);
-        return true;
+//        return true;
       }};
 }
 }  // namespace match_engine
