@@ -23,8 +23,8 @@ bool TradePersistInfluxdb::PersistTrade(TradeEntity& trade) {
   std::string resp;
   int ret = influxdb_cpp::builder()
                 .meas(database_table_name_)
-                .tag("buy_order_id", trade.buy_order_id_)
-                .tag("sell_order_id", trade.sell_order_id_)
+                .field("buy_order_id", trade.buy_order_id_)
+                .field("sell_order_id", trade.sell_order_id_)
                 .field("symbol_id", trade.symbol_id_)
                 .field("trade_id", trade.trade_id_)
                 .field("price", trade.price_)
