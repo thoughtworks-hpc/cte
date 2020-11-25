@@ -94,15 +94,15 @@ while true; do
 
   i=$((i + 1))
 
-  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=orders' -s --data-urlencode "q=select * into orders_backup_${i} from orders"
+#  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=orders' -s --data-urlencode "q=select * into orders_backup_${i} from orders"
   curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=orders' -s --data-urlencode "q=drop measurement orders"
 
-  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=cte_order_manager' -s --data-urlencode 'q=select * into order_backup_'${i}' from "order"'
+#  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=cte_order_manager' -s --data-urlencode 'q=select * into order_backup_'${i}' from "order"'
   curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=cte_order_manager' -s --data-urlencode 'q=drop measurement "order"'
-  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=akka_order_manager' -s --data-urlencode 'q=select * into order_backup_'${i}' from "order"'
+#  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=akka_order_manager' -s --data-urlencode 'q=select * into order_backup_'${i}' from "order"'
   curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=akka_order_manager' -s --data-urlencode 'q=drop measurement "order"'
 
-  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=trade_manager' -s --data-urlencode "q=select * into akka_te_trades_backup_${i} from akka_te_trades"
+#  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=trade_manager' -s --data-urlencode "q=select * into akka_te_trades_backup_${i} from akka_te_trades"
 
   while true; do
     echo '[IMPORTANT] start to clear akka_te_trades from trade_manager database'
@@ -116,7 +116,7 @@ while true; do
     fi
   done
 
-  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=trade_manager' -s --data-urlencode "q=select * into cte_trades_backup_${i} from cte_trades"
+#  curl -POST 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode 'db=trade_manager' -s --data-urlencode "q=select * into cte_trades_backup_${i} from cte_trades"
 
   while true; do
     echo '[IMPORTANT] start to clear cte_trades from trade_manager database'
