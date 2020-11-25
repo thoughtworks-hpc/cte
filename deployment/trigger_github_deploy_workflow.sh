@@ -10,8 +10,8 @@ curl \
   -X POST \
   -H "Accept: application/vnd.github.v3+json" \
   https://api.github.com/repos/thoughtworks-hpc/cte/actions/workflows/publish_and_deploy_image.yml/dispatches \
-  -d '{"ref": "optimize_write_chunk_data_to_db",
-  "inputs": {"DEBUG_FLAG": "1", "NUM_OF_REQUEST": "150000", "SKIP_PUBLISH_DOCKER_IMAGE": "false"}
+  -d '{"ref": "develop",
+  "inputs": {"DEBUG_FLAG": "1", "NUM_OF_REQUEST": "1000000", "SKIP_PUBLISH_DOCKER_IMAGE": "false"}
   }'
 
 # DEBUG_FLAG = 1 ->  order_manager will not write data to db
