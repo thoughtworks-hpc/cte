@@ -69,6 +69,14 @@ bool write_data_to_db(int& count_, trade_persistence_tool::Config& config,
   std::string resp;
   auto payload = influxdb_cpp::detail::field_caller();
   for (const auto& trade : trade_manager_db_buffer) {
+    using time_stamp = std::chrono::time_point<std::chrono::system_clock,
+                                               std::chrono::nanoseconds>;
+    time_stamp current_time_stamp =
+        std::chrono::time_point_cast<std::chrono::nanoseconds>(
+            std::chrono::system_clock::now());
+    int64_t nanoseconds_since_epoch =
+        current_time_stamp.time_since_epoch().count();
+
     payload.meas(config.database_table_name)
         .field("buy_order_id", trade.buy_order_id_)
         .field("sell_order_id", trade.sell_order_id_)
@@ -78,7 +86,8 @@ bool write_data_to_db(int& count_, trade_persistence_tool::Config& config,
         .field("amount", trade.amount_)
         .field("sell_user_id", trade.sell_user_id_)
         .field("buy_user_id", trade.buy_user_id_)
-        .field("submit_time", static_cast<int64_t>(trade.submit_time));
+        .field("submit_time", static_cast<int64_t>(trade.submit_time))
+        .timestamp(nanoseconds_since_epoch);
   }
   int ret = payload.chunk_post(si, &resp);
 
