@@ -63,6 +63,13 @@ while true; do
     if [ $count1 == $count2 ]; then
       echo '[IMPORTANT] cte database is available now'
       echo '[IMPORTANT] cte database is available now' >>/tmp/log/long_run_status.log
+      cte_trades_count=$(curl -GET 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode "db=trade_manager" --data-urlencode "q=SELECT count(symbol_id) FROM cte_trades" | python -c 'import json,sys;obj=json.load(sys.stdin); print(obj["results"][0]["series"][0]["values"][0][1])')
+      akka_te_trades_count=$(curl -GET 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode "db=trade_manager" --data-urlencode "q=SELECT count(symbol_id) FROM akka_te_trades" | python -c 'import json,sys;obj=json.load(sys.stdin); print(obj["results"][0]["series"][0]["values"][0][1])')
+
+      echo "[IMPORTANT] When cte db available, cte_trades_count: ${cte_trades_count}"
+      echo "[IMPORTANT] When cte db available, cte_trades_count: ${cte_trades_count}" >>/tmp/log/long_run_status.log
+      echo "[IMPORTANT] When cte db available, akka_te_trades_count: ${akka_te_trades_count}"
+      echo "[IMPORTANT] When cte db available, akka_te_trades_count: ${akka_te_trades_count}" >>/tmp/log/long_run_status.log
       break
     fi
     echo 'cte database is still busy, try to sleep 15 seconds...'
@@ -76,6 +83,14 @@ while true; do
     if [ $count1 == $count2 ]; then
       echo '[IMPORTANT] akka_te database is available now'
       echo '[IMPORTANT] akka_te database is available now' >>/tmp/log/long_run_status.log
+
+      cte_trades_count=$(curl -GET 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode "db=trade_manager" --data-urlencode "q=SELECT count(symbol_id) FROM cte_trades" | python -c 'import json,sys;obj=json.load(sys.stdin); print(obj["results"][0]["series"][0]["values"][0][1])')
+      akka_te_trades_count=$(curl -GET 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode "db=trade_manager" --data-urlencode "q=SELECT count(symbol_id) FROM akka_te_trades" | python -c 'import json,sys;obj=json.load(sys.stdin); print(obj["results"][0]["series"][0]["values"][0][1])')
+
+      echo "[IMPORTANT] When akka db available, cte_trades_count: ${cte_trades_count}"
+      echo "[IMPORTANT] When akka db available, cte_trades_count: ${cte_trades_count}" >>/tmp/log/long_run_status.log
+      echo "[IMPORTANT] When akka db available, akka_te_trades_count: ${akka_te_trades_count}"
+      echo "[IMPORTANT] When akka db available, akka_te_trades_count: ${akka_te_trades_count}" >>/tmp/log/long_run_status.log
       break
     fi
     echo 'akka_te database is still busy, try to sleep 15 seconds...'
