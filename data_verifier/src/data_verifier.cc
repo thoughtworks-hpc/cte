@@ -169,7 +169,7 @@ bool DataVerifier::VerifyEqualityForOrderedBySymbolDataSource(
         CDCF_LOGGER_ERROR("unmatched entries from data source {}:",
                           data_source_a_->GetDataSourceName());
         for (const auto& entry : unmatched_data_entries_a) {
-          CDCF_LOGGER_WARN(
+          CDCF_LOGGER_DEBUG(
               "{}", data_source_a_->GetDataEntryDebugString(entry.second));
         }
       }
@@ -177,7 +177,7 @@ bool DataVerifier::VerifyEqualityForOrderedBySymbolDataSource(
         CDCF_LOGGER_ERROR("unmatched entries from data source {}:",
                           data_source_b_->GetDataSourceName());
         for (const auto& entry : unmatched_data_entries_b) {
-          CDCF_LOGGER_WARN(
+          CDCF_LOGGER_DEBUG(
               "{}", data_source_b_->GetDataEntryDebugString(entry.second));
         }
       }
@@ -187,7 +187,7 @@ bool DataVerifier::VerifyEqualityForOrderedBySymbolDataSource(
       CDCF_LOGGER_ERROR("leftover entries from data source {}:",
                         data_source_a_->GetDataSourceName());
       for (int j = i; j < data_entries_a.size(); ++j) {
-        CDCF_LOGGER_WARN(
+        CDCF_LOGGER_DEBUG(
             "{}", data_source_a_->GetDataEntryDebugString(data_entries_a[j]));
       }
     }
@@ -196,7 +196,7 @@ bool DataVerifier::VerifyEqualityForOrderedBySymbolDataSource(
       CDCF_LOGGER_ERROR("leftover entries from data source {}:",
                         data_source_b_->GetDataSourceName());
       for (int j = i; j < data_entries_b.size(); ++j) {
-        CDCF_LOGGER_WARN(
+        CDCF_LOGGER_DEBUG(
             "{}", data_source_b_->GetDataEntryDebugString(data_entries_b[j]));
       }
     }
