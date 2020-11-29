@@ -25,6 +25,6 @@
                 driver: "json-file"
                 options:
                   max-size: "2048m"
-      - assert:
-          that:
-            - "request_generator.request_generator.state.running"
+    - assert:
+        that:
+          - "request_generator.request_generator.state.running"
