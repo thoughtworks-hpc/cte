@@ -66,7 +66,8 @@ TradeEntity::TradeEntity(const match_engine_proto::Trade& trade) {
     influxdb.write(payload);
  */
 
-database_interface::entity TradeEntity::to_entity() {
+database_interface::entity TradeEntity::to_entity(
+    std::string& database_table_name) {
   using time_stamp = std::chrono::time_point<std::chrono::system_clock,
                                              std::chrono::nanoseconds>;
   time_stamp current_time_stamp =
@@ -95,7 +96,7 @@ database_interface::entity TradeEntity::to_entity() {
   field.emplace_back(database_interface::data_pair{
       "submit_time", std::to_string(this->submit_time)});
 
-  database_interface::entity payload{"orders", tag, field,
+  database_interface::entity payload{database_table_name, tag, field,
                                      nanoseconds_since_epoch};
   return payload;
 }

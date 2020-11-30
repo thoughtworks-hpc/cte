@@ -40,7 +40,6 @@ bool database_interface::InfluxDB::write(entity& data_entity) {
     }
     buffer_mutex.unlock();
   } else {
-
     // buffer.emplace_back(data_entity);
     buffer.push_back(std::move(data_entity));
 
@@ -75,14 +74,17 @@ void database_interface::InfluxDB::thread_main() {
 }
 
 bool database_interface::InfluxDB::flush_buffer() {
-  CDCF_LOGGER_INFO("Try to send buffered {} trades data to table",
-                   buffer.size());
   std::string resp;
 
   influxdb_cpp::detail::field_caller payload =
       influxdb_cpp::detail::field_caller();
 
   for (int i = 0; i < buffer.size(); ++i) {
+    if (i == 0) {
+      CDCF_LOGGER_INFO("Try to send buffered {} trades to {}", buffer.size(),
+                       buffer[0].measurement);
+    }
+
     const auto& trade_entity = buffer[i];
     payload.meas(trade_entity.measurement);
     for (const auto& tag : trade_entity.tag) {
@@ -133,5 +135,4 @@ database_interface::entity::entity(const std::string& measurement,
                                    const std::vector<data_pair>& tag,
                                    const std::vector<data_pair>& field,
                                    int64_t timestamp)
-    : measurement(measurement), tag(tag), field(field), timestamp(timestamp) {
-}
+    : measurement(measurement), tag(tag), field(field), timestamp(timestamp) {}

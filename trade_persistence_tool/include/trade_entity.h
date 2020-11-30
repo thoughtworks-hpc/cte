@@ -25,7 +25,7 @@ class TradeEntity {
 
   explicit TradeEntity(const match_engine_proto::Trade& trade);
 
-  database_interface::entity to_entity();
+  database_interface::entity to_entity(std::string& database_table_name);
 };
 
 #endif  // TRADE_PERSISTENCE_TOOL_INCLUDE_TRADE_ENTITY_H_
