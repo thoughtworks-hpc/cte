@@ -19,10 +19,10 @@ bool write_data_to_db(int& count_, trade_persistence_tool::Config& config,
 int main(int argc, char* argv[]) {
   trade_persistence_tool::Config config(argc, argv);
 
-//  TradePersistInfluxdb tradePersistInfluxdb(
-//      config.database_name, config.db_ip, config.db_port, config.db_username,
-//      config.db_password, config.database_table_name);
-//  DatabaseWriteInterface* influxdb = &tradePersistInfluxdb;
+  //  TradePersistInfluxdb tradePersistInfluxdb(
+  //      config.database_name, config.db_ip, config.db_port,
+  //      config.db_username, config.db_password, config.database_table_name);
+  //  DatabaseWriteInterface* influxdb = &tradePersistInfluxdb;
 
   influxdb_cpp::server_info si(config.db_ip, std::stoi(config.db_port),
                                config.database_name, config.db_username,
@@ -32,36 +32,36 @@ int main(int argc, char* argv[]) {
   TradePersistenceClient tradePersistenceClient(
       &influxdb, config.order_manager_address, config.database_table_name);
 
-//  std::thread th = std::thread([&] {
-//    CDCF_LOGGER_INFO("Chunk Database IO Thread starts");
-//    influxdb_cpp::server_info si(config.db_ip, std::stoi(config.db_port),
-//                                 config.database_name, config.db_username,
-//                                 config.db_password);
-//    thread_local int count_ = 0;
-//    thread_local int last_round_vector_size = 0;
-//    while (true) {
-//      CDCF_LOGGER_DEBUG(
-//          "Chunk Database IO Thread scans data ( waiting time: 10s )");
-//      thread_end_flag_mutex.lock();
-//      if (thread_end_flag) {
-//        write_data_to_db(count_, config, si);
-//        CDCF_LOGGER_INFO("Chunk Database IO Thread ends");
-//        return;
-//      }
-//      thread_end_flag_mutex.unlock();
-//
-//      if (trade_manager_db_buffer.size() >= 5000 ||
-//          (last_round_vector_size == trade_manager_db_buffer.size() &&
-//           last_round_vector_size != 0)) {
-//        if (!write_data_to_db(count_, config, si)) {
-//          CDCF_LOGGER_ERROR("Write db failed, Chunk Database IO Thread ends");
-//          return;
-//        }
-//      }
-//      last_round_vector_size = trade_manager_db_buffer.size();
-//      sleep(10);
-//    }
-//  });
+  //  std::thread th = std::thread([&] {
+  //    CDCF_LOGGER_INFO("Chunk Database IO Thread starts");
+  //    influxdb_cpp::server_info si(config.db_ip, std::stoi(config.db_port),
+  //                                 config.database_name, config.db_username,
+  //                                 config.db_password);
+  //    thread_local int count_ = 0;
+  //    thread_local int last_round_vector_size = 0;
+  //    while (true) {
+  //      CDCF_LOGGER_DEBUG(
+  //          "Chunk Database IO Thread scans data ( waiting time: 10s )");
+  //      thread_end_flag_mutex.lock();
+  //      if (thread_end_flag) {
+  //        write_data_to_db(count_, config, si);
+  //        CDCF_LOGGER_INFO("Chunk Database IO Thread ends");
+  //        return;
+  //      }
+  //      thread_end_flag_mutex.unlock();
+  //
+  //      if (trade_manager_db_buffer.size() >= 5000 ||
+  //          (last_round_vector_size == trade_manager_db_buffer.size() &&
+  //           last_round_vector_size != 0)) {
+  //        if (!write_data_to_db(count_, config, si)) {
+  //          CDCF_LOGGER_ERROR("Write db failed, Chunk Database IO Thread
+  //          ends"); return;
+  //        }
+  //      }
+  //      last_round_vector_size = trade_manager_db_buffer.size();
+  //      sleep(10);
+  //    }
+  //  });
 
   tradePersistenceClient.PersistTrades();
   thread_end_flag = true;
@@ -78,7 +78,7 @@ bool write_data_to_db(int& count_, trade_persistence_tool::Config& config,
   auto payload = influxdb_cpp::detail::field_caller();
   for (const auto& trade : trade_manager_db_buffer) {
     using time_stamp = std::chrono::time_point<std::chrono::system_clock,
-        std::chrono::nanoseconds>;
+                                               std::chrono::nanoseconds>;
     time_stamp current_time_stamp =
         std::chrono::time_point_cast<std::chrono::nanoseconds>(
             std::chrono::system_clock::now());
