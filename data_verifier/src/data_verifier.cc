@@ -16,6 +16,12 @@ bool DataVerifier::VerifyEquality() {
   int data_source_a_number = data_source_a_->GetDataEntryNumber();
   int data_source_b_number = data_source_b_->GetDataEntryNumber();
 
+  if (data_source_a_number == 0 && data_source_b_number == 0) {
+    CDCF_LOGGER_ERROR(
+        "cannot get trade entry number from both data sources, might be empty");
+    return false;
+  }
+
   if (data_source_a_number != data_source_b_number) {
     CDCF_LOGGER_INFO(
         "trade data entry number inconsistent between {} and {} from 2 data "
