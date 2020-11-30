@@ -23,6 +23,7 @@ database_interface::InfluxDB::InfluxDB(influxdb_cpp::server_info& si,
 
 database_interface::InfluxDB::~InfluxDB() {
   if (enable_thread) {
+    CDCF_LOGGER_INFO("deconstruct of InfluxDB has been called");
     thread_end_flag = true;
     th.join();
   }
@@ -31,13 +32,18 @@ database_interface::InfluxDB::~InfluxDB() {
 bool database_interface::InfluxDB::write(entity& data_entity) {
   if (enable_thread) {
     buffer_mutex.lock();
+
     buffer.emplace_back(data_entity);
+
     if (buffer.size() >= 10000) {
       flush_buffer();
     }
     buffer_mutex.unlock();
   } else {
-    buffer.emplace_back(data_entity);
+
+    // buffer.emplace_back(data_entity);
+    buffer.push_back(std::move(data_entity));
+
     if (buffer.size() >= 10000) {
       flush_buffer();
     }
@@ -51,7 +57,7 @@ void database_interface::InfluxDB::thread_main() {
   thread_local int last_round_vector_size = 0;
   while (true) {
     CDCF_LOGGER_DEBUG(
-        "Chunk Database IO Thread scans data ( waiting time: 10s )");
+        "Chunk Database IO Thread scans data ( waiting time: 5s )");
     buffer_mutex.lock();
     bool res = flush_buffer();
     buffer_mutex.unlock();
@@ -64,7 +70,7 @@ void database_interface::InfluxDB::thread_main() {
       CDCF_LOGGER_INFO("Chunk Database IO Thread ends");
       return;
     }
-    sleep(3);
+    sleep(5);
   }
 }
 
@@ -113,7 +119,7 @@ bool database_interface::InfluxDB::flush_buffer() {
       for (const auto& field : trade_entity.field) {
         log << field.Key << ": " << field.Value << ", ";
       }
-      CDCF_LOGGER_DEBUG("Write #{}:  {}", ++count, log.str());
+      // CDCF_LOGGER_DEBUG("Write #{}:  {}", ++count, log.str());
     }
     buffer.clear();
     return true;
@@ -127,4 +133,5 @@ database_interface::entity::entity(const std::string& measurement,
                                    const std::vector<data_pair>& tag,
                                    const std::vector<data_pair>& field,
                                    int64_t timestamp)
-    : measurement(measurement), tag(tag), field(field), timestamp(timestamp) {}
+    : measurement(measurement), tag(tag), field(field), timestamp(timestamp) {
+}

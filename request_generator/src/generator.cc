@@ -29,11 +29,12 @@ bool Generator::PrepareOrders() {
   int count = 0;
   for (auto& item : j["results"][0]["series"][0]["values"]) {
     order_manager_proto::Order order;
-    order.set_amount(item[1]);
-    order.set_price(item[2]);
-    order.set_symbol(item[3]);
-    order.set_trading_side(item[4]);
-    order.set_user_id(item[5]);
+    order.set_amount(std::stoi(item[1].get_ref<std::string&>()));
+    order.set_price(std::stoi(item[2].get_ref<std::string&>()));
+    order.set_symbol(std::stoi(item[3].get_ref<std::string&>()));
+    order.set_trading_side(static_cast<order_manager_proto::TradingSide>(
+        std::stoi(item[4].get_ref<std::string&>())));
+    order.set_user_id(std::stoi(item[5].get_ref<std::string&>()));
     orders_.push(order);
     count++;
     if (count == num_of_orders_) break;
