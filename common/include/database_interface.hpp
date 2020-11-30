@@ -5,11 +5,13 @@
 #ifndef COMMON_INCLUDE_DATABASE_INTERFACE_HPP_
 #define COMMON_INCLUDE_DATABASE_INTERFACE_HPP_
 
+#include <cdcf/logger.h>
+
 #include <mutex>
 #include <string>
 #include <thread>
 #include <vector>
-#include <cdcf/logger.h>
+
 #include "./influxdb.hpp"
 
 namespace database_interface {
@@ -28,27 +30,24 @@ struct entity {
          const std::vector<data_pair>& field, int64_t timestamp);
 };
 
-class Database {
- public:
-  virtual bool write(entity& data_entity) = 0;
-  virtual ~Database() {}
-};
-
-class InfluxDB : public Database {
+class InfluxDB {
  public:
   explicit InfluxDB(influxdb_cpp::server_info& si,
+                    const bool enable_thread = true,
                     const int default_size = 20000);
   ~InfluxDB();
 
   bool write(entity& data_entity);
+  bool flush_buffer();
 
  private:
   void thread_main();
-  bool thread_write_db();
   influxdb_cpp::server_info si;
   std::vector<entity> buffer;
+
   std::mutex buffer_mutex;
   std::thread th;
+  bool enable_thread;
   bool thread_end_flag;
   int count;
 };

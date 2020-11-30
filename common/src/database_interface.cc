@@ -5,26 +5,44 @@
 #include "../include/database_interface.hpp"
 
 database_interface::InfluxDB::InfluxDB(influxdb_cpp::server_info& si,
+                                       const bool enable_thread,
                                        const int default_size)
-    : si(si) {
+    : si(si), enable_thread(enable_thread) {
   CDCF_LOGGER_DEBUG("Initialize Database vector, reserve {} default size",
                     default_size);
   buffer.reserve(default_size);
-  thread_end_flag = false;
+
   count = 0;
-  th = std::thread([&]() { this->thread_main(); });
-  // th = std::thread(thread_main); // require func is static
+
+  if (enable_thread) {
+    thread_end_flag = false;
+    th = std::thread([&]() { this->thread_main(); });
+    // th = std::thread(thread_main); // require func is static
+  }
 }
 
 database_interface::InfluxDB::~InfluxDB() {
-  thread_end_flag = true;
-  th.join();
+  if (enable_thread) {
+    thread_end_flag = true;
+    th.join();
+  }
 }
 
 bool database_interface::InfluxDB::write(entity& data_entity) {
-  buffer_mutex.lock();
-  buffer.emplace_back(data_entity);
-  buffer_mutex.unlock();
+  if (enable_thread) {
+    buffer_mutex.lock();
+    buffer.emplace_back(data_entity);
+    if (buffer.size() >= 10000) {
+      flush_buffer();
+    }
+    buffer_mutex.unlock();
+  } else {
+    buffer.emplace_back(data_entity);
+    if (buffer.size() >= 10000) {
+      flush_buffer();
+    }
+  }
+
   return true;
 }
 
@@ -35,7 +53,7 @@ void database_interface::InfluxDB::thread_main() {
     CDCF_LOGGER_DEBUG(
         "Chunk Database IO Thread scans data ( waiting time: 10s )");
     buffer_mutex.lock();
-    bool res = thread_write_db();
+    bool res = flush_buffer();
     buffer_mutex.unlock();
     if (!res) {
       CDCF_LOGGER_ERROR("Write db failed, Chunk Database IO Thread ends");
@@ -50,16 +68,15 @@ void database_interface::InfluxDB::thread_main() {
   }
 }
 
-bool database_interface::InfluxDB::thread_write_db() {
-  auto size = std::min(buffer.size(), static_cast<unsigned long>(50000));
+bool database_interface::InfluxDB::flush_buffer() {
   CDCF_LOGGER_INFO("Try to send buffered {} trades data to table",
-                   std::to_string(size));
+                   buffer.size());
   std::string resp;
 
   influxdb_cpp::detail::field_caller payload =
       influxdb_cpp::detail::field_caller();
 
-  for (int i = 0; i < size; ++i) {
+  for (int i = 0; i < buffer.size(); ++i) {
     const auto& trade_entity = buffer[i];
     payload.meas(trade_entity.measurement);
     for (const auto& tag : trade_entity.tag) {
@@ -80,7 +97,8 @@ bool database_interface::InfluxDB::thread_write_db() {
             .field(field.Key, field.Value);
       }
     }
-    payload.timestamp(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+    payload.timestamp(
+        std::chrono::high_resolution_clock::now().time_since_epoch().count());
     // CDCF_LOGGER_INFO("{}", payload.get_line());
   }
 

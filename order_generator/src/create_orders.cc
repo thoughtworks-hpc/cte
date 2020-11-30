@@ -2,7 +2,6 @@
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
 
-
 #include "../../common/include/database_interface.hpp"
 #include "../include/order_generator.h"
 
@@ -40,8 +39,7 @@ int main(int argc, char* argv[]) {
       orders_config["database_name"], orders_config["database_user"],
       orders_config["database_password"]);
 
-  database_interface::InfluxDB influxdb(si);
-  database_interface::Database* database_interface = &influxdb;
+  database_interface::InfluxDB influxdb(si, false);
 
   for (int i = 0; i < orders_config["order_amount"]; i++) {
     Order order(initial_prices, orders_config["user_id_min"],
@@ -51,15 +49,21 @@ int main(int argc, char* argv[]) {
 
     std::vector<database_interface::data_pair> tag;
     std::vector<database_interface::data_pair> field;
-    field.emplace_back(database_interface::data_pair{"user_id", std::to_string(order.GetUserId())});
-    field.emplace_back(database_interface::data_pair{"symbol", std::to_string(order.GetSymbol())});
-    field.emplace_back(database_interface::data_pair{"price", std::to_string(order.GetPrice())});
-    field.emplace_back(database_interface::data_pair{"amount", std::to_string(order.GetAmount())});
-    field.emplace_back(database_interface::data_pair{"trading_side", std::to_string(order.GetTradingSide())});
+    field.emplace_back(database_interface::data_pair{
+        "user_id", std::to_string(order.GetUserId())});
+    field.emplace_back(database_interface::data_pair{
+        "symbol", std::to_string(order.GetSymbol())});
+    field.emplace_back(database_interface::data_pair{
+        "price", std::to_string(order.GetPrice())});
+    field.emplace_back(database_interface::data_pair{
+        "amount", std::to_string(order.GetAmount())});
+    field.emplace_back(database_interface::data_pair{
+        "trading_side", std::to_string(order.GetTradingSide())});
 
     database_interface::entity payload{"orders", tag, field, i};
-    database_interface->write(payload);
+    influxdb.write(payload);
   }
+  influxdb.flush_buffer();
 
   return ret;
 }
