@@ -16,6 +16,12 @@ bool DataVerifier::VerifyEquality() {
   int data_source_a_number = data_source_a_->GetDataEntryNumber();
   int data_source_b_number = data_source_b_->GetDataEntryNumber();
 
+  if (data_source_a_number == 0 && data_source_b_number == 0) {
+    CDCF_LOGGER_ERROR(
+        "cannot get trade entry number from both data sources, might be empty");
+    return false;
+  }
+
   if (data_source_a_number != data_source_b_number) {
     CDCF_LOGGER_INFO(
         "trade data entry number inconsistent between {} and {} from 2 data "
@@ -169,7 +175,7 @@ bool DataVerifier::VerifyEqualityForOrderedBySymbolDataSource(
         CDCF_LOGGER_ERROR("unmatched entries from data source {}:",
                           data_source_a_->GetDataSourceName());
         for (const auto& entry : unmatched_data_entries_a) {
-          CDCF_LOGGER_WARN(
+          CDCF_LOGGER_DEBUG(
               "{}", data_source_a_->GetDataEntryDebugString(entry.second));
         }
       }
@@ -177,7 +183,7 @@ bool DataVerifier::VerifyEqualityForOrderedBySymbolDataSource(
         CDCF_LOGGER_ERROR("unmatched entries from data source {}:",
                           data_source_b_->GetDataSourceName());
         for (const auto& entry : unmatched_data_entries_b) {
-          CDCF_LOGGER_WARN(
+          CDCF_LOGGER_DEBUG(
               "{}", data_source_b_->GetDataEntryDebugString(entry.second));
         }
       }
@@ -187,7 +193,7 @@ bool DataVerifier::VerifyEqualityForOrderedBySymbolDataSource(
       CDCF_LOGGER_ERROR("leftover entries from data source {}:",
                         data_source_a_->GetDataSourceName());
       for (int j = i; j < data_entries_a.size(); ++j) {
-        CDCF_LOGGER_WARN(
+        CDCF_LOGGER_DEBUG(
             "{}", data_source_a_->GetDataEntryDebugString(data_entries_a[j]));
       }
     }
@@ -196,7 +202,7 @@ bool DataVerifier::VerifyEqualityForOrderedBySymbolDataSource(
       CDCF_LOGGER_ERROR("leftover entries from data source {}:",
                         data_source_b_->GetDataSourceName());
       for (int j = i; j < data_entries_b.size(); ++j) {
-        CDCF_LOGGER_WARN(
+        CDCF_LOGGER_DEBUG(
             "{}", data_source_b_->GetDataEntryDebugString(data_entries_b[j]));
       }
     }

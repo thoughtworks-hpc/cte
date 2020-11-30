@@ -21,6 +21,10 @@
               command: /bin/bash start_request_generator.sh
               volumes:
                 - /tmp/log:/tmp/log
+              logging:
+                driver: "json-file"
+                options:
+                  max-size: "2048m"
     - assert:
         that:
           - "request_generator.request_generator.state.running"
