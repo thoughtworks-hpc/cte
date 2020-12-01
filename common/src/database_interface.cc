@@ -58,7 +58,11 @@ void database_interface::InfluxDB::thread_main() {
     CDCF_LOGGER_DEBUG(
         "Chunk Database IO Thread scans data ( waiting time: 5s )");
     buffer_mutex.lock();
-    bool res = flush_buffer();
+
+    bool res = true;
+    if (buffer.size() != 0) {
+      res = flush_buffer();
+    }
     buffer_mutex.unlock();
     if (!res) {
       CDCF_LOGGER_ERROR("Write db failed, Chunk Database IO Thread ends");
@@ -112,20 +116,22 @@ bool database_interface::InfluxDB::flush_buffer() {
 
   int ret = payload.post_http(si, &resp);
 
-  if (0 == ret && resp.empty()) {
-    for (const auto& trade_entity : buffer) {
-      std::stringstream log;
-      for (const auto& tag : trade_entity.tag) {
-        log << tag.Key << ": " << tag.Value << ", ";
-      }
-      for (const auto& field : trade_entity.field) {
-        log << field.Key << ": " << field.Value << ", ";
-      }
-      // CDCF_LOGGER_DEBUG("Write #{}:  {}", ++count, log.str());
+  std::stringstream log;
+  for (const auto& trade_entity : buffer) {
+    for (const auto& tag : trade_entity.tag) {
+      log << tag.Key << ": " << tag.Value << ", ";
     }
-    buffer.clear();
+    for (const auto& field : trade_entity.field) {
+      log << field.Key << ": " << field.Value << ", ";
+    }
+  }
+  buffer.clear();
+
+  if (0 == ret && resp.empty()) {
+    CDCF_LOGGER_DEBUG("Write #{}:  {}", ++count, log.str());
     return true;
   } else {
+    CDCF_LOGGER_ERROR("Write #{}:  {}", ++count, log.str());
     CDCF_LOGGER_ERROR("Write db failed, ret:{} resp:{}", ret, resp);
     return false;
   }
