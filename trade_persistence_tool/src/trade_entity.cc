@@ -25,47 +25,6 @@ TradeEntity::TradeEntity(const match_engine_proto::Trade& trade) {
   }
 }
 
-/*
- *     using time_stamp = std::chrono::time_point<std::chrono::system_clock,
-        std::chrono::nanoseconds>;
-    time_stamp current_time_stamp =
-        std::chrono::time_point_cast<std::chrono::nanoseconds>(
-            std::chrono::system_clock::now());
-    int64_t nanoseconds_since_epoch =
-        current_time_stamp.time_since_epoch().count();
-
-    payload.meas(config.database_table_name)
-        .field("buy_order_id", trade.buy_order_id_)
-        .field("sell_order_id", trade.sell_order_id_)
-        .field("symbol_id", trade.symbol_id_)
-        .field("trade_id", trade.trade_id_)
-        .field("price", trade.price_)
-        .field("amount", trade.amount_)
-        .field("sell_user_id", trade.sell_user_id_)
-        .field("buy_user_id", trade.buy_user_id_)
-        .field("submit_time", static_cast<int64_t>(trade.submit_time))
-        .timestamp(nanoseconds_since_epoch);
- *
- */
-
-/*
- *     std::vector<database_interface::data_pair> tag;
-    std::vector<database_interface::data_pair> field;
-    field.emplace_back(database_interface::data_pair{
-        "user_id", std::to_string(order.GetUserId())});
-    field.emplace_back(database_interface::data_pair{
-        "symbol", std::to_string(order.GetSymbol())});
-    field.emplace_back(database_interface::data_pair{
-        "price", std::to_string(order.GetPrice())});
-    field.emplace_back(database_interface::data_pair{
-        "amount", std::to_string(order.GetAmount())});
-    field.emplace_back(database_interface::data_pair{
-        "trading_side", std::to_string(order.GetTradingSide())});
-
-    database_interface::entity payload{"orders", tag, field, i};
-    influxdb.write(payload);
- */
-
 database_interface::entity TradeEntity::to_entity(
     std::string& database_table_name) {
   using time_stamp = std::chrono::time_point<std::chrono::system_clock,
