@@ -30,6 +30,8 @@ RUN cmake . -DCMAKE_TOOLCHAIN_FILE=conan_paths.cmake -DCMAKE_BUILD_TYPE=Release 
     && ctest --output-on-failure
 
 FROM debian
+RUN /bin/cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && echo 'Asia/Shanghai' >/etc/timezone
 RUN apt-get clean \
     && apt-get update \
     && apt-get install influxdb vim curl python procps -y
