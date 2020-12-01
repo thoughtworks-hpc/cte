@@ -30,6 +30,7 @@ while true; do
   echo "[$(date "+%Y-%m-%d %T.%3N")] [info] initial orders are generated"
   echo "[$(date "+%Y-%m-%d %T.%3N")] [info] initial orders are generated" >>/tmp/log/long_run_status.log
 
+  # 判断上一轮是否有残留
   cte_trades_count=$(curl -GET 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode "db=trade_manager" --data-urlencode "q=SELECT count(symbol_id) FROM cte_trades" | python -c 'import json,sys;obj=json.load(sys.stdin); print(obj["results"][0]["series"][0]["values"][0][1])')
   akka_te_trades_count=$(curl -GET 'http://172.30.28.30:8086/query?pretty=true' -s --data-urlencode "db=trade_manager" --data-urlencode "q=SELECT count(symbol_id) FROM akka_te_trades" | python -c 'import json,sys;obj=json.load(sys.stdin); print(obj["results"][0]["series"][0]["values"][0][1])')
 
