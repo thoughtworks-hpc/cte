@@ -70,8 +70,8 @@ while true; do
       echo "[$(date "+%Y-%m-%d %T.%3N")] [info] cte database is available now"
       echo "[$(date "+%Y-%m-%d %T.%3N")] [info] cte database is available now" >>/tmp/log/long_run_status.log
       cte_total_trade_number=$((cte_total_trade_number + count1))
-      echo "[IMPORTANT] cte total trade number till now: ${cte_total_trade_number}"
-      echo "[IMPORTANT] cte total trade number till now: ${cte_total_trade_number}" >>/tmp/log/long_run_status.log
+      echo "[$(date "+%Y-%m-%d %T.%3N")] [info] cte total trade number till now: ${cte_total_trade_number}"
+      echo "[$(date "+%Y-%m-%d %T.%3N")] [info] cte total trade number till now: ${cte_total_trade_number}" >>/tmp/log/long_run_status.log
       break
     fi
     echo "[$(date "+%Y-%m-%d %T.%3N")] [info] cte database is still busy, try to sleep 15 seconds..."
@@ -88,8 +88,8 @@ while true; do
       echo "[$(date "+%Y-%m-%d %T.%3N")] [info] akka_te database is available now" >>/tmp/log/long_run_status.log
 
       ate_total_trade_number=$((ate_total_trade_number + count1))
-      echo "[IMPORTANT] ate total trade number till now: ${ate_total_trade_number}"
-      echo "[IMPORTANT] ate total trade number till now: ${ate_total_trade_number}" >>/tmp/log/long_run_status.log
+      echo "[$(date "+%Y-%m-%d %T.%3N")] [info] ate total trade number till now: ${ate_total_trade_number}"
+      echo "[$(date "+%Y-%m-%d %T.%3N")] [info] ate total trade number till now: ${ate_total_trade_number}" >>/tmp/log/long_run_status.log
       break
     fi
     echo "[$(date "+%Y-%m-%d %T.%3N")] [info] akka_te database is still busy, try to sleep 15 seconds..."
