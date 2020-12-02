@@ -16,8 +16,7 @@ class OrderStoreMock : public OrderStore {
  public:
   int PersistOrder(const Order& order, std::string status,
                    int concluded_amount);
-  int GetOrderByIndex(int index, Order& order,
-                      std::string& status);
+  int GetOrderByIndex(int index, Order& order, std::string& status);
   int GetOrderByOrderId(int id, Order& order);
 
   void GetStatusByOrderId(int id, std::string& status);
