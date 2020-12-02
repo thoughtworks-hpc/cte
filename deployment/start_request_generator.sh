@@ -3,6 +3,12 @@
 i=0
 cte_total_trade_number=0
 ate_total_trade_number=0
+
+cd /bin
+/bin/create_initial_prices
+echo "[$(date "+%Y-%m-%d %T.%3N")] [info] initial prices are generated"
+echo "[$(date "+%Y-%m-%d %T.%3N")] [info] initial prices are generated" >>/tmp/log/long_run_status.log
+
 while true; do
   #  curl -POST http://172.30.28.8:8086/query -s --data-urlencode "q=DROP DATABASE order_manager"
   #  curl -POST http://172.30.28.8:8086/query -s --data-urlencode "q=DROP DATABASE trade_manager"
@@ -23,9 +29,6 @@ while true; do
   #  fi
 
   cd /bin
-  /bin/create_initial_prices
-  echo "[$(date "+%Y-%m-%d %T.%3N")] [info] initial prices are generated"
-  echo "[$(date "+%Y-%m-%d %T.%3N")] [info] initial prices are generated" >>/tmp/log/long_run_status.log
   /bin/create_orders initial_prices.json test_env_create_orders_config.json
   echo "[$(date "+%Y-%m-%d %T.%3N")] [info] initial orders are generated"
   echo "[$(date "+%Y-%m-%d %T.%3N")] [info] initial orders are generated" >>/tmp/log/long_run_status.log
