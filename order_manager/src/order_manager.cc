@@ -306,7 +306,7 @@ void OrderManagerService::BuildOrder(
   int64_t nanoseconds_since_epoch =
       current_time_stamp.time_since_epoch().count();
 
-  auto order_id = order_id_++;
+  auto order_id = ++order_id_;
 
   order.order_id = order_id;
   order.amount = request.amount();
