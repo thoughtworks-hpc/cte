@@ -321,3 +321,18 @@ void OrderManagerService::SetLatencyAverageWarning(
 void OrderManagerService::SetTestModeIsOpen(bool test_mode_is_open) {
   test_mode_is_open_ = test_mode_is_open;
 }
+
+::grpc::Status OrderManagerService::GetRunningStatus(
+    ::grpc::ServerContext *context, const ::google::protobuf::Empty *request,
+    ::order_manager_proto::RunningStatus *response) {
+  int64_t order_status_map_size = 0;
+
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    order_status_map_size = order_id_to_order_status_.size();
+  }
+
+  response->set_order_status_map_size(order_status_map_size);
+
+  return grpc::Status::OK;
+}

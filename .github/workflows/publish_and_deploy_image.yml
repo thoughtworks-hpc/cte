@@ -22,7 +22,7 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v2
         with:
-          ref: optimize_influxdb_memory_usage
+          ref:  order_manager_running_status
 
       - name: Publish Docker
         uses: elgohr/Publish-Docker-Github-Action@2.21

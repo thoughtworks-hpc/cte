@@ -42,6 +42,10 @@ class OrderManagerService final
       const ::order_manager_proto::ManagerStatus* status,
       ::order_manager_proto::Reply* response) override;
 
+  ::grpc::Status GetRunningStatus(
+      ::grpc::ServerContext* context, const ::google::protobuf::Empty* request,
+      ::order_manager_proto::RunningStatus* response) override;
+
   void RecordTracker(int& time_interval_in_seconds);
 
  private:
