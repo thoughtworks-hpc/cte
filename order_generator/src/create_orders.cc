@@ -1,6 +1,8 @@
 /*
  * Copyright (c) 2020 ThoughtWorks Inc.
  */
+
+#include "../../common/include/database_interface.hpp"
 #include "../include/order_generator.h"
 
 int main(int argc, char* argv[]) {
@@ -36,35 +38,32 @@ int main(int argc, char* argv[]) {
       orders_config["database_host"], orders_config["database_port"],
       orders_config["database_name"], orders_config["database_user"],
       orders_config["database_password"]);
-  influxdb_cpp::detail::ts_caller payload;
+
+  database_interface::InfluxDB influxdb(si, false);
+
   for (int i = 0; i < orders_config["order_amount"]; i++) {
     Order order(initial_prices, orders_config["user_id_min"],
                 orders_config["user_id_max"],
                 orders_config["trading_amount_min"],
                 orders_config["trading_amount_max"]);
 
-    payload.meas("orders")
-        .field("user_id", order.GetUserId())
-        .field("symbol", order.GetSymbol())
-        .field("price", order.GetPrice())
-        .field("amount", order.GetAmount())
-        .field("trading_side", order.GetTradingSide())
-        .timestamp(i);
+    std::vector<database_interface::data_pair> tag;
+    std::vector<database_interface::data_pair> field;
+    field.emplace_back(database_interface::data_pair{
+        "user_id", std::to_string(order.GetUserId())});
+    field.emplace_back(database_interface::data_pair{
+        "symbol", std::to_string(order.GetSymbol())});
+    field.emplace_back(database_interface::data_pair{
+        "price", std::to_string(order.GetPrice())});
+    field.emplace_back(database_interface::data_pair{
+        "amount", std::to_string(order.GetAmount())});
+    field.emplace_back(database_interface::data_pair{
+        "trading_side", std::to_string(order.GetTradingSide())});
 
-    if ((i + 1) % 10000 == 0 ||
-        (orders_config["order_amount"] < 10000 &&
-         i == static_cast<int>(orders_config["order_amount"]) - 1)) {
-      std::string resp;
-      int ret = payload.post_http(si, &resp);
-      if (0 != ret || !resp.empty()) {
-        std::cout << "write db failed, ret:" << ret << " resp:" << resp
-                  << std::endl;
-        return ret;
-      }
-      payload.reset_payload();
-      std::cout << "write db success, the round is: " << i + 1 << std::endl;
-    }
+    database_interface::entity payload{"orders", tag, field, i};
+    influxdb.write(payload);
   }
+  influxdb.flush_buffer();
 
   return ret;
 }

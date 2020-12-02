@@ -7,6 +7,10 @@
   Please see LICENSE file or visit https://github.com/orca-zhang/influxdb-cpp
   for details.
  */
+
+#ifndef INFLUXDB_HPP
+#define INFLUXDB_HPP
+
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -78,6 +82,8 @@ struct builder {
     lines_.clear();
     lines_.str("");
   }
+
+  std::string get_line() { return lines_.str(); }
 
   int chunk_post(const server_info& si, std::string* resp = NULL) {
     return _post_http(si, resp);
@@ -407,3 +413,5 @@ END:
 }
 }  // namespace detail
 }  // namespace influxdb_cpp
+
+#endif  // INFLUXDB_HPP

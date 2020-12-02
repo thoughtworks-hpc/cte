@@ -5,8 +5,9 @@ include_directories(./include)
 
 add_library(${PROJECT_NAME} src/order_generator.cc)
 
-add_executable(create_orders src/create_orders.cc)
-target_link_libraries(create_orders order_generator)
+find_package(cdcf)
+add_executable(create_orders src/create_orders.cc ../common/src/database_interface.cc)
+target_link_libraries(create_orders order_generator cdcf::cdcf)
 
 add_executable(create_initial_prices src/create_initial_prices.cc)
 target_link_libraries(create_initial_prices order_generator)

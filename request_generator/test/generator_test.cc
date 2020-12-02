@@ -22,8 +22,9 @@ class MockDatabase : public DatabaseQueryInterface {
   std::string GetOrders() override {
     return "{\"results\":[{\"statement_id\":0,\"series\":[{\"name\":\"orders\","
            "\"columns\":[\"time\",\"amount\",\"price\",\"symbol\",\"trading_"
-           "side\",\"user_id\"],\"values\":[[1,1,1,1,1,1],[2,2,2,2,2,2],[3,3,3,"
-           "3,3,3],[4,4,4,4,4,4]]}]}]}";
+           "side\",\"user_id\"],\"values\":[[\"1\",\"1\",\"1\",\"1\",\"1\","
+           "\"1\"],[\"2\",\"2\",\"2\",\"2\",\"2\",\"2\"],[\"3\",\"3\",\"3\","
+           "\"3\",\"3\",\"3\"],[\"4\",\"4\",\"4\",\"4\",\"4\",\"4\"]]}]}]}";
   }
 };
 

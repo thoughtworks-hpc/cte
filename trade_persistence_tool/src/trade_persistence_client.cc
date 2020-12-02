@@ -33,8 +33,8 @@ bool TradePersistenceClient::PersistTrades() {
         trade.price(), trade.trading_side(), trade.amount(),
         trade.buyer_user_id(), trade.seller_user_id());
 
-    auto trade_entity = TradeEntity(trade);
-    if (!database->PersistTrade(trade_entity)) {
+    auto trade_entity = TradeEntity(trade).to_entity(database_table_name_);
+    if (!database->write(trade_entity)) {
       return false;
     } else {
       CDCF_LOGGER_DEBUG("Write #{} trade to database: {} success", count,

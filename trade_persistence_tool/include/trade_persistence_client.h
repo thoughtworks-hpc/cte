@@ -9,11 +9,12 @@
 #include <utility>
 #include <vector>
 
+#include "../../common/include/database_interface.hpp"
 #include "./database_write_interface.h"
 
 class TradePersistenceClient {
  public:
-  TradePersistenceClient(DatabaseWriteInterface* database,
+  TradePersistenceClient(database_interface::InfluxDB* database,
                          std::string tradeEngineAddress,
                          std::string databaseTableName)
       : database(database),
@@ -23,7 +24,7 @@ class TradePersistenceClient {
   bool PersistTrades();
 
  private:
-  DatabaseWriteInterface* database;
+  database_interface::InfluxDB* database;
   std::string trade_engine_address_;
   std::string database_table_name_;
 };
