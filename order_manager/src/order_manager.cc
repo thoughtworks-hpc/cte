@@ -220,9 +220,7 @@ void OrderManagerService::HandleMatchResult(
   if (record_is_start_) {
     receive_data_amount_ += 1;
   }
-  if (test_mode_is_open_) {
-    return;
-  }
+
   int32_t maker_concluded_amount = 0;
   int32_t taker_concluded_amount = 0;
   match_engine_proto::Order maker_order;
@@ -261,6 +259,10 @@ void OrderManagerService::HandleMatchResult(
     } else {
       if_order_exists = false;
     }
+  }
+
+  if (test_mode_is_open_) {
+    return;
   }
 
   if (if_order_exists) {
