@@ -148,10 +148,11 @@ int OrderManagerService::PrintRecordResult() {
 ::grpc::Status OrderManagerService::PlaceOrder(
     ::grpc::ServerContext *context, const ::order_manager_proto::Order *request,
     ::order_manager_proto::Reply *response) {
-  match_engine_proto::Order order;
+  Order order;
+  match_engine_proto::Order match_engine_order;
   match_engine_proto::Reply reply;
 
-  BuildMatchEngineOrder(*request, order);
+  BuildOrder(*request, order, match_engine_order);
 
   SaveOrderStatus(order);
   if (!test_mode_is_open_) {
@@ -167,7 +168,8 @@ int OrderManagerService::PrintRecordResult() {
       send_time = std::chrono::system_clock::now();
     }
 
-    ::grpc::Status status = match_engine_stub_->Match(order, &reply);
+    ::grpc::Status status =
+        match_engine_stub_->Match(match_engine_order, &reply);
 
     if (record_is_start_) {
       auto receive_time = std::chrono::system_clock::now();
@@ -192,11 +194,11 @@ int OrderManagerService::PrintRecordResult() {
       ret = order_store_->PersistOrder(order, "submitted", 0);
     }
     if (0 == ret) {
-      CDCF_LOGGER_DEBUG("submitted and saved order {}", order.order_id());
+      CDCF_LOGGER_DEBUG("submitted and saved order {}", order.order_id);
       message = "order submitted";
       response->set_error_code(order_manager_proto::SUCCESS);
     } else {
-      CDCF_LOGGER_INFO("submission error for order {}", order.order_id());
+      CDCF_LOGGER_INFO("submission error for order {}", order.order_id);
       message = "order submission error";
       response->set_error_code(order_manager_proto::FAILURE);
     }
@@ -206,13 +208,13 @@ int OrderManagerService::PrintRecordResult() {
   return grpc::Status::OK;
 }
 
-void OrderManagerService::SaveOrderStatus(
-    const match_engine_proto::Order &order) {
-  OrderStatus order_status;
+void OrderManagerService::SaveOrderStatus(const Order &order) {
+  OrderStatus order_status{};
+
   order_status.order = order;
   order_status.concluded_amount = 0;
   std::lock_guard<std::mutex> lock(mutex_);
-  order_id_to_order_status_[order.order_id()] = order_status;
+  order_id_to_order_status_[order.order_id] = order_status;
 }
 
 void OrderManagerService::HandleMatchResult(
@@ -223,8 +225,8 @@ void OrderManagerService::HandleMatchResult(
 
   int32_t maker_concluded_amount = 0;
   int32_t taker_concluded_amount = 0;
-  match_engine_proto::Order maker_order;
-  match_engine_proto::Order taker_order;
+  Order maker_order;
+  Order taker_order;
   bool if_order_exists = false;
   bool if_maker_concluded = false;
   bool if_taker_concluded = false;
@@ -248,11 +250,11 @@ void OrderManagerService::HandleMatchResult(
       maker_concluded_amount = maker_order_status.concluded_amount;
       taker_concluded_amount = taker_order_status.concluded_amount;
 
-      if (maker_order.amount() <= maker_concluded_amount) {
+      if (maker_order.amount <= maker_concluded_amount) {
         if_maker_concluded = true;
         order_id_to_order_status_.erase(trade.maker_id());
       }
-      if (taker_order.amount() <= taker_concluded_amount) {
+      if (taker_order.amount <= taker_concluded_amount) {
         if_taker_concluded = true;
         order_id_to_order_status_.erase(trade.taker_id());
       }
@@ -293,9 +295,9 @@ void OrderManagerService::HandleMatchResult(
   }
 }
 
-void OrderManagerService::BuildMatchEngineOrder(
-    const order_manager_proto::Order &request,
-    match_engine_proto::Order &order) {
+void OrderManagerService::BuildOrder(
+    const order_manager_proto::Order &request, Order &order,
+    match_engine_proto::Order &match_engine_order) {
   using time_stamp = std::chrono::time_point<std::chrono::system_clock,
                                              std::chrono::nanoseconds>;
   time_stamp current_time_stamp =
@@ -304,18 +306,38 @@ void OrderManagerService::BuildMatchEngineOrder(
   int64_t nanoseconds_since_epoch =
       current_time_stamp.time_since_epoch().count();
 
-  order.set_order_id(++order_id_);
-  order.set_symbol_id(request.symbol());
-  order.set_user_id(request.user_id());
-  order.set_price(request.price());
-  order.set_amount(request.amount());
-  order.set_trading_side(static_cast<match_engine_proto::TradingSide>(
-      static_cast<int>(request.trading_side())));
-  order.set_submit_time(nanoseconds_since_epoch);
+  auto order_id = order_id_++;
+
+  order.order_id = order_id;
+  order.amount = request.amount();
+  order.user_id = request.user_id();
+  order.symbol_id = request.symbol();
+  order.price = request.price();
+  order.submit_time = nanoseconds_since_epoch;
+
+  if (request.trading_side() == order_manager_proto::TRADING_BUY) {
+    order.trading_side = OrderTradingSide::Buy;
+  } else if (request.trading_side() == order_manager_proto::TRADING_SELL) {
+    order.trading_side = OrderTradingSide::Sell;
+  } else {
+    order.trading_side = OrderTradingSide::Unknown;
+  }
+
+  match_engine_order.set_order_id(order_id);
+  match_engine_order.set_symbol_id(request.symbol());
+  match_engine_order.set_user_id(request.user_id());
+  match_engine_order.set_price(request.price());
+  match_engine_order.set_amount(request.amount());
+  match_engine_order.set_trading_side(
+      static_cast<match_engine_proto::TradingSide>(
+          static_cast<int>(request.trading_side())));
+  match_engine_order.set_submit_time(nanoseconds_since_epoch);
 }
+
 void OrderManagerService::SetRecordTimeInterval(int interval) {
   record_time_interval_ = interval;
 }
+
 void OrderManagerService::SetLatencyAverageWarning(
     int latency_average_warning) {
   latency_average_warning_ = latency_average_warning;

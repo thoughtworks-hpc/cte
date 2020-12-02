@@ -8,11 +8,12 @@
 #include <string>
 
 #include "../../common/protobuf_gen/match_engine.grpc.pb.h"
+#include "./order.h"
 
 class OrderStore {
  public:
-  virtual int PersistOrder(const match_engine_proto::Order &order,
-                           std::string status, int concluded_amount) = 0;
+  virtual int PersistOrder(const Order &order, std::string status,
+                           int concluded_amount) = 0;
 };
 
 #endif  // ORDER_MANAGER_INCLUDE_ORDER_STORE_H_

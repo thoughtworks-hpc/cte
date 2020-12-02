@@ -21,7 +21,7 @@ struct DatabaseConfig {
 class OrderStoreInfluxDB : public OrderStore {
  public:
   explicit OrderStoreInfluxDB(const DatabaseConfig& config);
-  int PersistOrder(const match_engine_proto::Order& order, std::string status,
+  int PersistOrder(const Order& order, std::string status,
                    int concluded_amount) override;
 
  private:
