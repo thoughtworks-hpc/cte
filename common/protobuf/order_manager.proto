@@ -1,11 +1,15 @@
 syntax = "proto3";
 
+import "google/protobuf/empty.proto";
+
 package order_manager_proto;
 
 service OrderManager {
     rpc PlaceOrder (Order) returns (Reply) {
     }
     rpc StartEndManager (ManagerStatus) returns (Reply) {
+    }
+    rpc GetRunningStatus (google.protobuf.Empty) returns (RunningStatus) {
     }
 }
 
@@ -41,3 +45,7 @@ enum Status {
 message ManagerStatus {
     Status status = 3;
 }
+
+message RunningStatus {
+    int64 order_status_map_size = 1;
+};
