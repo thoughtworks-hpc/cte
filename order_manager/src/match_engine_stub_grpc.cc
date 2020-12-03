@@ -38,7 +38,7 @@ MatchEngineStubGrpc::MatchEngineStubGrpc(
   if (!request_stubs_.empty()) {
     grpc::ClientContext client_context;
     status = GetNextRequestStub()->Match(&client_context, request, response);
-    CDCF_LOGGER_DEBUG("send match request for order {}", request.order_id());
+    // CDCF_LOGGER_DEBUG("send match request for order {}", request.order_id());
   }
 
   return status;

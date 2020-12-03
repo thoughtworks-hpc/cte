@@ -4,17 +4,17 @@
 
 #include "../include/order_store_mock.h"
 
-int OrderStoreMock::PersistOrder(const match_engine_proto::Order& order,
-                                 std::string status, int concluded_amount) {
+int OrderStoreMock::PersistOrder(const Order& order, std::string status,
+                                 int concluded_amount) {
   order_and_status_.emplace_back(std::make_pair(order, status));
-  order_id_to_order_[order.order_id()] = order;
-  order_id_to_status_[order.order_id()] = status;
-  order_id_to_concluded_amount_[order.order_id()] = concluded_amount;
+  order_id_to_order_[order.order_id] = order;
+  order_id_to_status_[order.order_id] = status;
+  order_id_to_concluded_amount_[order.order_id] = concluded_amount;
 
   return 0;
 }
 
-int OrderStoreMock::GetOrderByIndex(int index, match_engine_proto::Order& order,
+int OrderStoreMock::GetOrderByIndex(int index, Order& order,
                                     std::string& status) {
   if (index >= order_and_status_.size()) {
     return 1;
@@ -27,8 +27,7 @@ int OrderStoreMock::GetOrderByIndex(int index, match_engine_proto::Order& order,
   return 0;
 }
 
-int OrderStoreMock::GetOrderByOrderId(int id,
-                                      match_engine_proto::Order& order) {
+int OrderStoreMock::GetOrderByOrderId(int id, Order& order) {
   if (order_id_to_order_.find(id) != order_id_to_order_.end()) {
     order = order_id_to_order_[id];
   }

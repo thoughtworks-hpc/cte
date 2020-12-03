@@ -24,17 +24,17 @@ TEST(OrderManager, should_store_order_correctly_when_place_an_order) {
 
   order_manager.PlaceOrder(nullptr, &order, &reply);
 
-  match_engine_proto::Order order_stored;
+  Order order_stored;
   std::string status_stored;
   order_store->GetOrderByIndex(0, order_stored, status_stored);
 
-  EXPECT_EQ(order_stored.order_id(), 1);
-  EXPECT_EQ(order_stored.amount(), 7);
-  EXPECT_EQ(order_stored.user_id(), 6);
-  EXPECT_EQ(order_stored.price(), 27);
-  EXPECT_EQ(order_stored.symbol_id(), 1);
-  EXPECT_EQ(order_stored.trading_side(), order_manager_proto::TRADING_BUY);
-  auto submit_time = order_stored.submit_time();
+  EXPECT_EQ(order_stored.order_id, 1);
+  EXPECT_EQ(order_stored.amount, 7);
+  EXPECT_EQ(order_stored.user_id, 6);
+  EXPECT_EQ(order_stored.price, 27);
+  EXPECT_EQ(order_stored.symbol_id, 1);
+  EXPECT_EQ(order_stored.trading_side, OrderTradingSide::Buy);
+  auto submit_time = order_stored.submit_time;
   EXPECT_GT(submit_time, 0);
 }
 
@@ -52,17 +52,17 @@ TEST(OrderManager, should_auto_increment_order_id_when_place_orders) {
   order_manager.PlaceOrder(nullptr, &order2, &reply);
   order_manager.PlaceOrder(nullptr, &order3, &reply);
 
-  match_engine_proto::Order order_stored1;
-  match_engine_proto::Order order_stored2;
-  match_engine_proto::Order order_stored3;
+  Order order_stored1;
+  Order order_stored2;
+  Order order_stored3;
   std::string status_stored;
   order_store->GetOrderByIndex(0, order_stored1, status_stored);
   order_store->GetOrderByIndex(1, order_stored2, status_stored);
   order_store->GetOrderByIndex(2, order_stored3, status_stored);
 
-  EXPECT_EQ(order_stored1.order_id(), 1);
-  EXPECT_EQ(order_stored2.order_id(), 2);
-  EXPECT_EQ(order_stored3.order_id(), 3);
+  EXPECT_EQ(order_stored1.order_id, 1);
+  EXPECT_EQ(order_stored2.order_id, 2);
+  EXPECT_EQ(order_stored3.order_id, 3);
 }
 
 TEST(OrderManager, should_update_stored_order_status_when_receving_trade) {
