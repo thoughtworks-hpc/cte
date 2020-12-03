@@ -55,7 +55,17 @@ void RunServer(const std::string& order_manager_address,
     }
   }
 
-  auto order_store = std::make_shared<OrderStoreInfluxDB>(database_config);
+  influxdb_cpp::server_info si(database_config.db_address,
+                               database_config.db_port, database_config.db_name,
+                               database_config.db_user,
+                               database_config.db_password);
+  CDCF_LOGGER_INFO("{}, {}, {}, {}, {}", database_config.db_address,
+                   database_config.db_port, database_config.db_name,
+                   database_config.db_user, database_config.db_password);
+  database_interface::InfluxDB influxdb(si);
+
+  auto order_store =
+      std::make_shared<OrderStoreInfluxDB>(database_config, &influxdb);
 
   auto match_engine_stub =
       std::make_shared<MatchEngineStubGrpc>(main_channel, request_channels);
@@ -142,6 +152,8 @@ int main(int argc, char* argv[]) {
 
   if (result.count("db_name")) {
     database_config.db_name = result["db_name"].as<std::string>();
+  } else {
+    database_config.db_name = "order_manager";
   }
   if (result.count("db_measurement")) {
     database_config.db_measurement = result["db_measurement"].as<std::string>();
