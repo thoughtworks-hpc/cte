@@ -81,8 +81,10 @@ Order::Order(const std::map<int, int>& all_initial_prices,
     }
     i++;
   }
-  this->price_ = GenerateRandomNumber(static_cast<int>(0.9 * initial_price),
-                                      static_cast<int>(1.1 * initial_price));
+  //  this->price_ = GenerateRandomNumber(static_cast<int>(0.9 * initial_price),
+  //                                      static_cast<int>(1.1 *
+  //                                      initial_price));
+  this->price_ = initial_price;
   this->amount_ = GenerateRandomNumber(amount_min, amount_max);
   this->trading_side_ = GenerateRandomNumber(1, 2);
 }

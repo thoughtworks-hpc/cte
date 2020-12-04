@@ -39,6 +39,7 @@ class InfluxDB {
 
   bool write(entity& data_entity);
   bool flush_buffer();
+  int get_count() const;
 
  private:
   void thread_main();

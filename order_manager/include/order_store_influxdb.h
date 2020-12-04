@@ -26,6 +26,8 @@ class OrderStoreInfluxDB : public OrderStore {
   int PersistOrder(const Order& order, std::string status,
                    int concluded_amount) override;
 
+  int GetDbCount();
+
  private:
   std::string host_;
   int port_;

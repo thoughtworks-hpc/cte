@@ -7,7 +7,7 @@ add_executable(fake_match_engine src/fake_match_engine.cc src/fake_match_engine_
 target_link_libraries(${PROJECT_NAME} common common_grpc cdcf::cdcf)
 target_link_libraries(fake_match_engine common common_grpc)
 
-add_executable(${PROJECT_NAME}_test src/order_manager_test.cc src/order_manager.cc src/order_store_mock.cc src/match_engine_stub_fake.cc ../common/src/database_interface.cc)
+add_executable(${PROJECT_NAME}_test src/order_manager_test.cc src/order_manager.cc src/order_store_mock.cc src/match_engine_stub_fake.cc ../common/src/database_interface.cc src/order_store_influxdb.cc)
 find_package(GTest REQUIRED)
 target_link_libraries(${PROJECT_NAME}_test GTest::GTest common common_grpc cdcf::cdcf)
 enable_testing()

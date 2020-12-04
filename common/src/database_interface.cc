@@ -133,6 +133,8 @@ bool database_interface::InfluxDB::flush_buffer() {
   }
 }
 
+int database_interface::InfluxDB::get_count() const { return count; }
+
 database_interface::entity::entity(const std::string& measurement,
                                    const std::vector<data_pair>& tag,
                                    const std::vector<data_pair>& field,

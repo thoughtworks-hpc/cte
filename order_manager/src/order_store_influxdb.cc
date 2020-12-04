@@ -81,3 +81,5 @@ int OrderStoreInfluxDB::PersistOrder(const Order& order, std::string status,
     return -1;
   }
 }
+
+int OrderStoreInfluxDB::GetDbCount() { return influxdb_->get_count(); }
