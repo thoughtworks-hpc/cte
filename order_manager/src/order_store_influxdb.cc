@@ -74,16 +74,7 @@ int OrderStoreInfluxDB::PersistOrder(const Order& order, std::string status,
   field.emplace_back(database_interface::data_pair{
       "concluded amount", std::to_string(concluded_amount)});
 
-  using time_stamp = std::chrono::time_point<std::chrono::system_clock,
-                                             std::chrono::nanoseconds>;
-  time_stamp current_time_stamp =
-      std::chrono::time_point_cast<std::chrono::nanoseconds>(
-          std::chrono::system_clock::now());
-  int64_t nanoseconds_since_epoch =
-      current_time_stamp.time_since_epoch().count();
-
-  database_interface::entity payload{"order", tag, field,
-                                     nanoseconds_since_epoch};
+  database_interface::entity payload{"order", tag, field, order.submit_time};
   if (influxdb_->write(payload)) {
     return 0;
   } else {

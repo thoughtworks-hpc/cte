@@ -106,8 +106,7 @@ bool database_interface::InfluxDB::flush_buffer() {
             .field(field.Key, field.Value);
       }
     }
-    payload.timestamp(
-        std::chrono::high_resolution_clock::now().time_since_epoch().count());
+    payload.timestamp(buffer[i].timestamp);
     // CDCF_LOGGER_INFO("{}", payload.get_line());
   }
 
