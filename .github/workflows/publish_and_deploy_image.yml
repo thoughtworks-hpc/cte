@@ -21,8 +21,6 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
-        with:
-          ref: optimize_order_manager_memory_usage
 
       - name: Publish Docker
         uses: elgohr/Publish-Docker-Github-Action@2.21

@@ -11,7 +11,6 @@ database_interface::InfluxDB::InfluxDB(influxdb_cpp::server_info& si,
   CDCF_LOGGER_DEBUG("Initialize Database vector, reserve {} default size",
                     default_size);
   buffer.reserve(default_size);
-
   count = 0;
 
   if (enable_thread) {
@@ -32,9 +31,7 @@ database_interface::InfluxDB::~InfluxDB() {
 bool database_interface::InfluxDB::write(entity& data_entity) {
   if (enable_thread) {
     buffer_mutex.lock();
-
     buffer.emplace_back(data_entity);
-
     if (buffer.size() >= 10000) {
       flush_buffer();
     }
@@ -109,8 +106,7 @@ bool database_interface::InfluxDB::flush_buffer() {
             .field(field.Key, field.Value);
       }
     }
-    payload.timestamp(
-        std::chrono::high_resolution_clock::now().time_since_epoch().count());
+    payload.timestamp(buffer[i].timestamp);
     // CDCF_LOGGER_INFO("{}", payload.get_line());
   }
 
@@ -136,6 +132,8 @@ bool database_interface::InfluxDB::flush_buffer() {
     return false;
   }
 }
+
+int database_interface::InfluxDB::get_count() const { return count; }
 
 database_interface::entity::entity(const std::string& measurement,
                                    const std::vector<data_pair>& tag,

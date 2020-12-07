@@ -7,6 +7,7 @@
 
 #include <string>
 
+#include "../../common/include/database_interface.hpp"
 #include "./order_store.h"
 
 struct DatabaseConfig {
@@ -20,9 +21,12 @@ struct DatabaseConfig {
 
 class OrderStoreInfluxDB : public OrderStore {
  public:
-  explicit OrderStoreInfluxDB(const DatabaseConfig& config);
+  explicit OrderStoreInfluxDB(const DatabaseConfig& config,
+                              database_interface::InfluxDB* influxdb);
   int PersistOrder(const Order& order, std::string status,
                    int concluded_amount) override;
+
+  int GetDbCount();
 
  private:
   std::string host_;
@@ -31,6 +35,7 @@ class OrderStoreInfluxDB : public OrderStore {
   std::string measurement_ = "order";
   std::string user_ = "order_manager";
   std::string password_ = "order";
+  database_interface::InfluxDB* influxdb_;
 };
 
 #endif  // ORDER_MANAGER_INCLUDE_ORDER_STORE_INFLUXDB_H_

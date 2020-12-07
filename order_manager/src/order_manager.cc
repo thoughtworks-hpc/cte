@@ -9,6 +9,7 @@
 #include <utility>
 
 #include "../../common/include/influxdb.hpp"
+#include "../include/order_store_influxdb.h"
 
 OrderManagerService::OrderManagerService(
     std::shared_ptr<OrderStore> order_store,
@@ -358,5 +359,20 @@ void OrderManagerService::SetTestModeIsOpen(bool test_mode_is_open) {
 
   response->set_order_status_map_size(order_status_map_size);
 
+  return grpc::Status::OK;
+}
+
+::grpc::Status OrderManagerService::GetOrderManagerDBCount(
+    ::grpc::ServerContext *context, const ::google::protobuf::Empty *request,
+    ::order_manager_proto::RunningStatus *response) {
+  int64_t order_status_map_size = 0;
+
+  {
+    order_status_map_size =
+        std::dynamic_pointer_cast<OrderStoreInfluxDB>(order_store_)
+            ->GetDbCount();
+  }
+
+  response->set_order_status_map_size(order_status_map_size);
   return grpc::Status::OK;
 }

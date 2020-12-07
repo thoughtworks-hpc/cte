@@ -20,6 +20,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "../../common/include/database_interface.hpp"
 #include "../../common/protobuf_gen/match_engine.grpc.pb.h"
 #include "../../common/protobuf_gen/order_manager.grpc.pb.h"
 #include "./match_engine_stub.h"
@@ -44,6 +45,10 @@ class OrderManagerService final
       ::order_manager_proto::Reply* response) override;
 
   ::grpc::Status GetRunningStatus(
+      ::grpc::ServerContext* context, const ::google::protobuf::Empty* request,
+      ::order_manager_proto::RunningStatus* response) override;
+
+  ::grpc::Status GetOrderManagerDBCount(
       ::grpc::ServerContext* context, const ::google::protobuf::Empty* request,
       ::order_manager_proto::RunningStatus* response) override;
 

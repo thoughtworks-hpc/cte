@@ -11,6 +11,8 @@ service OrderManager {
     }
     rpc GetRunningStatus (google.protobuf.Empty) returns (RunningStatus) {
     }
+    rpc GetOrderManagerDBCount (google.protobuf.Empty) returns (RunningStatus) {
+    }
 }
 
 enum TradingSide {
